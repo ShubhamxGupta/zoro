@@ -26,7 +26,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Composite TypeScript Typecheck
-        run: npx tsc -b
+        run: npx tsc -b --force
 
   unit-and-integration-tests:
     name: Vitest Unit & Integration Tests (Coverage)
