@@ -1,14 +1,26 @@
 {
   "name": "@repo-intel/web",
-  "version": "0.0.0",
+  "version": "0.6.0",
   "private": true,
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc --build",
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
     "check-types": "tsc --noEmit",
-    "lint": "eslint src --ext .ts",
-    "clean": "rimraf dist *.tsbuildinfo"
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@repo-intel/shared": "*",
+    "lucide-react": "^0.368.0",
+    "next": "^14.2.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.4.5"
   }
 }

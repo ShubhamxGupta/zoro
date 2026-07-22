@@ -1,0 +1,132 @@
+/* Vanilla CSS Design Tokens - HSL & Hex Matrices */
+
+:root,
+:root[data-theme="dark"] {
+  /* Surfaces & Backgrounds */
+  --bg-base: #0b0d10;
+  --bg-surface: #12151a;
+  --bg-surface-elevated: #181c23;
+  --border-subtle: #1d232c;
+  --border-default: #242b35;
+  --border-strong: #364151;
+  --text-primary: #ededed;
+  --text-secondary: #9da4b0;
+  --text-muted: #636b78;
+
+  /* Accents */
+  --accent-primary: #3b82f6;
+  --accent-hover: #60a5fa;
+  --accent-subtle: rgba(59, 130, 246, 0.12);
+  --code-bg: #0e1116;
+
+  /* Severity States (Dark Mode) */
+  --sev-critical-text: #ff6b6b;
+  --sev-critical-bg: #3a1014;
+  --sev-critical-border: #842029;
+
+  --sev-high-text: #ffa94d;
+  --sev-high-bg: #341d09;
+  --sev-high-border: #7a4310;
+
+  --sev-medium-text: #fcc419;
+  --sev-medium-bg: #2d2605;
+  --sev-medium-border: #6b5b00;
+
+  --sev-low-text: #4dabf7;
+  --sev-low-bg: #0c2340;
+  --sev-low-border: #18497a;
+
+  --sev-info-text: #51cf66;
+  --sev-info-bg: #122019;
+  --sev-info-border: #1b4d2e;
+
+  --sev-resolved-text: #868e96;
+  --sev-resolved-bg: #1a1d20;
+
+  --sev-fix-text: #63e6be;
+  --sev-fix-bg: #0a251d;
+
+  /* Elevation Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 32px -4px rgba(0, 0, 0, 0.65);
+  --shadow-focus: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+:root[data-theme="light"] {
+  /* Surfaces & Backgrounds */
+  --bg-base: #f8f9fa;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #f1f3f5;
+  --border-subtle: #eceeef;
+  --border-default: #e2e4e9;
+  --border-strong: #cdd1d9;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+
+  /* Accents */
+  --accent-primary: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-subtle: rgba(37, 99, 235, 0.08);
+  --code-bg: #f3f4f6;
+
+  /* Severity States (Light Mode) */
+  --sev-critical-text: #c92a2a;
+  --sev-critical-bg: #fff5f5;
+  --sev-critical-border: #ffc9c9;
+
+  --sev-high-text: #d9480f;
+  --sev-high-bg: #fff4e6;
+  --sev-high-border: #ffd8a8;
+
+  --sev-medium-text: #e67700;
+  --sev-medium-bg: #fff9db;
+  --sev-medium-border: #ffec99;
+
+  --sev-low-text: #1864ab;
+  --sev-low-bg: #e7f5ff;
+  --sev-low-border: #a5d8ff;
+
+  --sev-info-text: #2b8a3e;
+  --sev-info-bg: #e6fcf5;
+  --sev-info-border: #96f2d7;
+
+  --sev-resolved-text: #495057;
+  --sev-resolved-bg: #f1f3f5;
+
+  --sev-fix-text: #0ca678;
+  --sev-fix-bg: #e6fcf5;
+
+  /* Elevation Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 12px 32px -4px rgba(0, 0, 0, 0.15);
+  --shadow-focus: 0 0 0 2px rgba(37, 99, 235, 0.4);
+}
+
+:root {
+  /* Spatial Grid System Tokens */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Border Radii */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* Motion Tokens */
+  --duration-fast: 100ms;
+  --duration-normal: 180ms;
+  --duration-slow: 250ms;
+  --ease-default: cubic-bezier(0.16, 1, 0.3, 1);
+}

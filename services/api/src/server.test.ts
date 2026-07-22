@@ -18,7 +18,7 @@ describe('Fastify REST API Gateway Skeleton', () => {
       const payload = response.json<HealthResponse>();
       assert.equal(payload.status, 'ok');
       assert.equal(typeof payload.uptime, 'number');
-      assert.equal(payload.version, '0.5.0');
+      assert.equal(payload.version, '0.6.0');
       assert.equal(typeof payload.timestamp, 'string');
       assert.ok(payload.environment);
       await app.close();

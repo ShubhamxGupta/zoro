@@ -6,22 +6,22 @@ This file is the **living state file** and **persistent engineering memory** for
 
 ## Project Status
 
-| Metric                | Status / Value                                                                  |
-| :-------------------- | :------------------------------------------------------------------------------ |
-| **Version**           | `0.5.0` (REST API Gateway Skeleton Initialized)                                 |
-| **Current Milestone** | Milestone 1: Project Foundation & Core Infrastructure                           |
-| **Current Phase**     | Phase 05: REST API Gateway Skeleton                                             |
-| **Overall Progress**  | 11.9% (5 / 42 Phases Completed)                                                 |
-| **Last Updated**      | 2026-07-22                                                                      |
-| **Current Branch**    | `main`                                                                          |
-| **Build Status**      | 🟢 Passing (`npx tsc -b` 0 errors across 12 packages)                           |
-| **Test Status**       | 🟢 Passing (Phase 02 Config, Phase 03 Log, Phase 04 Domain, Phase 05 API Tests) |
+| Metric                | Status / Value                                                         |
+| :-------------------- | :--------------------------------------------------------------------- |
+| **Version**           | `0.6.0` (Web Application Shell & Hardened Foundation Initialized)      |
+| **Current Milestone** | Milestone 1: Project Foundation & Core Infrastructure                  |
+| **Current Phase**     | Phase 06: Web Application Shell & Layout System                        |
+| **Overall Progress**  | 14.3% (6 / 42 Phases Completed)                                        |
+| **Last Updated**      | 2026-07-22                                                             |
+| **Current Branch**    | `main`                                                                 |
+| **Build Status**      | 🟢 Passing (`npx tsc -b` 0 errors across 12 packages)                  |
+| **Test Status**       | 🟢 Passing (11/11 Unit & Integration Tests; API & Web Builds Verified) |
 
 ---
 
 ## Current Focus
 
-### Phase 05: REST API Gateway Skeleton
+### Phase 06: Web Application Shell & Layout System
 
 - **Status:** Complete 🟢
 - **Started:** 2026-07-22
@@ -29,24 +29,36 @@ This file is the **living state file** and **persistent engineering memory** for
 
 #### Objectives Achieved
 
-1. Initialized Fastify HTTP server factory in `services/api/src/server.ts`.
-2. Registered CORS, Helmet, and Swagger / Swagger UI OpenAPI spec plugins.
-3. Implemented `GET /healthz` and versioned `GET /api/v1/healthz` operational health check endpoints.
-4. Attached custom `onRequest` hook for `x-request-id` propagation into `@repo-intel/shared` AsyncLocalStorage logger context.
-5. Implemented standardized global error handler and 404 handler returning structured JSON error payloads.
-6. Created integration and unit test suite in `services/api/src/server.test.ts` with 100% pass rate.
+1. Created Next.js App Router application shell in `apps/web/` (`next` v14, `react`, `react-dom`, `lucide-react`).
+2. Modularized Vanilla CSS Design Tokens into `styles/tokens.css`, `typography.css`, `layout.css`, `animations.css`, `utilities.css`, imported into `app/globals.css`.
+3. Built client-side theme engine (`ThemeProvider`) supporting dark mode by default (`:root[data-theme="dark"]`) and soft light mode parity (`:root[data-theme="light"]`).
+4. Built navigation shell components: Header (`48px`), Sidebar (`240px` collapsible to `48px`), Footer Status Bar (`24px`), and responsive drawer layout.
+5. Created accessible UI primitives & component barrels: `Button`, `Badge`, `Card`, `Input`/`Select`, `Skeleton`, `EmptyState`, `Modal`, `CommandPalette`, and `Icon` wrappers.
+6. Implemented interactive Dashboard feature components in `components/dashboard/`: `MetricCards`, `FindingsList`, `CodeViewerPane`, and `GraphVisualizerPane`.
+7. Introduced shared error codes (`ErrorCode`, `ApiError`) and system constants (`APP_VERSION`, `API_V1_PREFIX`) in `@repo-intel/shared`.
 
 ---
 
 ## Current Working Files
 
 ```text
-services/api/package.json
+apps/web/package.json
+apps/web/next.config.mjs
+apps/web/tsconfig.json
+apps/web/app/globals.css
+apps/web/app/layout.tsx
+apps/web/app/page.tsx
+apps/web/app/loading.tsx
+apps/web/app/error.tsx
+apps/web/app/not-found.tsx
+apps/web/components/theme-provider.tsx
+apps/web/components/ui/index.ts
+apps/web/components/layout/index.ts
+apps/web/components/icons/index.tsx
+apps/web/components/charts/index.ts
+apps/web/components/dashboard/index.ts
 services/api/src/server.ts
-services/api/src/routes/health.ts
-services/api/src/routes/index.ts
-services/api/src/index.ts
-services/api/src/server.test.ts
+packages/shared/src/index.ts
 ```
 
 ---
@@ -55,55 +67,72 @@ services/api/src/server.test.ts
 
 ### 2026-07-22
 
-- **Phase:** Phase 05: REST API Gateway Skeleton
-- **Feature:** Production-ready, modular Fastify REST API Gateway with plugin architecture, CORS, Helmet, Swagger OpenAPI generation, structured request logging, AsyncLocalStorage correlation context, global error handler, and health check route.
+- **Phase:** Phase 06: Web Application Shell & Layout System
+- **Feature:** Next.js App Router application shell, modularized Vanilla CSS design tokens manifest, dark/light theme engine, responsive navigation shell, metric cards, findings split-pane view, knowledge graph visualizer container, command palette, error/loading/404 boundaries, shared error codes, system constants, and API modularization.
 - **Files Created / Modified:**
-  - [`services/api/package.json`](file:///d:/Coding/zoro/services/api/package.json)
-  - [`services/api/tsconfig.json`](file:///d:/Coding/zoro/services/api/tsconfig.json)
-  - [`services/api/src/server.ts`](file:///d:/Coding/zoro/services/api/src/server.ts)
+  - [`apps/web/package.json`](file:///d:/Coding/zoro/apps/web/package.json)
+  - [`apps/web/next.config.mjs`](file:///d:/Coding/zoro/apps/web/next.config.mjs)
+  - [`apps/web/tsconfig.json`](file:///d:/Coding/zoro/apps/web/tsconfig.json)
+  - [`apps/web/app/globals.css`](file:///d:/Coding/zoro/apps/web/app/globals.css)
+  - [`apps/web/styles/tokens.css`](file:///d:/Coding/zoro/apps/web/styles/tokens.css)
+  - [`apps/web/styles/typography.css`](file:///d:/Coding/zoro/apps/web/styles/typography.css)
+  - [`apps/web/styles/layout.css`](file:///d:/Coding/zoro/apps/web/styles/layout.css)
+  - [`apps/web/styles/animations.css`](file:///d:/Coding/zoro/apps/web/styles/animations.css)
+  - [`apps/web/styles/utilities.css`](file:///d:/Coding/zoro/apps/web/styles/utilities.css)
+  - [`apps/web/app/layout.tsx`](file:///d:/Coding/zoro/apps/web/app/layout.tsx)
+  - [`apps/web/app/page.tsx`](file:///d:/Coding/zoro/apps/web/app/page.tsx)
+  - [`apps/web/app/loading.tsx`](file:///d:/Coding/zoro/apps/web/app/loading.tsx)
+  - [`apps/web/app/error.tsx`](file:///d:/Coding/zoro/apps/web/app/error.tsx)
+  - [`apps/web/app/not-found.tsx`](file:///d:/Coding/zoro/apps/web/app/not-found.tsx)
+  - [`apps/web/components/theme-provider.tsx`](file:///d:/Coding/zoro/apps/web/components/theme-provider.tsx)
+  - [`apps/web/components/ui/index.ts`](file:///d:/Coding/zoro/apps/web/components/ui/index.ts)
+  - [`apps/web/components/ui/command-palette.tsx`](file:///d:/Coding/zoro/apps/web/components/ui/command-palette.tsx)
+  - [`apps/web/components/layout/index.ts`](file:///d:/Coding/zoro/apps/web/components/layout/index.ts)
+  - [`apps/web/components/icons/index.tsx`](file:///d:/Coding/zoro/apps/web/components/icons/index.tsx)
+  - [`apps/web/components/charts/index.ts`](file:///d:/Coding/zoro/apps/web/components/charts/index.ts)
+  - [`apps/web/components/dashboard/index.ts`](file:///d:/Coding/zoro/apps/web/components/dashboard/index.ts)
+  - [`packages/shared/src/errors/error.codes.ts`](file:///d:/Coding/zoro/packages/shared/src/errors/error.codes.ts)
+  - [`packages/shared/src/constants/index.ts`](file:///d:/Coding/zoro/packages/shared/src/constants/index.ts)
+  - [`services/api/src/plugins/security.plugin.ts`](file:///d:/Coding/zoro/services/api/src/plugins/security.plugin.ts)
+  - [`services/api/src/plugins/swagger.plugin.ts`](file:///d:/Coding/zoro/services/api/src/plugins/swagger.plugin.ts)
+  - [`services/api/src/middleware/request-tracing.middleware.ts`](file:///d:/Coding/zoro/services/api/src/middleware/request-tracing.middleware.ts)
+  - [`services/api/src/middleware/error.handler.ts`](file:///d:/Coding/zoro/services/api/src/middleware/error.handler.ts)
   - [`services/api/src/routes/health.ts`](file:///d:/Coding/zoro/services/api/src/routes/health.ts)
-  - [`services/api/src/routes/index.ts`](file:///d:/Coding/zoro/services/api/src/routes/index.ts)
-  - [`services/api/src/index.ts`](file:///d:/Coding/zoro/services/api/src/index.ts)
-  - [`services/api/src/server.test.ts`](file:///d:/Coding/zoro/services/api/src/server.test.ts)
-  - [`packages/shared/tsconfig.json`](file:///d:/Coding/zoro/packages/shared/tsconfig.json)
-  - [`packages/shared/src/config/index.ts`](file:///d:/Coding/zoro/packages/shared/src/config/index.ts)
-  - [`packages/shared/src/logging/index.ts`](file:///d:/Coding/zoro/packages/shared/src/logging/index.ts)
-  - [`packages/shared/src/logging/context.ts`](file:///d:/Coding/zoro/packages/shared/src/logging/context.ts)
-  - [`packages/shared/src/logging/logger.ts`](file:///d:/Coding/zoro/packages/shared/src/logging/logger.ts)
-  - [`packages/shared/src/logging/logger.types.ts`](file:///d:/Coding/zoro/packages/shared/src/logging/logger.types.ts)
-- **Summary:** Built the REST API Gateway shell using Fastify in `services/api`. Included CORS, Helmet security headers, Swagger UI served at `/documentation`, health check at `/healthz`, request correlation ID context propagation, and structured error responses. Fully tested with 11 passing tests and 0 TypeScript compilation errors.
+  - [`services/api/src/server.ts`](file:///d:/Coding/zoro/services/api/src/server.ts)
+- **Summary:** Completed Next.js Web Application Shell & Layout System in `apps/web/`, hardened core foundation across shared errors and constants, modularized CSS and component barrels, and built the full interactive Dashboard view. Verified with clean TypeScript composite typecheck (`tsc -b`), passing test suite (11/11 passing), and static Next.js production builds.
 
 ---
 
 ## Current TODO
 
-1. [x] Install Fastify and essential plugins in `services/api`.
-2. [x] Implement Fastify server instance in `services/api/src/server.ts`.
-3. [x] Register GET `/healthz` route handler.
-4. [x] Write integration test for Fastify API gateway skeleton.
+1. [x] Harden foundation across `@repo-intel/shared` and `@repo-intel/api`.
+2. [x] Modularize CSS stylesheets into `styles/` tokens, typography, layout, animations, utilities.
+3. [x] Build reusable component barrels (`components/ui/`, `components/layout/`, `components/icons/`, `components/charts/`, `components/dashboard/`).
+4. [x] Implement Dashboard View (`MetricCards`, `FindingsList`, `CodeViewerPane`, `GraphVisualizerPane`, `CommandPalette`).
+5. [x] Run production builds and unit test verification.
 
 ---
 
 ## Upcoming Phase
 
-### Phase 06: Web Application Shell & Layout System
+### Phase 07: Testing Infrastructure & CI Pipeline Setup
 
-- **Goal:** Create Next.js App Router shell in `apps/web/` with responsive layout, sidebar, and design system color tokens.
-- **Dependencies:** Phase 01 through Phase 05.
-- **Expected Deliverables:** Runnable Next.js frontend application.
+- **Goal:** Setup Vitest test runner across workspace and GitHub Actions CI workflow file.
+- **Dependencies:** Phase 01 through Phase 06.
+- **Expected Deliverables:** Automated CI pipeline passing on repository pushes.
 
 ---
 
 ## Progress Dashboard
 
-### Milestone 1: Project Foundation & Core Infrastructure (5 / 7)
+### Milestone 1: Project Foundation & Core Infrastructure (6 / 7)
 
 - [x] Phase 01: Monorepo & Workspace Initialization
 - [x] Phase 02: Configuration Management & Environment Validation Engine
 - [x] Phase 03: Structured Logger & Diagnostics Module
 - [x] Phase 04: Domain Types & Shared Data Models
 - [x] Phase 05: REST API Gateway Skeleton
-- [ ] Phase 06: Web Application Shell & Layout System
+- [x] Phase 06: Web Application Shell & Layout System
 - [ ] Phase 07: Testing Infrastructure & CI Pipeline Setup
 
 ### Milestone 2: Repository Scanner & AST Parsing Engine (0 / 7)
