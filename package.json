@@ -1,0 +1,25 @@
+{
+  "name": "repo-intelligence-platform",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Enterprise-grade, graph-aware, multi-agent code analysis and repository intelligence platform",
+  "author": "Antigravity",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "pnpm --recursive run build",
+    "lint": "pnpm --recursive run lint",
+    "check-types": "pnpm --recursive run check-types",
+    "test": "pnpm --recursive run test",
+    "clean": "pnpm --recursive run clean"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "prettier": "^3.2.5",
+    "eslint": "^8.57.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

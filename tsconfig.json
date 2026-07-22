@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.base.json",
+  "files": [],
+  "references": [
+    { "path": "./packages/shared" },
+    { "path": "./packages/parser" },
+    { "path": "./packages/graph" },
+    { "path": "./packages/retrieval" },
+    { "path": "./packages/ai" },
+    { "path": "./packages/review-engine" },
+    { "path": "./packages/agents" },
+    { "path": "./packages/patch-gen" },
+    { "path": "./apps/web" },
+    { "path": "./apps/cli" },
+    { "path": "./apps/vscode" },
+    { "path": "./services/api" }
+  ]
+}
