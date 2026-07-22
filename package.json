@@ -29,14 +29,8 @@
     "prettier": "^3.2.5",
     "eslint": "^8.57.0"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "@swc/core"
-    ]
-  },
   "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=8.0.0"
+    "node": ">=22.0.0",
+    "pnpm": ">=11.0.0"
   }
 }
