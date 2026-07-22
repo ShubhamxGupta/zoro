@@ -3,3 +3,4 @@
  */
 
 export * from './scanner/index.js';
+export * from './language/index.js';
