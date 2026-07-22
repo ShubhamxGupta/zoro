@@ -1,6 +1,11 @@
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@repo-intel/shared': new URL('./packages/shared/src/index.ts', import.meta.url).pathname,
+    },
+  },
   test: {
     globals: true,
     environment: 'node',
