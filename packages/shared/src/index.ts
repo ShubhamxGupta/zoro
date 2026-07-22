@@ -9,3 +9,5 @@ export interface BaseEntity {
   createdAt: string;
   updatedAt: string;
 }
+
+export * from './config/index.js';
