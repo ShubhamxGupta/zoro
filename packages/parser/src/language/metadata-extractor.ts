@@ -35,7 +35,7 @@ export async function extractRepoMetadata(
   const rawStats: Map<LanguageId, { fileCount: number; totalBytes: number }> = new Map();
 
   for (const file of classified) {
-    categoryBreakdown[file.category]++;
+    categoryBreakdown[file.category] = (categoryBreakdown[file.category] ?? 0) + 1;
 
     if (file.category === 'source') totalSourceFiles++;
     if (file.category === 'test') totalTestFiles++;

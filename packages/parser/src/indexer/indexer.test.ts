@@ -38,7 +38,7 @@ describe('Repository State Store & Incremental Indexer Suite', () => {
     expect(snapshot.delta.added.length).toBeGreaterThan(0);
     expect(snapshot.delta.hasChanges).toBe(true);
     expect(snapshot.facts.primaryLanguage).toBe('typescript');
-    expect(snapshot.facts.frameworks.map((f) => f.name)).toContain('next');
+    expect(snapshot.facts.frameworks.map((f: { name: string }) => f.name)).toContain('next');
     expect(eventsTriggered).toContain('RepositoryOpened');
     expect(eventsTriggered).toContain('ScanCompleted');
 
