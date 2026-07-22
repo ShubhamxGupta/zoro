@@ -6,3 +6,4 @@ export * from './diff.types.js';
 export * from './language.types.js';
 export * from './facts.types.js';
 export * from './state.types.js';
+export * from './ast-domain.types.js';

@@ -111,9 +111,12 @@ export class IncrementalIndexer {
       facts: repoFacts,
       delta,
       statistics,
+      createdAt: new Date().toISOString(),
     };
 
     this.events.emit('ScanCompleted', { snapshot });
+    this.events.emit('RepositoryIndexed', { rootPath: absoluteRoot, totalFiles: classifiedFiles.length, durationMs: scanDurationMs });
+    this.events.emit('RepositoryCompleted', { snapshot, totalParseTimeMs: 0 });
 
     return snapshot;
   }

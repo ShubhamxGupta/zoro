@@ -8,11 +8,16 @@ export type SymbolKind =
   | 'function'
   | 'method'
   | 'variable'
+  | 'constant'
   | 'type_alias'
   | 'enum'
   | 'property'
   | 'import'
-  | 'export';
+  | 'export'
+  | 'annotation'
+  | 'comment'
+  | 'module'
+  | 'unknown';
 
 export interface Location {
   filePath: string;

@@ -6,22 +6,22 @@ This file is the **living state file** and **persistent engineering memory** for
 
 ### Project Status
 
-| Metric                | Status / Value                                                                  |
-| :-------------------- | :------------------------------------------------------------------------------ |
-| **Version**           | `0.10.0` (Repository State Store & Incremental Indexer Initialized)             |
-| **Current Milestone** | Milestone 2: Repository Scanner & AST Parsing Engine                            |
-| **Current Phase**     | Phase 10: Incremental Indexer & SHA-256 State Tracker                           |
-| **Overall Progress**  | 23.8% (10 / 42 Phases Completed)                                                |
-| **Last Updated**      | 2026-07-22                                                                      |
-| **Current Branch**    | `main`                                                                          |
-| **Build Status**      | 🟢 Passing (`npx tsc -b` 0 errors across 14 packages)                           |
-| **Test Status**       | 🟢 Passing (74 Vitest tests passing; V8 coverage verified; Playwright suite)   |
+| Metric                | Status / Value                                                                 |
+| :-------------------- | :----------------------------------------------------------------------------- |
+| **Version**           | `0.11.0` (Tree-Sitter Parser Abstraction Manager)                              |
+| **Current Milestone** | Milestone 2: Repository Scanner & AST Parsing Engine                           |
+| **Current Phase**     | Phase 11: Tree-Sitter Parser Abstraction Manager ✅                            |
+| **Overall Progress**  | 26.2% (11 / 42 Phases Completed)                                               |
+| **Last Updated**      | 2026-07-22                                                                     |
+| **Current Branch**    | `main`                                                                         |
+| **Build Status**      | 🟢 Passing (`npx tsc -b` 0 errors across 14 packages)                          |
+| **Test Status**       | 🟢 Passing (108/108 Vitest tests; 16 new Phase 11 tests; V8 coverage verified) |
 
 ---
 
 ## Current Focus
 
-### Phase 10: Incremental Indexer & SHA-256 State Tracker
+### Phase 11: Tree-Sitter Parser Abstraction Manager
 
 - **Status:** Complete 🟢
 - **Started:** 2026-07-22
@@ -29,32 +29,69 @@ This file is the **living state file** and **persistent engineering memory** for
 
 #### Objectives Achieved
 
-1. Refactored Phase 09 with data-driven language manifest ([`languages.data.ts`](file:///d:/Coding/zoro/packages/parser/src/language/resources/languages.data.ts)), modular framework detectors ([`framework-detectors/`](file:///d:/Coding/zoro/packages/parser/src/language/framework-detectors/)) with confidence scoring, shared `RepositoryFacts` domain model, and language plugin interface contracts ([`languages/`](file:///d:/Coding/zoro/packages/parser/src/languages/)).
-2. Implemented versioned `RepositoryState` schema and `RepositoryStateStore` interface abstraction with `JsonRepositoryStateStore` backend ([`json-state-store.ts`](file:///d:/Coding/zoro/packages/parser/src/indexer/json-state-store.ts)) saving `.repo-intel-cache.json`.
-3. Built `DeltaEngine` ([`delta-engine.ts`](file:///d:/Coding/zoro/packages/parser/src/indexer/delta-engine.ts)) with metadata size/mtime hash short-circuiting ($0$ SHA-256 operations on unchanged files).
-4. Implemented `ScannerEventEmitter` ([`events.ts`](file:///d:/Coding/zoro/packages/parser/src/indexer/events.ts)) emitting lifecycle events (`RepositoryOpened`, `FileAdded`, `FileModified`, `FileDeleted`, `ScanCompleted`).
-5. Built `IncrementalIndexer` ([`incremental-indexer.ts`](file:///d:/Coding/zoro/packages/parser/src/indexer/incremental-indexer.ts)) returning rich `RepositorySnapshot` instances.
-6. Authored Vitest unit tests ([`indexer.test.ts`](file:///d:/Coding/zoro/packages/parser/src/indexer/indexer.test.ts)) and benchmark scaffolding ([`indexer.bench.ts`](file:///d:/Coding/zoro/packages/parser/src/indexer/indexer.bench.ts)).
-7. Documented **ADR-020: Repository State Store & Incremental Hash Short-Circuit Strategy** in [`decisions.md`](file:///d:/Coding/zoro/decisions.md).
+1. **Phase 10 Improvements:**
+   - Hardened `RepositoryState`, `DeltaResult`, and `RepositorySnapshot` with full `readonly` modifiers.
+   - Added `DeltaSummaryStatistics` to `DeltaResult` exposing `addedCount`, `modifiedCount`, `deletedCount`, `totalChangedFiles`.
+   - Added `createdAt: string` to `RepositorySnapshot` for snapshot immutability tracking.
+   - Expanded `ScannerEventEmitter` with 5 new events: `FileQueued`, `FileParsingStarted`, `FileParsingCompleted`, `ParseFailed`, `RepositoryIndexed`, `RepositoryCompleted`.
+   - Extended `LanguagePlugin` interface with `capabilities`, `queryDirectory`, `grammarId`, and `normalize`/`createParser` stubs.
+
+2. **AST Domain Layer** (`packages/shared/src/types/ast-domain.types.ts`):
+   - `ASTRange`, `ASTNode`, `ASTTree`, `ASTCursor`, `ASTVisitor<T>`, `ASTQuery`, `ASTQueryMatch`, `ASTQueryCapture`.
+   - `NormalizedSymbol`, `ParseDiagnostic`, `ParseResult<T>` normalized symbol types.
+   - `SymbolKind` extended in `ast.types.ts` with `constant`, `annotation`, `comment`, `module`, `unknown`.
+
+3. **Grammar Registry** (`packages/parser/src/treesitter/grammar-registry.ts`):
+   - `GrammarEntry` with id, languageId, WASM path, version, capabilities, isLoaded flag.
+   - `GrammarRegistry` class with register/get/getByLanguageId/markLoaded/listRegistered/clear.
+   - `createDefaultGrammarRegistry()` factory pre-populating 6 core language grammars.
+
+4. **Parser Pool** (`packages/parser/src/treesitter/parser-pool.ts`):
+   - Generic `ParserPool<T extends Poolable>` with acquire/release/disposeAll/idleCount/activeCount.
+   - Idle timeout eviction, overflow handling, factory-based instance creation.
+
+5. **TreeSitterManager** (`packages/parser/src/treesitter/tree-sitter-manager.ts`):
+   - Central manager coordinating grammar registry and parser pool.
+   - Async `parse(source, languageId): Promise<ASTTree>` via placeholder binding (Phase 12+ for real WASM).
+   - `initialize()`, `supportsLanguage()`, `getPoolStats()`, `dispose()` lifecycle API.
+
+6. **AST Normalizer** (`packages/parser/src/treesitter/ast-normalizer.ts`):
+   - `normalizeTree(tree, languageId): NormalizedSymbol[]` interface-level implementation.
+   - Node type → SymbolKind inference mapping.
+
+7. **Query Infrastructure** (`packages/parser/queries/`):
+   - Documented S-expression placeholder queries for TypeScript, Python, Go, Java, Rust.
+
+8. **Tests & Benchmarks:**
+   - `treesitter.test.ts` — 16 unit tests covering GrammarRegistry, ParserPool, TreeSitterManager, and AST normalizer.
+   - `treesitter.bench.ts` — Benchmark scaffolding: parser creation vs. pool reuse, parse throughput.
+
+9. **Documentation:**
+   - Added ADR-018 through ADR-021 to `decisions.md`.
+   - Updated `phases.md` Phase 11 status to Complete.
 
 ---
 
 ## Current Working Files
 
 ```text
-packages/shared/src/types/facts.types.ts
+packages/shared/src/types/ast-domain.types.ts
+packages/shared/src/types/ast.types.ts
 packages/shared/src/types/state.types.ts
-packages/parser/src/language/resources/languages.data.ts
-packages/parser/src/language/framework-detectors/
-packages/parser/src/languages/
-packages/parser/src/indexer/state-store.interface.ts
-packages/parser/src/indexer/json-state-store.ts
-packages/parser/src/indexer/delta-engine.ts
-packages/parser/src/indexer/facts-extractor.ts
+packages/parser/src/treesitter/grammar-registry.ts
+packages/parser/src/treesitter/parser-pool.ts
+packages/parser/src/treesitter/tree-sitter-manager.ts
+packages/parser/src/treesitter/ast-normalizer.ts
+packages/parser/src/treesitter/treesitter.test.ts
+packages/parser/src/treesitter/treesitter.bench.ts
+packages/parser/src/treesitter/index.ts
+packages/parser/queries/typescript/symbols.scm
+packages/parser/queries/python/symbols.scm
+packages/parser/queries/go/symbols.scm
+packages/parser/queries/java/symbols.scm
+packages/parser/queries/rust/symbols.scm
 packages/parser/src/indexer/events.ts
-packages/parser/src/indexer/incremental-indexer.ts
-packages/parser/src/indexer/indexer.test.ts
-packages/parser/src/indexer/indexer.bench.ts
+packages/parser/src/languages/plugin.interface.ts
 memory.md
 phases.md
 decisions.md

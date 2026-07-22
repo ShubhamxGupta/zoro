@@ -31,6 +31,10 @@ The **Repository Intelligence & Code Review Platform** is an enterprise-grade, g
 | **ADR-015** | Docker Packaging Strategy for Local & Cloud Deployments | Accepted | 2026-07-22 |
 | **ADR-016** | GitHub Actions for CI Pipeline Gate Enforcement         | Accepted | 2026-07-22 |
 | **ADR-017** | 4-Tier Unidirectionally Layered Monorepo Architecture   | Accepted | 2026-07-22 |
+| **ADR-018** | Data-Driven Language Registry Architecture              | Accepted | 2026-07-22 |
+| **ADR-019** | Repository Scanner Event-Driven Architecture            | Accepted | 2026-07-22 |
+| **ADR-020** | JSON File-Based Repository State Store Strategy         | Accepted | 2026-07-22 |
+| **ADR-021** | Tree-Sitter Abstraction & Parser Pooling Strategy       | Accepted | 2026-07-22 |
 
 ---
 
@@ -612,6 +616,99 @@ Reserved slots for future architectural decision records:
 - **ADR-025:** Repository Memory & Ignored Findings Vector Persistence
 - ...
 - **ADR-100:** Enterprise Self-Hosted Air-Gapped Packaging Specification
+
+---
+
+### ADR-018: Data-Driven Language Registry Architecture
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+Phase 09 introduced a language classification system. Early prototypes hard-coded language extension mappings directly in TypeScript. As the number of supported languages grew, this became difficult to maintain and extend.
+
+#### Decision
+
+Language definitions are extracted into a `languages.data.ts` resource file using a structured `LanguageDefinition` interface. Framework detectors are modular classes implementing a `FrameworkDetector` interface. A `LanguageRegistry` class wraps the data for runtime lookup.
+
+#### Consequences
+
+- Adding new languages requires editing only the data file, not logic code.
+- Framework detection is composable and testable in isolation.
+- Language plugin contracts are consistent across all languages.
+
+---
+
+### ADR-019: Repository Scanner Event-Driven Architecture
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+The incremental indexer and scanner need to report progress and lifecycle events to higher-level consumers (API, UI, tests). A polling model would couple consumers to internals.
+
+#### Decision
+
+A strongly typed `ScannerEventEmitter` class publishes a discriminated union of event types with typed payloads. Consumer code subscribes via `on(eventType, listener)`. Event types cover the full lifecycle: `RepositoryOpened`, `RepositoryScanned`, `FileAdded`, `FileModified`, `FileDeleted`, `FileIgnored`, `FileParsingStarted`, `FileParsingCompleted`, `ParseFailed`, `ScanCompleted`, `RepositoryIndexed`, `RepositoryCompleted`, `ScanCancelled`.
+
+#### Consequences
+
+- Decouples scanner internals from consumers.
+- Events are type-safe at compile time.
+- Subscriber errors are caught to avoid crashing the scanner loop.
+
+---
+
+### ADR-020: JSON File-Based Repository State Store Strategy
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+The incremental indexer needs persistent state across runs to support delta computation and hash short-circuit optimization. The solution must be simple, portable, and not introduce a database dependency in Phase 10.
+
+#### Decision
+
+`JsonRepositoryStateStore` saves `RepositoryState` as a `.repo-intel-cache.json` file inside the repository root using atomic rename (write-then-move) to prevent corruption on crash. Nodes requiring `node:sqlite` are avoided to maintain Node.js v20 compatibility.
+
+#### Consequences
+
+- Zero external database dependency for state caching.
+- Atomic writes prevent partial state corruption.
+- The interface (`RepositoryStateStore`) allows swapping to SQLite or embedded DB in future phases.
+
+---
+
+### ADR-021: Tree-Sitter Abstraction & Parser Pooling Strategy
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+Phase 11 introduces the Tree-Sitter Parser Abstraction Manager. The goal is to provide a production-ready parsing infrastructure layer without exposing raw Tree-Sitter API types to higher-level packages.
+
+#### Decision
+
+Four design choices were made:
+
+1. **AST Domain Layer in `@repo-intel/shared`:** All packages consume `ASTNode`, `ASTTree`, `ASTCursor`, `ASTVisitor`, `ASTQuery`, and `NormalizedSymbol` domain types. Raw Tree-Sitter nodes must never cross package boundaries.
+
+2. **Grammar Registry (`GrammarRegistry`):** Maintains grammar metadata (id, languageId, WASM path placeholder, version, capabilities) independently from language plugins. This allows grammar loading to evolve without touching plugin definitions.
+
+3. **Generic Parser Pool (`ParserPool<T>`):** A reusable object pool with `acquire()`/`release()` semantics, `maxSize` limit, and idle timeout eviction. Avoids repeated expensive Tree-Sitter parser instance creation.
+
+4. **Placeholder Binding First:** Phase 11 builds the full abstraction without wiring actual WASM/native binaries. Actual grammar loading is deferred to Phase 12 when the first symbol extractor (TypeScript) validates the grammar binary in CI.
+
+#### Consequences
+
+- Higher-level packages are fully decoupled from Tree-Sitter internals.
+- The parser pool enables concurrent parsing without re-initialization overhead.
+- Grammar registry supports future hot-swap of grammars without restarts.
+- Placeholder binding keeps CI green across all platforms before C++ compilation requirements are introduced.
 
 ---
 
