@@ -6,22 +6,22 @@ This file is the **living state file** and **persistent engineering memory** for
 
 ## Project Status
 
-| Metric                | Status / Value                                             |
-| :-------------------- | :--------------------------------------------------------- |
-| **Version**           | `0.3.0` (Structured Logging Subsystem Initialized)         |
-| **Current Milestone** | Milestone 1: Project Foundation & Core Infrastructure      |
-| **Current Phase**     | Phase 04: Shared Domain Models & Type Definitions          |
-| **Overall Progress**  | 7.1% (3 / 42 Phases Completed)                             |
-| **Last Updated**      | 2026-07-22                                                 |
-| **Current Branch**    | `main`                                                     |
-| **Build Status**      | 🟢 Passing (`npx tsc -b` 0 errors across 12 packages)      |
-| **Test Status**       | 🟢 Passing (Phase 02 Config & Phase 03 Logging Unit Tests) |
+| Metric                | Status / Value                                                    |
+| :-------------------- | :---------------------------------------------------------------- |
+| **Version**           | `0.4.0` (Shared Domain Models Initialized)                        |
+| **Current Milestone** | Milestone 1: Project Foundation & Core Infrastructure             |
+| **Current Phase**     | Phase 05: REST API Gateway Skeleton                               |
+| **Overall Progress**  | 9.5% (4 / 42 Phases Completed)                                    |
+| **Last Updated**      | 2026-07-22                                                        |
+| **Current Branch**    | `main`                                                            |
+| **Build Status**      | 🟢 Passing (`npx tsc -b` 0 errors across 12 packages)             |
+| **Test Status**       | 🟢 Passing (Phase 02 Config, Phase 03 Log, Phase 04 Domain Tests) |
 
 ---
 
 ## Current Focus
 
-### Phase 04: Shared Domain Models & Type Definitions
+### Phase 05: REST API Gateway Skeleton
 
 - **Status:** In Progress (Ready to Execute)
 - **Started:** 2026-07-22
@@ -29,20 +29,20 @@ This file is the **living state file** and **persistent engineering memory** for
 
 #### Immediate Objectives
 
-1. Create `packages/shared/src/types/ast.types.ts` for Tree-Sitter AST symbol schemas (`SymbolNode`, `FileNode`, `ImportStatement`).
-2. Create `packages/shared/src/types/graph.types.ts` for Knowledge Graph schemas (`GraphNode`, `GraphEdge`, `CallGraphEntry`).
-3. Create `packages/shared/src/types/finding.types.ts` for `ExplainableFinding` JSON schema matching Section 8.2 of PRD.
-4. Export all domain schemas from `@repo-intel/shared`.
+1. Create Fastify HTTP server skeleton in `services/api/src/server.ts`.
+2. Register CORS, Helmet, and Swagger OpenAPI document generator plugins.
+3. Add health check endpoint (`GET /healthz`) returning system health and uptime status.
+4. Add global error handler middleware integrating `@repo-intel/shared` logger and schema validation error responses.
 
 ---
 
 ## Current Working Files
 
 ```text
-packages/shared/src/types/ast.types.ts
-packages/shared/src/types/graph.types.ts
-packages/shared/src/types/finding.types.ts
-packages/shared/src/index.ts
+services/api/package.json
+services/api/src/server.ts
+services/api/src/routes/health.ts
+services/api/src/index.ts
 ```
 
 ---
@@ -50,6 +50,19 @@ packages/shared/src/index.ts
 ## Recently Completed
 
 ### 2026-07-22
+
+- **Phase:** Phase 04: Shared Domain Models & Type Definitions
+- **Feature:** Standardized domain interfaces for AST symbols, RKG Knowledge Graph, Explainable Findings, Risk Scores, PAL Provider Adapters, and Git Diff Payloads
+- **Files Created / Modified:**
+  - [`packages/shared/src/types/ast.types.ts`](file:///d:/Coding/zoro/packages/shared/src/types/ast.types.ts)
+  - [`packages/shared/src/types/graph.types.ts`](file:///d:/Coding/zoro/packages/shared/src/types/graph.types.ts)
+  - [`packages/shared/src/types/finding.types.ts`](file:///d:/Coding/zoro/packages/shared/src/types/finding.types.ts)
+  - [`packages/shared/src/types/pal.types.ts`](file:///d:/Coding/zoro/packages/shared/src/types/pal.types.ts)
+  - [`packages/shared/src/types/diff.types.ts`](file:///d:/Coding/zoro/packages/shared/src/types/diff.types.ts)
+  - [`packages/shared/src/types/domain.test.ts`](file:///d:/Coding/zoro/packages/shared/src/types/domain.test.ts)
+  - [`packages/shared/src/types/index.ts`](file:///d:/Coding/zoro/packages/shared/src/types/index.ts)
+  - [`packages/shared/src/index.ts`](file:///d:/Coding/zoro/packages/shared/src/index.ts)
+- **Summary:** Defined centralized TypeScript domain interfaces for `SymbolNode`, `FileNode`, `GraphNode`, `GraphEdge`, `ExplainableFinding`, `RiskScore`, `ProviderAdapter`, `CompletionRequest`, `CompletionResponse`, and `GitDiffPayload`. Verified with clean TypeScript typecheck and domain unit tests.
 
 - **Phase:** Phase 03: Structured Logging & Telemetry Subsystem
 - **Feature:** Structured JSON logger with AsyncLocalStorage context propagation & automatic secret redaction
@@ -63,46 +76,35 @@ packages/shared/src/index.ts
   - [`packages/shared/src/index.ts`](file:///d:/Coding/zoro/packages/shared/src/index.ts)
 - **Summary:** Implemented structured JSON logger supporting log severity levels (`fatal`, `error`, `warn`, `info`, `debug`, `trace`), correlation tracing context via Node `AsyncLocalStorage`, automatic credential/token masking (`[REDACTED]`), and child logger context binding. Verified with passing unit tests.
 
-- **Phase:** Phase 02: Configuration Management & Environment Validation Engine
-- **Feature:** Schema-validated configuration loader with dotenv integration & fallback defaults
-- **Files Created / Modified:**
-  - [`packages/shared/package.json`](file:///d:/Coding/zoro/packages/shared/package.json)
-  - [`packages/shared/src/config/env.schema.ts`](file:///d:/Coding/zoro/packages/shared/src/config/env.schema.ts)
-  - [`packages/shared/src/config/config.loader.ts`](file:///d:/Coding/zoro/packages/shared/src/config/config.loader.ts)
-  - [`packages/shared/src/config/config.test.ts`](file:///d:/Coding/zoro/packages/shared/src/config/config.test.ts)
-  - [`packages/shared/src/config/index.ts`](file:///d:/Coding/zoro/packages/shared/src/config/index.ts)
-  - [`packages/shared/src/index.ts`](file:///d:/Coding/zoro/packages/shared/src/index.ts)
-- **Summary:** Built Zod schema validation for runtime environment variables (`NODE_ENV`, `PORT`, `LOG_LEVEL`, `KUZU_DB_PATH`, `LANCE_DB_PATH`, provider keys), custom `ConfigValidationError` throwing structured error reports, and exported frozen `AppConfig` loader. Verified with passing unit tests.
-
 ---
 
 ## Current TODO
 
-1. [ ] Create AST symbol domain model schemas in `@repo-intel/shared`.
-2. [ ] Create Knowledge Graph node & edge schema definitions in `@repo-intel/shared`.
-3. [ ] Create PRD Section 8.2 compliant `ExplainableFinding` interface and type definitions.
-4. [ ] Write unit tests verifying schema definitions and type exports.
+1. [ ] Install Fastify and essential plugins in `services/api`.
+2. [ ] Implement Fastify server instance in `services/api/src/server.ts`.
+3. [ ] Register GET `/healthz` route handler.
+4. [ ] Write integration test for Fastify API gateway skeleton.
 
 ---
 
 ## Upcoming Phase
 
-### Phase 05: REST API Gateway Skeleton
+### Phase 06: Web Application Shell & Layout System
 
-- **Goal:** Build Express/Fastify API server with route handlers, CORS, request validation, and error middleware in `services/api/`.
-- **Dependencies:** Phase 01 through Phase 04.
-- **Expected Deliverables:** Runnable REST API Gateway service listening on configured port.
+- **Goal:** Create Next.js App Router shell in `apps/web/` with responsive layout, sidebar, and design system color tokens.
+- **Dependencies:** Phase 01 through Phase 05.
+- **Expected Deliverables:** Runnable Next.js frontend application.
 
 ---
 
 ## Progress Dashboard
 
-### Milestone 1: Project Foundation & Core Infrastructure (3 / 7)
+### Milestone 1: Project Foundation & Core Infrastructure (4 / 7)
 
 - [x] Phase 01: Monorepo & Workspace Initialization
 - [x] Phase 02: Configuration Management & Environment Validation Engine
 - [x] Phase 03: Structured Logger & Diagnostics Module
-- [ ] Phase 04: Domain Types & Shared Data Models
+- [x] Phase 04: Domain Types & Shared Data ModelsModels
 - [ ] Phase 05: REST API Gateway Skeleton
 - [ ] Phase 06: Web Application Shell & Layout System
 - [ ] Phase 07: Testing Infrastructure & CI Pipeline Setup
