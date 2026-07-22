@@ -4,10 +4,22 @@ declare namespace NodeJS {
   }
   interface Process {
     env: ProcessEnv;
+    stdout: {
+      write(str: string): boolean;
+    };
   }
 }
 
 declare const process: NodeJS.Process;
+
+declare module 'async_hooks' {
+  export class AsyncLocalStorage<T> {
+    disable(): void;
+    getStore(): T | undefined;
+    run<R>(store: T, callback: (...args: any[]) => R, ...args: any[]): R;
+    enterWith(store: T): void;
+  }
+}
 
 declare module 'dotenv' {
   export interface DotenvConfigOptions {

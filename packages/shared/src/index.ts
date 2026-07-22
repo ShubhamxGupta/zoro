@@ -11,3 +11,4 @@ export interface BaseEntity {
 }
 
 export * from './config/index.js';
+export * from './logging/index.js';
