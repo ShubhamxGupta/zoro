@@ -10,6 +10,10 @@ export class LogContextManager {
     return contextStorage.run(mergedContext, fn);
   }
 
+  public static run<T>(context: LogContext, fn: () => T): T {
+    return LogContextManager.runWithContext(context, fn);
+  }
+
   public static getContext(): LogContext {
     return contextStorage.getStore() ?? {};
   }

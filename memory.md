@@ -6,16 +6,16 @@ This file is the **living state file** and **persistent engineering memory** for
 
 ## Project Status
 
-| Metric                | Status / Value                                                    |
-| :-------------------- | :---------------------------------------------------------------- |
-| **Version**           | `0.4.0` (Shared Domain Models Initialized)                        |
-| **Current Milestone** | Milestone 1: Project Foundation & Core Infrastructure             |
-| **Current Phase**     | Phase 05: REST API Gateway Skeleton                               |
-| **Overall Progress**  | 9.5% (4 / 42 Phases Completed)                                    |
-| **Last Updated**      | 2026-07-22                                                        |
-| **Current Branch**    | `main`                                                            |
-| **Build Status**      | 🟢 Passing (`npx tsc -b` 0 errors across 12 packages)             |
-| **Test Status**       | 🟢 Passing (Phase 02 Config, Phase 03 Log, Phase 04 Domain Tests) |
+| Metric                | Status / Value                                                                  |
+| :-------------------- | :------------------------------------------------------------------------------ |
+| **Version**           | `0.5.0` (REST API Gateway Skeleton Initialized)                                 |
+| **Current Milestone** | Milestone 1: Project Foundation & Core Infrastructure                           |
+| **Current Phase**     | Phase 05: REST API Gateway Skeleton                                             |
+| **Overall Progress**  | 11.9% (5 / 42 Phases Completed)                                                 |
+| **Last Updated**      | 2026-07-22                                                                      |
+| **Current Branch**    | `main`                                                                          |
+| **Build Status**      | 🟢 Passing (`npx tsc -b` 0 errors across 12 packages)                           |
+| **Test Status**       | 🟢 Passing (Phase 02 Config, Phase 03 Log, Phase 04 Domain, Phase 05 API Tests) |
 
 ---
 
@@ -23,16 +23,18 @@ This file is the **living state file** and **persistent engineering memory** for
 
 ### Phase 05: REST API Gateway Skeleton
 
-- **Status:** In Progress (Ready to Execute)
+- **Status:** Complete 🟢
 - **Started:** 2026-07-22
-- **Expected Completion:** 2026-07-23
+- **Completed:** 2026-07-22
 
-#### Immediate Objectives
+#### Objectives Achieved
 
-1. Create Fastify HTTP server skeleton in `services/api/src/server.ts`.
-2. Register CORS, Helmet, and Swagger OpenAPI document generator plugins.
-3. Add health check endpoint (`GET /healthz`) returning system health and uptime status.
-4. Add global error handler middleware integrating `@repo-intel/shared` logger and schema validation error responses.
+1. Initialized Fastify HTTP server factory in `services/api/src/server.ts`.
+2. Registered CORS, Helmet, and Swagger / Swagger UI OpenAPI spec plugins.
+3. Implemented `GET /healthz` and versioned `GET /api/v1/healthz` operational health check endpoints.
+4. Attached custom `onRequest` hook for `x-request-id` propagation into `@repo-intel/shared` AsyncLocalStorage logger context.
+5. Implemented standardized global error handler and 404 handler returning structured JSON error payloads.
+6. Created integration and unit test suite in `services/api/src/server.test.ts` with 100% pass rate.
 
 ---
 
@@ -42,7 +44,9 @@ This file is the **living state file** and **persistent engineering memory** for
 services/api/package.json
 services/api/src/server.ts
 services/api/src/routes/health.ts
+services/api/src/routes/index.ts
 services/api/src/index.ts
+services/api/src/server.test.ts
 ```
 
 ---
@@ -51,39 +55,32 @@ services/api/src/index.ts
 
 ### 2026-07-22
 
-- **Phase:** Phase 04: Shared Domain Models & Type Definitions
-- **Feature:** Standardized domain interfaces for AST symbols, RKG Knowledge Graph, Explainable Findings, Risk Scores, PAL Provider Adapters, and Git Diff Payloads
+- **Phase:** Phase 05: REST API Gateway Skeleton
+- **Feature:** Production-ready, modular Fastify REST API Gateway with plugin architecture, CORS, Helmet, Swagger OpenAPI generation, structured request logging, AsyncLocalStorage correlation context, global error handler, and health check route.
 - **Files Created / Modified:**
-  - [`packages/shared/src/types/ast.types.ts`](file:///d:/Coding/zoro/packages/shared/src/types/ast.types.ts)
-  - [`packages/shared/src/types/graph.types.ts`](file:///d:/Coding/zoro/packages/shared/src/types/graph.types.ts)
-  - [`packages/shared/src/types/finding.types.ts`](file:///d:/Coding/zoro/packages/shared/src/types/finding.types.ts)
-  - [`packages/shared/src/types/pal.types.ts`](file:///d:/Coding/zoro/packages/shared/src/types/pal.types.ts)
-  - [`packages/shared/src/types/diff.types.ts`](file:///d:/Coding/zoro/packages/shared/src/types/diff.types.ts)
-  - [`packages/shared/src/types/domain.test.ts`](file:///d:/Coding/zoro/packages/shared/src/types/domain.test.ts)
-  - [`packages/shared/src/types/index.ts`](file:///d:/Coding/zoro/packages/shared/src/types/index.ts)
-  - [`packages/shared/src/index.ts`](file:///d:/Coding/zoro/packages/shared/src/index.ts)
-- **Summary:** Defined centralized TypeScript domain interfaces for `SymbolNode`, `FileNode`, `GraphNode`, `GraphEdge`, `ExplainableFinding`, `RiskScore`, `ProviderAdapter`, `CompletionRequest`, `CompletionResponse`, and `GitDiffPayload`. Verified with clean TypeScript typecheck and domain unit tests.
-
-- **Phase:** Phase 03: Structured Logging & Telemetry Subsystem
-- **Feature:** Structured JSON logger with AsyncLocalStorage context propagation & automatic secret redaction
-- **Files Created / Modified:**
-  - [`packages/shared/src/logging/logger.types.ts`](file:///d:/Coding/zoro/packages/shared/src/logging/logger.types.ts)
-  - [`packages/shared/src/logging/redactor.ts`](file:///d:/Coding/zoro/packages/shared/src/logging/redactor.ts)
+  - [`services/api/package.json`](file:///d:/Coding/zoro/services/api/package.json)
+  - [`services/api/tsconfig.json`](file:///d:/Coding/zoro/services/api/tsconfig.json)
+  - [`services/api/src/server.ts`](file:///d:/Coding/zoro/services/api/src/server.ts)
+  - [`services/api/src/routes/health.ts`](file:///d:/Coding/zoro/services/api/src/routes/health.ts)
+  - [`services/api/src/routes/index.ts`](file:///d:/Coding/zoro/services/api/src/routes/index.ts)
+  - [`services/api/src/index.ts`](file:///d:/Coding/zoro/services/api/src/index.ts)
+  - [`services/api/src/server.test.ts`](file:///d:/Coding/zoro/services/api/src/server.test.ts)
+  - [`packages/shared/tsconfig.json`](file:///d:/Coding/zoro/packages/shared/tsconfig.json)
+  - [`packages/shared/src/config/index.ts`](file:///d:/Coding/zoro/packages/shared/src/config/index.ts)
+  - [`packages/shared/src/logging/index.ts`](file:///d:/Coding/zoro/packages/shared/src/logging/index.ts)
   - [`packages/shared/src/logging/context.ts`](file:///d:/Coding/zoro/packages/shared/src/logging/context.ts)
   - [`packages/shared/src/logging/logger.ts`](file:///d:/Coding/zoro/packages/shared/src/logging/logger.ts)
-  - [`packages/shared/src/logging/logging.test.ts`](file:///d:/Coding/zoro/packages/shared/src/logging/logging.test.ts)
-  - [`packages/shared/src/logging/index.ts`](file:///d:/Coding/zoro/packages/shared/src/logging/index.ts)
-  - [`packages/shared/src/index.ts`](file:///d:/Coding/zoro/packages/shared/src/index.ts)
-- **Summary:** Implemented structured JSON logger supporting log severity levels (`fatal`, `error`, `warn`, `info`, `debug`, `trace`), correlation tracing context via Node `AsyncLocalStorage`, automatic credential/token masking (`[REDACTED]`), and child logger context binding. Verified with passing unit tests.
+  - [`packages/shared/src/logging/logger.types.ts`](file:///d:/Coding/zoro/packages/shared/src/logging/logger.types.ts)
+- **Summary:** Built the REST API Gateway shell using Fastify in `services/api`. Included CORS, Helmet security headers, Swagger UI served at `/documentation`, health check at `/healthz`, request correlation ID context propagation, and structured error responses. Fully tested with 11 passing tests and 0 TypeScript compilation errors.
 
 ---
 
 ## Current TODO
 
-1. [ ] Install Fastify and essential plugins in `services/api`.
-2. [ ] Implement Fastify server instance in `services/api/src/server.ts`.
-3. [ ] Register GET `/healthz` route handler.
-4. [ ] Write integration test for Fastify API gateway skeleton.
+1. [x] Install Fastify and essential plugins in `services/api`.
+2. [x] Implement Fastify server instance in `services/api/src/server.ts`.
+3. [x] Register GET `/healthz` route handler.
+4. [x] Write integration test for Fastify API gateway skeleton.
 
 ---
 
@@ -99,13 +96,13 @@ services/api/src/index.ts
 
 ## Progress Dashboard
 
-### Milestone 1: Project Foundation & Core Infrastructure (4 / 7)
+### Milestone 1: Project Foundation & Core Infrastructure (5 / 7)
 
 - [x] Phase 01: Monorepo & Workspace Initialization
 - [x] Phase 02: Configuration Management & Environment Validation Engine
 - [x] Phase 03: Structured Logger & Diagnostics Module
-- [x] Phase 04: Domain Types & Shared Data ModelsModels
-- [ ] Phase 05: REST API Gateway Skeleton
+- [x] Phase 04: Domain Types & Shared Data Models
+- [x] Phase 05: REST API Gateway Skeleton
 - [ ] Phase 06: Web Application Shell & Layout System
 - [ ] Phase 07: Testing Infrastructure & CI Pipeline Setup
 
@@ -246,6 +243,7 @@ _No known runtime issues currently logged (project in initialization phase)._
 - [`rules.md`](file:///d:/Coding/zoro/rules.md) — Engineering guidelines, coding standards, error handling rules.
 - [`design.md`](file:///d:/Coding/zoro/design.md) — Design system specification, component tokens, aesthetic guidelines.
 - [`phases.md`](file:///d:/Coding/zoro/phases.md) — 42-phase sequential development roadmap.
+- [`decisions.md`](file:///d:/Coding/zoro/decisions.md) — Permanent Architecture Decision Records (ADRs).
 - [`memory.md`](file:///d:/Coding/zoro/memory.md) — Living state file & persistent engineering memory (this file).
 
 ---

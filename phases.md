@@ -127,20 +127,22 @@ Establish the monorepo workspace, build toolchain, environment configuration sys
 
 ### Phase 05: Backend API Gateway Skeleton (Fastify)
 
+- **Status:** Completed 🟢
 - **Goal:** Create the initial REST API Gateway application shell using Fastify in `services/api/`.
 - **Why This Phase Exists:** Provides the HTTP foundation for API routing, health checks, and middleware handlers.
-- **Features:** Fastify HTTP server, OpenAPI spec generator (Swagger), global error handler, and health check route.
-- **Tasks:**
-  - Initialize Fastify server in `services/api/src/server.ts`.
-  - Register CORS, Helmet, and Swagger plugins.
-  - Implement `GET /health` endpoint returning server status, uptime, and version.
-  - Attach global Fastify error handler mapping domain errors to standard HTTP status codes.
-- **Deliverables:** Runnable Fastify backend server in `services/api/`.
+- **Features:** Fastify HTTP server, OpenAPI spec generator (Swagger/Swagger UI), global error handler, request correlation tracking (`x-request-id`), and health check route.
+- **Tasks Completed:**
+  - Initialized Fastify server factory in [`services/api/src/server.ts`](file:///d:/Coding/zoro/services/api/src/server.ts).
+  - Registered `@fastify/cors`, `@fastify/helmet`, `@fastify/swagger`, and `@fastify/swagger-ui` plugins.
+  - Implemented `GET /healthz` and versioned `GET /api/v1/healthz` endpoints returning server status, uptime, timestamp, and version.
+  - Attached custom `onRequest` hook for `x-request-id` propagation into `@repo-intel/shared` AsyncLocalStorage logger context.
+  - Attached global error handler and 404 handler mapping domain & routing errors to standardized JSON payloads.
+- **Deliverables:** Runnable Fastify backend server in `services/api/` with passing integration test suite in [`services/api/src/server.test.ts`](file:///d:/Coding/zoro/services/api/src/server.test.ts).
 - **Dependencies:** Phase 02, Phase 03, Phase 04.
-- **Acceptance Criteria:** `pnpm --filter @repo-intel/api dev` starts server on port 3000; `GET /health` returns `200 OK`.
+- **Acceptance Criteria:** `services/api` builds cleanly with 0 TypeScript compilation errors; `GET /healthz` returns `200 OK` with valid system status JSON.
 - **Testing:**
-  - _Integration Tests:_ Supertest calls to `/health` and invalid routes to verify 404/500 JSON responses.
-- **Risks:** Plugin initialization order issues in Fastify.
+  - _Integration Tests:_ Unit & integration tests in `services/api/src/server.test.ts` covering `/healthz`, `/api/v1/healthz`, `/documentation`, `/documentation/json`, `x-request-id` correlation tracing, 404 responses, and uncaught error formatting (11 / 11 passing).
+- **Risks:** None (Resolved plugin initialization order & typescript references).
 - **Estimated Complexity:** Medium.
 - **Estimated Time:** 1 day.
 

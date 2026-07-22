@@ -2,6 +2,11 @@
   "name": "repo-intelligence-platform",
   "version": "0.0.0",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "services/*"
+  ],
   "description": "Enterprise-grade, graph-aware, multi-agent code analysis and repository intelligence platform",
   "author": "Antigravity",
   "license": "MIT",

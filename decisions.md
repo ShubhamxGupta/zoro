@@ -1,0 +1,547 @@
+# Architecture Decision Records (`decisions.md`)
+
+This document serves as the project's permanent **Architecture Decision Record (ADR)** for the Repository Intelligence & Code Review Platform. Unlike `memory.md`, this file does not track day-to-day progress. Instead, it records fundamental engineering, architectural, product, and technology decisions that shape the long-term direction of the codebase.
+
+---
+
+## Project Overview
+
+The **Repository Intelligence & Code Review Platform** is an enterprise-grade, graph-aware, multi-agent code analysis system. By constructing an in-memory/embedded **Repository Knowledge Graph (RKG)** via static analysis and Tree-Sitter AST parsing, the platform provides exact structural context (< 2,000 tokens) to a multi-agent review pipeline through a unified **AI Provider Abstraction Layer (PAL)** supporting both cloud LLMs and local offline models.
+
+---
+
+## Decision Index
+
+| ADR ID      | Title                                                   | Status   | Date       |
+| :---------- | :------------------------------------------------------ | :------- | :--------- |
+| **ADR-001** | pnpm Workspaces for Monorepo Package Management         | Accepted | 2026-07-22 |
+| **ADR-002** | TypeScript Composite Projects & Build Pipelines         | Accepted | 2026-07-22 |
+| **ADR-003** | Fastify as REST API Gateway Core Framework              | Accepted | 2026-07-22 |
+| **ADR-004** | Next.js App Router for Web Dashboard Shell              | Accepted | 2026-07-22 |
+| **ADR-005** | Strict Type Checking & Zero-Implicit-Any Standard       | Accepted | 2026-07-22 |
+| **ADR-006** | Tree-Sitter as Core AST & Symbol Parsing Infrastructure | Accepted | 2026-07-22 |
+| **ADR-007** | KùzuDB Embedded Graph Database for RKG Storage          | Accepted | 2026-07-22 |
+| **ADR-008** | Provider Abstraction Layer (PAL) Interface Contract     | Accepted | 2026-07-22 |
+| **ADR-009** | Specialized Multi-Agent Parallel Review Engine          | Accepted | 2026-07-22 |
+| **ADR-010** | Repository Knowledge Graph (RKG) Schema & Taxonomy      | Accepted | 2026-07-22 |
+| **ADR-011** | Graph-First 2-Hop Context Retrieval Engine (CRE)        | Accepted | 2026-07-22 |
+| **ADR-012** | Vanilla CSS Design Tokens over Tailwind for Web Core    | Accepted | 2026-07-22 |
+| **ADR-013** | Stitch for Interactive UI Generation & Mockups          | Accepted | 2026-07-22 |
+| **ADR-014** | Vitest as Workspace Test Runner Infrastructure          | Accepted | 2026-07-22 |
+| **ADR-015** | Docker Packaging Strategy for Local & Cloud Deployments | Accepted | 2026-07-22 |
+| **ADR-016** | GitHub Actions for CI Pipeline Gate Enforcement         | Accepted | 2026-07-22 |
+| **ADR-017** | 4-Tier Unidirectionally Layered Monorepo Architecture   | Accepted | 2026-07-22 |
+
+---
+
+## Decision Log
+
+### ADR-001: pnpm Workspaces for Monorepo Package Management
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+The platform requires clear package boundaries dividing executable applications (`apps/`), shared business logic (`packages/`), and infrastructure services (`services/`). We needed a fast, deterministic package manager supporting monorepo workspace linking.
+
+#### Alternatives Considered
+
+1. **npm Workspaces:** Slower resolution, prone to phantom dependency hoisting.
+2. **Yarn v4 (PnP):** Complex node resolution quirks; compatibility issues with native C++ bindings (Tree-Sitter, KùzuDB).
+3. **pnpm Workspaces:** Hard-linked content-addressable storage, strict dependency isolation, zero phantom imports.
+
+#### Why This Option Was Chosen
+
+`pnpm` guarantees that subpackages can only import explicitly declared dependencies, eliminating hidden hoisting bugs while optimizing local disk usage.
+
+#### Trade-offs
+
+- **Pros:** Fast installs, strict boundary isolation, minimal disk consumption.
+- **Cons:** Requires `pnpm` CLI installed in developer environments and CI runners.
+- **Limitations:** Native binding node_modules symlinking requires explicit `pnpm-workspace.yaml` configuration.
+
+#### Consequences
+
+- **Positive:** Strict monorepo governance matching [`rules.md`](file:///d:/Coding/zoro/rules.md#L69).
+- **Negative:** CI pipelines must use `pnpm/action-setup`.
+- **Affected Modules:** All workspace packages.
+- **References:** [`rules.md`](file:///d:/Coding/zoro/rules.md#L69), [`phases.md`](file:///d:/Coding/zoro/phases.md#L40).
+
+---
+
+### ADR-002: TypeScript Composite Projects & Build Pipelines
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+With 12 decoupled subpackages, building each package independently using uncoordinated scripts introduces build ordering errors and slow incremental builds.
+
+#### Alternatives Considered
+
+1. **Single Flat tsconfig.json:** Loses package boundary enforcement.
+2. **TurboRepo alone without TS references:** Requires redundant configuration for typechecking graph resolution.
+3. **TypeScript Composite Projects (`tsc -b`):** Built-in incremental compilation graph using `tsconfig.json` references.
+
+#### Why This Option Was Chosen
+
+TypeScript composite project references (`composite: true`, `references: [...]`) allow `tsc -b` to build the entire monorepo in topological order with incremental cache invalidation out-of-the-box.
+
+#### Trade-offs
+
+- **Pros:** Zero third-party build orchestrator overhead for type checking, instant incremental re-compilation.
+- **Cons:** Requires explicit declaration files (`declaration: true`) and declaration maps.
+- **Limitations:** Every package must maintain a `tsconfig.json` extending `tsconfig.base.json`.
+
+#### Consequences
+
+- **Positive:** Monorepo compilation succeeds with 0 errors across all 12 packages in seconds.
+- **Affected Modules:** All packages in `apps/`, `packages/`, `services/`.
+- **References:** [`tsconfig.base.json`](file:///d:/Coding/zoro/tsconfig.base.json), [`tsconfig.json`](file:///d:/Coding/zoro/tsconfig.json).
+
+---
+
+### ADR-003: Fastify as REST API Gateway Core Framework
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+The backend API Gateway (`services/api`) requires high throughput, low overhead, JSON schema request/response validation, and OpenAPI specification generation.
+
+#### Alternatives Considered
+
+1. **Express.js:** Legacy architecture, slow JSON serialization, lacks native TypeScript schema integration.
+2. **NestJS:** Excessive decorator abstraction, high boilerplate overhead violating "Simplicity Over Cleverness" rule.
+3. **Fastify:** Ultra-low overhead, native JSON schema compilation via Ajv, automatic Swagger generation.
+
+#### Why This Option Was Chosen
+
+Fastify provides 2–4x higher request throughput than Express while natively compiling Zod/JSON schemas into high-speed serializers.
+
+#### Trade-offs
+
+- **Pros:** Fast throughput, native TypeScript types, clean plugin architecture.
+- **Cons:** Plugin ecosystem differs slightly from legacy Express middleware.
+- **Affected Modules:** `services/api`.
+- **References:** [`architecture.md`](file:///d:/Coding/zoro/architecture.md#L53), [`phases.md`](file:///d:/Coding/zoro/phases.md#L128).
+
+---
+
+### ADR-004: Next.js App Router for Web Dashboard Shell
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+The frontend web application (`apps/web`) requires server-side rendering for initial graph loads, React Server Components (RSC) for streaming review findings, and client-side interactive rendering for 3D graph visualizers.
+
+#### Alternatives Considered
+
+1. **Vite SPA:** Client-only rendering causes loading layout shifts when fetching large graph payloads.
+2. **Next.js App Router:** Hybrid SSR/RSC framework with layout routing, optimized asset loading, and server action support.
+
+#### Why This Option Was Chosen
+
+Next.js App Router provides streaming SSR out of the box, allowing the review dashboard to render server-cached findings instantly while lazy-loading heavy Cytoscape/Three.js graph visualizer canvases.
+
+#### Trade-offs
+
+- **Pros:** Instant initial page loads, built-in layout routing, seamless API proxying.
+- **Cons:** Server/Client component boundary rules require explicit `'use client'` demarcation.
+- **Affected Modules:** `apps/web`.
+- **References:** [`design.md`](file:///d:/Coding/zoro/design.md#L15), [`phases.md`](file:///d:/Coding/zoro/phases.md#L150).
+
+---
+
+### ADR-005: Strict Type Checking & Zero-Implicit-Any Standard
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+Repository intelligence engines handle complex AST syntax trees and graph edge topologies. Untyped code or permissive `any` types invite null pointer crashes and subtle parsing bugs.
+
+#### Alternatives Considered
+
+1. **Permissive TypeScript (`strict: false`):** Faster initial prototyping but causes runtime errors in edge traversal.
+2. **Strict TypeScript (`strict: true`, `noImplicitAny: true`):** Compiler enforces total type safety and non-null assertions.
+
+#### Why This Option Was Chosen
+
+Mandating strict type-checking at root level (`tsconfig.base.json`) prevents type erosion across workspace boundaries.
+
+#### Trade-offs
+
+- **Pros:** Zero runtime type crashes, self-documenting method signatures.
+- **Cons:** Requires explicit parameter annotations and type guard assertions.
+- **Affected Modules:** Entire codebase.
+- **References:** [`rules.md`](file:///d:/Coding/zoro/rules.md#L21), [`tsconfig.base.json`](file:///d:/Coding/zoro/tsconfig.base.json).
+
+---
+
+### ADR-006: Tree-Sitter as Core AST & Symbol Parsing Infrastructure
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+The platform must extract AST symbols (classes, interfaces, functions, imports) across multiple programming languages (TypeScript, JavaScript, Python, Go, Java) with identical concrete syntax tree representations.
+
+#### Alternatives Considered
+
+1. **Compiler-Specific AST Parsers (Babel, `@typescript/compiler-api`, `libcst`, `go/parser`):** Disparate AST schemas, heavy memory footprints, inconsistent line offset models.
+2. **Regex / Heuristic Extractors:** Extremely error-prone, misses nested function definitions and macro expansions.
+3. **Tree-Sitter:** High-performance C-based incremental parser generator with unified S-expression tree-query syntax.
+
+#### Why This Option Was Chosen
+
+Tree-Sitter parses source files in milliseconds, provides concrete syntax tree node positions, supports incremental parsing on file saves, and unifies multi-language queries under standard `.scm` file queries.
+
+#### Trade-offs
+
+- **Pros:** Extremely fast parsing, unified multi-language query API, incremental re-parsing.
+- **Cons:** Requires native C/WASM bindings.
+- **Affected Modules:** `packages/parser`.
+- **References:** [`architecture.md`](file:///d:/Coding/zoro/architecture.md#L19), [`phases.md`](file:///d:/Coding/zoro/phases.md#L190).
+
+---
+
+### ADR-007: KùzuDB Embedded Graph Database for RKG Storage
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+The Repository Knowledge Graph (RKG) stores millions of symbol nodes and caller/callee/import edges. We needed a graph storage engine optimized for local execution without requiring complex client-server database cluster infrastructure.
+
+#### Alternatives Considered
+
+1. **Neo4j:** Requires heavy JVM server setup, external service orchestration, high memory footprint.
+2. **Memgraph:** Docker container dependency required for local execution.
+3. **KùzuDB:** Extremely fast in-process C++ graph database with Cypher query support, embedded like SQLite.
+
+#### Why This Option Was Chosen
+
+KùzuDB runs directly in-process via C++/Node native bindings, requiring zero server configuration for local CLI users while delivering sub-millisecond 2-hop graph traversal queries.
+
+#### Trade-offs
+
+- **Pros:** In-process embedded execution, Cypher support, zero external daemon requirements.
+- **Cons:** Single-writer concurrency model.
+- **Affected Modules:** `packages/graph`.
+- **References:** [`architecture.md`](file:///d:/Coding/zoro/architecture.md#L21), [`phases.md`](file:///d:/Coding/zoro/phases.md#L378).
+
+---
+
+### ADR-008: Provider Abstraction Layer (PAL) Interface Contract
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+Review agents need to dispatch prompts to cloud LLMs (OpenAI, Claude, Gemini, Groq) and local offline LLMs (Ollama, vLLM) without coupling agent code to vendor-specific SDKs.
+
+#### Alternatives Considered
+
+1. **Vendor SDK Direct Imports:** Tight coupling; adding new model providers breaks existing agent logic.
+2. **Unified PAL Adapter Contract (`ProviderAdapter`):** Standard interface exposing `complete()`, `streamComplete()`, `validateCapabilities()`, and `getHealthStatus()`.
+
+#### Why This Option Was Chosen
+
+PAL decouples model integration completely. Switching from cloud GPT-4o to offline Ollama requires changing one configuration string.
+
+#### Trade-offs
+
+- **Pros:** Easy addition of new model vendors, zero-data-retention header control, offline support.
+- **Cons:** Standardized request wrapper must normalize minor vendor output differences.
+- **Affected Modules:** `packages/ai`, `packages/agents`, `packages/review-engine`.
+- **References:** [`architecture.md`](file:///d:/Coding/zoro/architecture.md#L315), [`phases.md`](file:///d:/Coding/zoro/phases.md#L471).
+
+---
+
+### ADR-009: Specialized Multi-Agent Parallel Review Engine
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+Code reviews require evaluating orthogonal engineering dimensions (Syntax, Logic, Security, Performance, Architecture). Single monolithic LLM prompts suffer from context truncation and missed vulnerabilities.
+
+#### Alternatives Considered
+
+1. **Single Monolithic Prompt:** Generates generic, shallow feedback and misses subtle security flaws.
+2. **Sequential Agent Chain:** High latency ($> 45$ seconds per diff review).
+3. **Parallel Specialized Agents:** Independent agents (SyntaxAgent, LogicAgent, SecurityAgent, PerformanceAgent, ArchitectureAgent) running concurrently against focused prompts.
+
+#### Why This Option Was Chosen
+
+Parallel agent execution reduces overall review latency to the duration of the slowest single agent call while allowing each agent prompt to specialize strictly on its domain.
+
+#### Trade-offs
+
+- **Pros:** Deep domain analysis, parallel execution speed, modular agent extensions.
+- **Cons:** Requires a finding aggregator & deduplicator to merge overlapping recommendations.
+- **Affected Modules:** `packages/agents`, `packages/review-engine`.
+- **References:** [`architecture.md`](file:///d:/Coding/zoro/architecture.md#L336), [`phases.md`](file:///d:/Coding/zoro/phases.md#L600).
+
+---
+
+### ADR-010: Repository Knowledge Graph (RKG) Schema & Taxonomy
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+Static code analysis requires a formal graph taxonomy to represent code structures and relationships across file and module boundaries.
+
+#### Alternatives Considered
+
+1. **Ad-Hoc JSON References:** Fragile, lacks explicit relation query capabilities.
+2. **Formal Node & Edge Taxonomy:**
+   - **Nodes:** `File`, `Module`, `Package`, `Class`, `Interface`, `Function`, `Variable`, `APIEndpoint`, `DatabaseModel`, `ConfigurationKey`, `UnitTest`.
+   - **Edges:** `CONTAINS`, `IMPORTS`, `CALLS`, `INHERITS_IMPLEMENTS`, `MUTATES`, `TESTED_BY`, `CONFIGURES`, `HANDLED_BY`.
+
+#### Why This Option Was Chosen
+
+A formal node/edge taxonomy enables deterministic Cypher queries for caller/callee chains, circular dependency detection, and impact radius calculations.
+
+#### Trade-offs
+
+- **Pros:** Strongly typed graph model, deterministic context extraction.
+- **Cons:** Symbol resolution logic must map relative imports to absolute declaration IDs.
+- **Affected Modules:** `packages/graph`, `packages/shared`.
+- **References:** [`architecture.md`](file:///d:/Coding/zoro/architecture.md#L201), [`packages/shared/src/types/graph.types.ts`](file:///d:/Coding/zoro/packages/shared/src/types/graph.types.ts).
+
+---
+
+### ADR-011: Graph-First 2-Hop Context Retrieval Engine (CRE)
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+LLM context windows are limited and expensive. Naive vector search (RAG) dumps entire files or irrelevant text chunks, causing high false positive rates and hallucinations.
+
+#### Alternatives Considered
+
+1. **Naive Vector RAG:** Misses caller/callee relationships; retrieves text based on keyword similarity rather than syntax rules.
+2. **Full File Context Dumps:** Exceeds token budgets ($> 50,000$ tokens) and inflates API costs.
+3. **Graph-First CRE Retrieval:** 2-hop structural graph walk ($C \rightarrow F \rightarrow D$) combined with vector search, producing compact subgraphs under 2,000 tokens.
+
+#### Why This Option Was Chosen
+
+CRE provides 100% precision on direct callers and callees while keeping prompt payloads lightweight, drastically reducing LLM cost and hallucination rates.
+
+#### Trade-offs
+
+- **Pros:** Grounded precision, sub-2k token context size, low LLM cost.
+- **Cons:** Requires RKG index build before initial retrieval.
+- **Affected Modules:** `packages/retrieval`, `packages/graph`.
+- **References:** [`architecture.md`](file:///d:/Coding/zoro/architecture.md#L261), [`phases.md`](file:///d:/Coding/zoro/phases.md#L442).
+
+---
+
+### ADR-012: Vanilla CSS Design Tokens over Tailwind for Web Core
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+The Web Dashboard (`apps/web`) requires custom glassmorphism visual effects, dark mode themes, and specialized 3D graph control containers matching [`design.md`](file:///d:/Coding/zoro/design.md).
+
+#### Alternatives Considered
+
+1. **TailwindCSS:** Rapid prototyping, but introduces utility class bloat when writing complex glassmorphism CSS backdrops and 3D graph canvas overlays.
+2. **Vanilla CSS Design Tokens (`index.css`):** Centralized CSS custom properties (`--bg-primary`, `--accent-color`, `--glass-blur`) with pure CSS module encapsulation.
+
+#### Why This Option Was Chosen
+
+Vanilla CSS design tokens provide total styling flexibility, direct control over backdrop filters, and zero utility class compilation overhead.
+
+#### Trade-offs
+
+- **Pros:** Pure CSS control, custom glassmorphism design system matching PRD specs.
+- **Cons:** Requires writing semantic CSS selectors instead of inline utility classes.
+- **Affected Modules:** `apps/web`.
+- **References:** [`design.md`](file:///d:/Coding/zoro/design.md#L20), [`rules.md`](file:///d:/Coding/zoro/rules.md).
+
+---
+
+### ADR-013: Stitch for Interactive UI Generation & Mockups
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+Designing premium frontend screens for the Web Dashboard requires rapid, high-fidelity UI layout generation that strictly aligns with [`design.md`](file:///d:/Coding/zoro/design.md).
+
+#### Alternatives Considered
+
+1. **Manual Ad-Hoc Component Coding:** Time-consuming, risks design inconsistency across screens.
+2. **Stitch Tool Integration:** Automated screen design, variant generation, and design system enforcement.
+
+#### Why This Option Was Chosen
+
+Stitch automates screen mockup generation while strictly enforcing predefined color tokens, glassmorphism card surfaces, and accessibility boundaries.
+
+#### Trade-offs
+
+- **Pros:** Consistent UI design language, rapid screen generation.
+- **Cons:** Generated UI components must be integrated into Next.js App Router paths.
+- **Affected Modules:** `apps/web`.
+- **References:** [`design.md`](file:///d:/Coding/zoro/design.md#L1).
+
+---
+
+### ADR-014: Vitest as Workspace Test Runner Infrastructure
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+We need a fast, native ESM unit and integration test runner across all monorepo subpackages.
+
+#### Alternatives Considered
+
+1. **Jest:** Slow startup times in ESM monorepos, complex transform configuration for TypeScript.
+2. **Vitest:** Instant HMR test runner, native ESM and TypeScript support, shared configuration via `vitest.workspace.ts`.
+
+#### Why This Option Was Chosen
+
+Vitest uses Vite's transformation pipeline, running monorepo test suites in parallel with minimal startup overhead.
+
+#### Trade-offs
+
+- **Pros:** Ultra-fast execution, native TypeScript & ESM parsing, seamless workspace integration.
+- **Cons:** Minor API differences from legacy Jest runners in global setup hooks.
+- **Affected Modules:** All packages in `packages/`, `apps/`, `services/`.
+- **References:** [`phases.md`](file:///d:/Coding/zoro/phases.md#L170).
+
+---
+
+### ADR-015: Docker Packaging Strategy for Local & Cloud Deployments
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+The API Gateway and indexing workers must run reliably across local developer workstations, air-gapped enterprise servers, and cloud Kubernetes clusters.
+
+#### Alternatives Considered
+
+1. **Bare Metal Node.js Install:** Prone to Node version mismatches and missing native C++ build toolchains.
+2. **Multi-Stage Docker Containers:** Self-contained container images building native Tree-Sitter & KùzuDB dependencies in isolated build stages.
+
+#### Why This Option Was Chosen
+
+Multi-stage Docker builds isolate C++ native compilation in build stages, producing lightweight production runtime containers (< 150MB).
+
+#### Trade-offs
+
+- **Pros:** Environment consistency, air-gapped offline deployment capability.
+- **Cons:** Requires container build caching configuration in CI.
+- **Affected Modules:** `services/api`, `services/indexing`, `services/pr-bot`.
+- **References:** [`architecture.md`](file:///d:/Coding/zoro/architecture.md#L500), [`phases.md`](file:///d:/Coding/zoro/phases.md#L950).
+
+---
+
+### ADR-016: GitHub Actions for CI Pipeline Gate Enforcement
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+Automated linting, typechecking, unit testing, and security scanning must execute on every pull request to protect codebase integrity.
+
+#### Alternatives Considered
+
+1. **Manual PR Reviews:** Human oversight misses formatting regressions and subtle type errors.
+2. **GitHub Actions Workflow (`ci.yml`):** Automated PR gate executing `pnpm lint`, `pnpm check-types`, and `pnpm test`.
+
+#### Why This Option Was Chosen
+
+GitHub Actions provides seamless GitHub PR integration, caching pnpm store directories to keep PR validation runs under 2 minutes.
+
+#### Trade-offs
+
+- **Pros:** Automated quality enforcement on PR pushes.
+- **Cons:** Requires workflow file maintenance.
+- **Affected Modules:** Root repository.
+- **References:** [`.github/workflows/ci.yml`](file:///d:/Coding/zoro/.github/workflows/ci.yml), [`phases.md`](file:///d:/Coding/zoro/phases.md#L170).
+
+---
+
+### ADR-017: 4-Tier Unidirectionally Layered Monorepo Architecture
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+To prevent circular dependencies and spaghetti code in a complex repository platform, strict layer boundaries must be enforced.
+
+#### Alternatives Considered
+
+1. **Unstructured Layering:** Allows presentation components to call database drivers or LLMs directly, causing tight coupling and untestable code.
+2. **4-Tier Unidirectional Layering:**
+   $$\text{Presentation Layer (Apps)} \longrightarrow \text{Application Layer (Services)} \longrightarrow \text{Domain Layer (Engines)} \longrightarrow \text{Infrastructure Layer (Adapters)}$$
+
+#### Why This Option Was Chosen
+
+Unidirectional layering guarantees that higher layers depend on lower abstraction layers, never in reverse. Presentation components are forbidden from importing database drivers or PAL adapters directly.
+
+#### Trade-offs
+
+- **Pros:** Modular testability, architectural isolation, zero circular dependencies.
+- **Cons:** Requires passing requests through application service orchestrators.
+- **Affected Modules:** Entire monorepo workspace.
+- **References:** [`rules.md`](file:///d:/Coding/zoro/rules.md#L36), [`architecture.md`](file:///d:/Coding/zoro/architecture.md#L40).
+
+---
+
+## Future Decisions
+
+Reserved slots for future architectural decision records:
+
+- **ADR-018:** KùzuDB Native vs WASM Browser Compilation Strategy
+- **ADR-019:** Vector Embedding Engine Selection (LanceDB vs Qdrant)
+- **ADR-020:** Token Pruning & Signature Truncation Algorithm
+- **ADR-021:** PR Webhook Event Queue Strategy (Redis / BullMQ vs Native NATS)
+- **ADR-022:** Multi-Tenant Role-Based Access Control (RBAC) Architecture
+- **ADR-023:** 3D Knowledge Graph Rendering Engine (Cytoscape.js vs Three.js ForceGraph)
+- **ADR-024:** VS Code LSP Diagnostic Protocol Extension Design
+- **ADR-025:** Repository Memory & Ignored Findings Vector Persistence
+- ...
+- **ADR-100:** Enterprise Self-Hosted Air-Gapped Packaging Specification
+
+---
+
+## Decision Rules & Governance
+
+A new Architecture Decision Record (**ADR**) **MUST** be created whenever:
+
+1. A new primary framework or core library is introduced to the monorepo.
+2. A database, storage engine, or indexing technology selection is made.
+3. A core architectural layer or boundary rule is modified.
+4. A security model, authentication protocol, or air-gap specification changes.
+5. An AI model provider protocol or PAL interface contract is altered.
+6. A breaking API change or deployment strategy shift occurs.
+
+_Minor refactorings, internal utility function additions, and routine bug fixes do NOT warrant an ADR._

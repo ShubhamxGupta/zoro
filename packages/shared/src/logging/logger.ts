@@ -70,28 +70,65 @@ export class Logger implements ILogger {
     this.destination(JSON.stringify(formattedPayload));
   }
 
-  public fatal(message: string, meta?: Record<string, unknown>, error?: Error): void {
-    this.emit('fatal', message, meta, error);
+  private normalizeArgs(
+    msgOrMeta: string | Record<string, unknown>,
+    metaOrErr?: Record<string, unknown> | Error,
+    errParam?: Error,
+  ): { message: string; meta?: Record<string, unknown>; error?: Error } {
+    if (typeof msgOrMeta === 'string') {
+      const error = metaOrErr instanceof Error ? metaOrErr : errParam;
+      const meta =
+        metaOrErr instanceof Error ? undefined : (metaOrErr as Record<string, unknown> | undefined);
+      return { message: msgOrMeta, meta, error };
+    }
+    const { msg, message, error: metaErr, ...restMeta } = msgOrMeta ?? {};
+    const messageStr =
+      typeof msg === 'string'
+        ? msg
+        : typeof message === 'string'
+          ? message
+          : JSON.stringify(msgOrMeta);
+    const errorObj =
+      metaOrErr instanceof Error ? metaOrErr : metaErr instanceof Error ? metaErr : errParam;
+    return { message: messageStr, meta: restMeta, error: errorObj };
   }
 
-  public error(message: string, meta?: Record<string, unknown>, error?: Error): void {
-    this.emit('error', message, meta, error);
+  public fatal(
+    msgOrMeta: string | Record<string, unknown>,
+    metaOrErr?: Record<string, unknown> | Error,
+    error?: Error,
+  ): void {
+    const { message, meta, error: err } = this.normalizeArgs(msgOrMeta, metaOrErr, error);
+    this.emit('fatal', message, meta, err);
   }
 
-  public warn(message: string, meta?: Record<string, unknown>): void {
-    this.emit('warn', message, meta);
+  public error(
+    msgOrMeta: string | Record<string, unknown>,
+    metaOrErr?: Record<string, unknown> | Error,
+    error?: Error,
+  ): void {
+    const { message, meta, error: err } = this.normalizeArgs(msgOrMeta, metaOrErr, error);
+    this.emit('error', message, meta, err);
   }
 
-  public info(message: string, meta?: Record<string, unknown>): void {
-    this.emit('info', message, meta);
+  public warn(msgOrMeta: string | Record<string, unknown>, meta?: Record<string, unknown>): void {
+    const { message, meta: resolvedMeta } = this.normalizeArgs(msgOrMeta, meta);
+    this.emit('warn', message, resolvedMeta);
   }
 
-  public debug(message: string, meta?: Record<string, unknown>): void {
-    this.emit('debug', message, meta);
+  public info(msgOrMeta: string | Record<string, unknown>, meta?: Record<string, unknown>): void {
+    const { message, meta: resolvedMeta } = this.normalizeArgs(msgOrMeta, meta);
+    this.emit('info', message, resolvedMeta);
   }
 
-  public trace(message: string, meta?: Record<string, unknown>): void {
-    this.emit('trace', message, meta);
+  public debug(msgOrMeta: string | Record<string, unknown>, meta?: Record<string, unknown>): void {
+    const { message, meta: resolvedMeta } = this.normalizeArgs(msgOrMeta, meta);
+    this.emit('debug', message, resolvedMeta);
+  }
+
+  public trace(msgOrMeta: string | Record<string, unknown>, meta?: Record<string, unknown>): void {
+    const { message, meta: resolvedMeta } = this.normalizeArgs(msgOrMeta, meta);
+    this.emit('trace', message, resolvedMeta);
   }
 
   public child(bindings: LogContext): ILogger {

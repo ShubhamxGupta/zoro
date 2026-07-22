@@ -1,0 +1,8 @@
+/**
+ * Shared Types & Utility Barrier Export for Repository Intelligence Platform
+ */
+export const SHARED_PACKAGE_VERSION = '0.0.0';
+export * from './config/index.js';
+export * from './logging/index.js';
+export * from './types/index.js';
+//# sourceMappingURL=index.js.map
