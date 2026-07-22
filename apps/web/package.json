@@ -8,16 +8,18 @@
     "build": "next build",
     "start": "next start -p 3001",
     "check-types": "tsc --noEmit",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@repo-intel/shared": "*",
+    "@repo-intel/shared": "workspace:*",
     "lucide-react": "^0.368.0",
     "next": "^14.2.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.44.0",
     "@types/node": "^20.12.7",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",

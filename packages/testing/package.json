@@ -1,0 +1,18 @@
+{
+  "name": "@repo-intel/testing",
+  "version": "0.6.0",
+  "description": "Shared Test Utilities, Mock Factories, and Fixtures for Repository Intelligence Platform",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --build"
+  },
+  "dependencies": {
+    "@repo-intel/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "typescript": "^5.4.5"
+  }
+}

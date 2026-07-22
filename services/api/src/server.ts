@@ -2,7 +2,7 @@ import fastify, {
   type FastifyInstance,
   type FastifyError,
   type FastifyRequest,
-  type FastifyReply,
+  type FastifyReply
 } from 'fastify';
 import { randomUUID } from 'crypto';
 import { ErrorCode, logger, logContext } from '@repo-intel/shared';

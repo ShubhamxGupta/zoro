@@ -1,72 +1,51 @@
-import {
-  loadConfig,
-  getConfig,
-  resetConfigForTesting,
-  ConfigValidationError,
-} from './config.loader.js';
+import { describe, test, expect, beforeEach } from 'vitest';
+import { loadConfig, getConfig, resetConfigForTesting, ConfigValidationError } from './config.loader.js';
 
-export function runConfigTests(): void {
-  // Test 1: Load default configuration
-  resetConfigForTesting();
-  const config = loadConfig({
-    overrideEnv: {
-      NODE_ENV: 'development',
-      PORT: '3000',
-      LOG_LEVEL: 'info',
-    },
-    reload: true,
+describe('Configuration Engine Unit Tests', () => {
+  beforeEach(() => {
+    resetConfigForTesting();
   });
 
-  if (config.NODE_ENV !== 'development') {
-    throw new Error(`Expected NODE_ENV to be development, got ${config.NODE_ENV}`);
-  }
-  if (config.PORT !== 3000) {
-    throw new Error(`Expected PORT to be 3000, got ${config.PORT}`);
-  }
-  if (config.LOG_LEVEL !== 'info') {
-    throw new Error(`Expected LOG_LEVEL to be info, got ${config.LOG_LEVEL}`);
-  }
-  if (config.KUZU_DB_PATH !== './.kuzu') {
-    throw new Error(`Expected default KUZU_DB_PATH, got ${config.KUZU_DB_PATH}`);
-  }
-
-  // Test 2: Verify singleton / cached instance
-  const fetchedConfig = getConfig();
-  if (fetchedConfig !== config) {
-    throw new Error('getConfig() did not return cached config instance');
-  }
-
-  // Test 3: Validation Error on Invalid Port Number
-  resetConfigForTesting();
-  try {
-    loadConfig({
+  test('loads default development configuration correctly', () => {
+    const config = loadConfig({
       overrideEnv: {
-        PORT: 'invalid_port',
+        NODE_ENV: 'development',
+        PORT: '3000',
+        LOG_LEVEL: 'info',
       },
       reload: true,
     });
-    throw new Error('Expected ConfigValidationError for invalid port');
-  } catch (err) {
-    if (!(err instanceof ConfigValidationError)) {
-      throw new Error(`Expected ConfigValidationError, got ${err}`);
-    }
-  }
 
-  // Test 4: Validation Error on Invalid Enum
-  resetConfigForTesting();
-  try {
-    loadConfig({
-      overrideEnv: {
-        LOG_LEVEL: 'invalid_log_level',
-      },
+    expect(config.NODE_ENV).toBe('development');
+    expect(config.PORT).toBe(3000);
+    expect(config.LOG_LEVEL).toBe('info');
+    expect(config.KUZU_DB_PATH).toBe('./.kuzu');
+  });
+
+  test('retrieves singleton cached config instance', () => {
+    const loaded = loadConfig({
+      overrideEnv: { NODE_ENV: 'test', PORT: '3000' },
       reload: true,
     });
-    throw new Error('Expected ConfigValidationError for invalid log level');
-  } catch (err) {
-    if (!(err instanceof ConfigValidationError)) {
-      throw new Error(`Expected ConfigValidationError, got ${err}`);
-    }
-  }
+    const cached = getConfig();
+    expect(cached).toBe(loaded);
+  });
 
-  console.info('All Phase 02 Configuration Unit Tests Passed Cleanly!');
-}
+  test('throws ConfigValidationError on invalid port number', () => {
+    expect(() =>
+      loadConfig({
+        overrideEnv: { PORT: 'invalid_port' },
+        reload: true,
+      }),
+    ).toThrow(ConfigValidationError);
+  });
+
+  test('throws ConfigValidationError on invalid log level enum', () => {
+    expect(() =>
+      loadConfig({
+        overrideEnv: { LOG_LEVEL: 'invalid_log_level' },
+        reload: true,
+      }),
+    ).toThrow(ConfigValidationError);
+  });
+});

@@ -516,11 +516,39 @@ Unidirectional layering guarantees that higher layers depend on lower abstractio
 
 ---
 
+### ADR-018: Unified Vitest Workspace & Playwright E2E Strategy
+
+- **Status:** Accepted
+- **Date:** 2026-07-22
+
+#### Context
+
+The monorepo requires a unified testing framework to execute unit tests, integration tests with V8 coverage, and end-to-end (E2E) browser smoke tests across all sub-packages without configuration fragmentation.
+
+#### Alternatives Considered
+
+1. **Jest + Cypress:** Heavy configuration footprint, slow startup times, and complex monorepo ESM module resolution issues.
+2. **Node.js Native Test Runner (`node:test`):** Lightweight, but lacks native V8 code coverage threshold enforcement, React DOM component rendering utilities, and workspace runner configuration.
+3. **Vitest + Playwright (`@repo-intel/testing`):** Vitest provides instant ESM execution across monorepo packages (`vitest.workspace.ts`) with V8 coverage thresholds, while Playwright provides headless browser E2E smoke tests.
+
+#### Why This Option Was Chosen
+
+Vitest integrates seamlessly with Vite and TypeScript composite packages, enabling zero-config ESM test execution across sub-packages. Playwright ensures full-stack E2E UI verification for the Next.js web application.
+
+#### Trade-offs
+
+- **Pros:** Fast ESM execution, unified workspace runner, V8 coverage reporting, automated Playwright UI smoke testing.
+- **Cons:** Requires Chromium binary installation in CI runner environments.
+- **Affected Modules:** `@repo-intel/shared`, `@repo-intel/testing`, `services/api`, `apps/web`, `.github/workflows/ci.yml`.
+- **References:** [`phases.md`](file:///d:/Coding/zoro/phases.md#L175), [`vitest.workspace.ts`](file:///d:/Coding/zoro/vitest.workspace.ts).
+
+---
+
 ## Future Decisions
 
 Reserved slots for future architectural decision records:
 
-- **ADR-018:** KùzuDB Native vs WASM Browser Compilation Strategy
+- **ADR-019:** KùzuDB Native vs WASM Browser Compilation Strategy
 - **ADR-019:** Vector Embedding Engine Selection (LanceDB vs Qdrant)
 - **ADR-020:** Token Pruning & Signature Truncation Algorithm
 - **ADR-021:** PR Webhook Event Queue Strategy (Redis / BullMQ vs Native NATS)

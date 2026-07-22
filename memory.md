@@ -4,24 +4,24 @@ This file is the **living state file** and **persistent engineering memory** for
 
 ---
 
-## Project Status
+### Project Status
 
-| Metric                | Status / Value                                                         |
-| :-------------------- | :--------------------------------------------------------------------- |
-| **Version**           | `0.6.0` (Web Application Shell & Hardened Foundation Initialized)      |
-| **Current Milestone** | Milestone 1: Project Foundation & Core Infrastructure                  |
-| **Current Phase**     | Phase 06: Web Application Shell & Layout System                        |
-| **Overall Progress**  | 14.3% (6 / 42 Phases Completed)                                        |
-| **Last Updated**      | 2026-07-22                                                             |
-| **Current Branch**    | `main`                                                                 |
-| **Build Status**      | 🟢 Passing (`npx tsc -b` 0 errors across 12 packages)                  |
-| **Test Status**       | 🟢 Passing (11/11 Unit & Integration Tests; API & Web Builds Verified) |
+| Metric                | Status / Value                                                                  |
+| :-------------------- | :------------------------------------------------------------------------------ |
+| **Version**           | `0.8.0` (Repository Discovery & File Walker Initialized)                        |
+| **Current Milestone** | Milestone 2: Repository Scanner & AST Parsing Engine                            |
+| **Current Phase**     | Phase 08: Repository Scanner & Git Boundary Detector                            |
+| **Overall Progress**  | 19.0% (8 / 42 Phases Completed)                                                 |
+| **Last Updated**      | 2026-07-22                                                                      |
+| **Current Branch**    | `main`                                                                          |
+| **Build Status**      | 🟢 Passing (`npx tsc -b` 0 errors across 14 packages)                           |
+| **Test Status**       | 🟢 Passing (56 Vitest tests passing; V8 coverage verified; Playwright suite)   |
 
 ---
 
 ## Current Focus
 
-### Phase 06: Web Application Shell & Layout System
+### Phase 08: Repository Scanner & Git Boundary Detector
 
 - **Status:** Complete 🟢
 - **Started:** 2026-07-22
@@ -29,36 +29,30 @@ This file is the **living state file** and **persistent engineering memory** for
 
 #### Objectives Achieved
 
-1. Created Next.js App Router application shell in `apps/web/` (`next` v14, `react`, `react-dom`, `lucide-react`).
-2. Modularized Vanilla CSS Design Tokens into `styles/tokens.css`, `typography.css`, `layout.css`, `animations.css`, `utilities.css`, imported into `app/globals.css`.
-3. Built client-side theme engine (`ThemeProvider`) supporting dark mode by default (`:root[data-theme="dark"]`) and soft light mode parity (`:root[data-theme="light"]`).
-4. Built navigation shell components: Header (`48px`), Sidebar (`240px` collapsible to `48px`), Footer Status Bar (`24px`), and responsive drawer layout.
-5. Created accessible UI primitives & component barrels: `Button`, `Badge`, `Card`, `Input`/`Select`, `Skeleton`, `EmptyState`, `Modal`, `CommandPalette`, and `Icon` wrappers.
-6. Implemented interactive Dashboard feature components in `components/dashboard/`: `MetricCards`, `FindingsList`, `CodeViewerPane`, and `GraphVisualizerPane`.
-7. Introduced shared error codes (`ErrorCode`, `ApiError`) and system constants (`APP_VERSION`, `API_V1_PREFIX`) in `@repo-intel/shared`.
+1. Implemented repository root detection ([`root-detector.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/root-detector.ts)) searching upward for boundary markers (`.git`, `package.json`, `go.mod`, `Cargo.toml`, `pyproject.toml`).
+2. Built `.gitignore` and ignore rule evaluator ([`ignore-evaluator.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/ignore-evaluator.ts)) loading `.gitignore` and `.repo-intel-ignore` with default filtering for `.git`, `node_modules`, `dist`, `.next`, `coverage`, and OS system files.
+3. Implemented binary file detection (`isBinaryFile`) via initial 8KB buffer null-byte `/0` inspection and symlink cycle tracker ([`file-utils.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/file-utils.ts)).
+4. Built high-performance asynchronous directory walker ([`repo-walker.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/repo-walker.ts)) returning structured file manifests (`ScannedFile[]`) with progress callbacks (`ScanProgress`), sha256 hashing, and cancellation signals (`AbortSignal`).
+5. Authored Vitest unit tests ([`scanner.test.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/scanner.test.ts)) and benchmark scaffolding ([`scanner.bench.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/scanner.bench.ts)).
 
 ---
 
 ## Current Working Files
 
 ```text
-apps/web/package.json
-apps/web/next.config.mjs
-apps/web/tsconfig.json
-apps/web/app/globals.css
-apps/web/app/layout.tsx
-apps/web/app/page.tsx
-apps/web/app/loading.tsx
-apps/web/app/error.tsx
-apps/web/app/not-found.tsx
-apps/web/components/theme-provider.tsx
-apps/web/components/ui/index.ts
-apps/web/components/layout/index.ts
-apps/web/components/icons/index.tsx
-apps/web/components/charts/index.ts
-apps/web/components/dashboard/index.ts
-services/api/src/server.ts
-packages/shared/src/index.ts
+packages/parser/package.json
+packages/parser/tsconfig.json
+packages/parser/src/index.ts
+packages/parser/src/scanner/scanner.types.ts
+packages/parser/src/scanner/root-detector.ts
+packages/parser/src/scanner/ignore-evaluator.ts
+packages/parser/src/scanner/file-utils.ts
+packages/parser/src/scanner/repo-walker.ts
+packages/parser/src/scanner/index.ts
+packages/parser/src/scanner/scanner.test.ts
+packages/parser/src/scanner/scanner.bench.ts
+memory.md
+phases.md
 ```
 
 ---
@@ -67,65 +61,48 @@ packages/shared/src/index.ts
 
 ### 2026-07-22
 
-- **Phase:** Phase 06: Web Application Shell & Layout System
-- **Feature:** Next.js App Router application shell, modularized Vanilla CSS design tokens manifest, dark/light theme engine, responsive navigation shell, metric cards, findings split-pane view, knowledge graph visualizer container, command palette, error/loading/404 boundaries, shared error codes, system constants, and API modularization.
+- **Phase:** Phase 08: Repository Scanner & Git Boundary Detector
+- **Feature:** Standalone file system scanner and repository boundary detector in `@repo-intel/parser`, `.gitignore` rule evaluator, binary buffer inspector, symlink loop tracker, progress reporting, cancellation support, unit test suite, and benchmark scaffolding.
 - **Files Created / Modified:**
-  - [`apps/web/package.json`](file:///d:/Coding/zoro/apps/web/package.json)
-  - [`apps/web/next.config.mjs`](file:///d:/Coding/zoro/apps/web/next.config.mjs)
-  - [`apps/web/tsconfig.json`](file:///d:/Coding/zoro/apps/web/tsconfig.json)
-  - [`apps/web/app/globals.css`](file:///d:/Coding/zoro/apps/web/app/globals.css)
-  - [`apps/web/styles/tokens.css`](file:///d:/Coding/zoro/apps/web/styles/tokens.css)
-  - [`apps/web/styles/typography.css`](file:///d:/Coding/zoro/apps/web/styles/typography.css)
-  - [`apps/web/styles/layout.css`](file:///d:/Coding/zoro/apps/web/styles/layout.css)
-  - [`apps/web/styles/animations.css`](file:///d:/Coding/zoro/apps/web/styles/animations.css)
-  - [`apps/web/styles/utilities.css`](file:///d:/Coding/zoro/apps/web/styles/utilities.css)
-  - [`apps/web/app/layout.tsx`](file:///d:/Coding/zoro/apps/web/app/layout.tsx)
-  - [`apps/web/app/page.tsx`](file:///d:/Coding/zoro/apps/web/app/page.tsx)
-  - [`apps/web/app/loading.tsx`](file:///d:/Coding/zoro/apps/web/app/loading.tsx)
-  - [`apps/web/app/error.tsx`](file:///d:/Coding/zoro/apps/web/app/error.tsx)
-  - [`apps/web/app/not-found.tsx`](file:///d:/Coding/zoro/apps/web/app/not-found.tsx)
-  - [`apps/web/components/theme-provider.tsx`](file:///d:/Coding/zoro/apps/web/components/theme-provider.tsx)
-  - [`apps/web/components/ui/index.ts`](file:///d:/Coding/zoro/apps/web/components/ui/index.ts)
-  - [`apps/web/components/ui/command-palette.tsx`](file:///d:/Coding/zoro/apps/web/components/ui/command-palette.tsx)
-  - [`apps/web/components/layout/index.ts`](file:///d:/Coding/zoro/apps/web/components/layout/index.ts)
-  - [`apps/web/components/icons/index.tsx`](file:///d:/Coding/zoro/apps/web/components/icons/index.tsx)
-  - [`apps/web/components/charts/index.ts`](file:///d:/Coding/zoro/apps/web/components/charts/index.ts)
-  - [`apps/web/components/dashboard/index.ts`](file:///d:/Coding/zoro/apps/web/components/dashboard/index.ts)
-  - [`packages/shared/src/errors/error.codes.ts`](file:///d:/Coding/zoro/packages/shared/src/errors/error.codes.ts)
-  - [`packages/shared/src/constants/index.ts`](file:///d:/Coding/zoro/packages/shared/src/constants/index.ts)
-  - [`services/api/src/plugins/security.plugin.ts`](file:///d:/Coding/zoro/services/api/src/plugins/security.plugin.ts)
-  - [`services/api/src/plugins/swagger.plugin.ts`](file:///d:/Coding/zoro/services/api/src/plugins/swagger.plugin.ts)
-  - [`services/api/src/middleware/request-tracing.middleware.ts`](file:///d:/Coding/zoro/services/api/src/middleware/request-tracing.middleware.ts)
-  - [`services/api/src/middleware/error.handler.ts`](file:///d:/Coding/zoro/services/api/src/middleware/error.handler.ts)
-  - [`services/api/src/routes/health.ts`](file:///d:/Coding/zoro/services/api/src/routes/health.ts)
-  - [`services/api/src/server.ts`](file:///d:/Coding/zoro/services/api/src/server.ts)
-- **Summary:** Completed Next.js Web Application Shell & Layout System in `apps/web/`, hardened core foundation across shared errors and constants, modularized CSS and component barrels, and built the full interactive Dashboard view. Verified with clean TypeScript composite typecheck (`tsc -b`), passing test suite (11/11 passing), and static Next.js production builds.
+  - [`packages/parser/package.json`](file:///d:/Coding/zoro/packages/parser/package.json)
+  - [`packages/parser/tsconfig.json`](file:///d:/Coding/zoro/packages/parser/tsconfig.json)
+  - [`packages/parser/src/index.ts`](file:///d:/Coding/zoro/packages/parser/src/index.ts)
+  - [`packages/parser/src/scanner/scanner.types.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/scanner.types.ts)
+  - [`packages/parser/src/scanner/root-detector.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/root-detector.ts)
+  - [`packages/parser/src/scanner/ignore-evaluator.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/ignore-evaluator.ts)
+  - [`packages/parser/src/scanner/file-utils.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/file-utils.ts)
+  - [`packages/parser/src/scanner/repo-walker.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/repo-walker.ts)
+  - [`packages/parser/src/scanner/index.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/index.ts)
+  - [`packages/parser/src/scanner/scanner.test.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/scanner.test.ts)
+  - [`packages/parser/src/scanner/scanner.bench.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/scanner.bench.ts)
+  - [`memory.md`](file:///d:/Coding/zoro/memory.md)
+  - [`phases.md`](file:///d:/Coding/zoro/phases.md)
+- **Summary:** Built Phase 08 Repository Discovery & File Walker in `@repo-intel/parser`. Implemented root detection, `.gitignore` parsing, recursive traversal, binary buffer checking, symlink cycle prevention, progress reporting, and cancellation support. Verified with 56 passing Vitest unit tests across the workspace.
 
 ---
 
 ## Current TODO
 
-1. [x] Harden foundation across `@repo-intel/shared` and `@repo-intel/api`.
-2. [x] Modularize CSS stylesheets into `styles/` tokens, typography, layout, animations, utilities.
-3. [x] Build reusable component barrels (`components/ui/`, `components/layout/`, `components/icons/`, `components/charts/`, `components/dashboard/`).
-4. [x] Implement Dashboard View (`MetricCards`, `FindingsList`, `CodeViewerPane`, `GraphVisualizerPane`, `CommandPalette`).
-5. [x] Run production builds and unit test verification.
+1. [x] Build root detector `detectRepositoryRoot`.
+2. [x] Implement `.gitignore` and `.repo-intel-ignore` evaluator.
+3. [x] Implement binary file inspector and symlink cycle tracker.
+4. [x] Implement `walkRepository` with progress callback and cancellation.
+5. [x] Write Vitest unit tests and benchmark scaffolding.
 
 ---
 
 ## Upcoming Phase
 
-### Phase 07: Testing Infrastructure & CI Pipeline Setup
+### Phase 09: Language Detection & File Classifier
 
-- **Goal:** Setup Vitest test runner across workspace and GitHub Actions CI workflow file.
-- **Dependencies:** Phase 01 through Phase 06.
-- **Expected Deliverables:** Automated CI pipeline passing on repository pushes.
+- **Goal:** Implement extension-based and shebang-based language classification in `packages/parser/src/language/` mapping files to canonical language IDs (`typescript`, `javascript`, `python`, `go`).
+- **Dependencies:** Phase 08.
 
 ---
 
 ## Progress Dashboard
 
-### Milestone 1: Project Foundation & Core Infrastructure (6 / 7)
+### Milestone 1: Project Foundation & Core Infrastructure (7 / 7 COMPLETE 🟢)
 
 - [x] Phase 01: Monorepo & Workspace Initialization
 - [x] Phase 02: Configuration Management & Environment Validation Engine
@@ -133,17 +110,18 @@ packages/shared/src/index.ts
 - [x] Phase 04: Domain Types & Shared Data Models
 - [x] Phase 05: REST API Gateway Skeleton
 - [x] Phase 06: Web Application Shell & Layout System
-- [ ] Phase 07: Testing Infrastructure & CI Pipeline Setup
+- [x] Phase 07: Testing Infrastructure & CI Pipeline Setup
 
-### Milestone 2: Repository Scanner & AST Parsing Engine (0 / 7)
+### Milestone 2: Repository Scanner & AST Parsing Engine (1 / 7)
 
-- [ ] Phase 08: Repository Scanner & Git Boundary Detector
-- [ ] Phase 09: Incremental File Indexer & Hash Tracker
-- [ ] Phase 10: Tree-Sitter AST Parsing Infrastructure
-- [ ] Phase 11: TypeScript & JavaScript Symbol Extractor
-- [ ] Phase 12: Python AST Symbol Extractor
-- [ ] Phase 13: Go & Java AST Symbol Extractors
-- [ ] Phase 14: Diff Parser & Staged Change Mapping
+- [x] Phase 08: Repository Scanner & Git Boundary Detector
+- [ ] Phase 09: Language Detection & File Classifier
+- [ ] Phase 10: Incremental File Indexer & Hash Tracker
+- [ ] Phase 11: Tree-Sitter AST Parsing Infrastructure
+- [ ] Phase 12: TypeScript & JavaScript Symbol Extractor
+- [ ] Phase 13: Python AST Symbol Extractor
+- [ ] Phase 14: Go & Java AST Symbol Extractors
+- [ ] Phase 15: Diff Parser & Staged Change Mapping
 
 ### Milestone 3: Knowledge Graph & Context Retrieval Engine (0 / 6)
 

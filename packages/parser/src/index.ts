@@ -1,5 +1,5 @@
 /**
- * Repository Scanner & Tree-Sitter AST Parsing Infrastructure
+ * AST Parser & Repository Scanner Package Entry Point
  */
 
-export const PARSER_PACKAGE_VERSION = '0.0.0';
+export * from './scanner/index.js';

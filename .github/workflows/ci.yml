@@ -1,0 +1,104 @@
+name: Monorepo CI Quality Gate & Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality-gate:
+    name: Typecheck & Code Hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Enable Corepack & pnpm
+        run: corepack enable
+
+      - name: Install Monorepo Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Composite TypeScript Typecheck
+        run: npx tsc -b
+
+  unit-and-integration-tests:
+    name: Vitest Unit & Integration Tests (Coverage)
+    runs-on: ubuntu-latest
+    needs: quality-gate
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Enable Corepack & pnpm
+        run: corepack enable
+
+      - name: Install Monorepo Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Vitest Suite with V8 Coverage
+        run: npx vitest run --coverage
+
+  production-builds:
+    name: API Gateway & Web App Production Builds
+    runs-on: ubuntu-latest
+    needs: quality-gate
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Enable Corepack & pnpm
+        run: corepack enable
+
+      - name: Install Monorepo Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build REST API Gateway
+        run: npm run build --workspace=@repo-intel/api
+
+      - name: Build Web Application
+        run: npm run build --workspace=@repo-intel/web
+
+  playwright-e2e:
+    name: Playwright End-to-End Smoke Tests
+    runs-on: ubuntu-latest
+    needs: production-builds
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Enable Corepack & pnpm
+        run: corepack enable
+
+      - name: Install Monorepo Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Web Application for E2E Server
+        run: npm run build --workspace=@repo-intel/web
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Execute Playwright E2E Smoke Tests
+        run: npx playwright test --config=apps/web/playwright.config.ts

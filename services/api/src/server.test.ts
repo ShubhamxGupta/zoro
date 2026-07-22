@@ -1,5 +1,4 @@
-import { test, describe } from 'node:test';
-import assert from 'node:assert/strict';
+import { describe, test, expect } from 'vitest';
 import { createAppServer, type StandardErrorResponse } from './server.js';
 import type { HealthResponse } from './routes/health.js';
 
@@ -12,15 +11,15 @@ describe('Fastify REST API Gateway Skeleton', () => {
         url: '/healthz',
       });
 
-      assert.equal(response.statusCode, 200);
-      assert.equal(response.headers['content-type'], 'application/json; charset=utf-8');
+      expect(response.statusCode).toBe(200);
+      expect(response.headers['content-type']).toBe('application/json; charset=utf-8');
 
       const payload = response.json<HealthResponse>();
-      assert.equal(payload.status, 'ok');
-      assert.equal(typeof payload.uptime, 'number');
-      assert.equal(payload.version, '0.6.0');
-      assert.equal(typeof payload.timestamp, 'string');
-      assert.ok(payload.environment);
+      expect(payload.status).toBe('ok');
+      expect(typeof payload.uptime).toBe('number');
+      expect(payload.version).toBe('0.6.0');
+      expect(typeof payload.timestamp).toBe('string');
+      expect(payload.environment).toBeDefined();
       await app.close();
     });
 
@@ -31,9 +30,9 @@ describe('Fastify REST API Gateway Skeleton', () => {
         url: '/api/v1/healthz',
       });
 
-      assert.equal(response.statusCode, 200);
+      expect(response.statusCode).toBe(200);
       const payload = response.json<HealthResponse>();
-      assert.equal(payload.status, 'ok');
+      expect(payload.status).toBe('ok');
       await app.close();
     });
   });
@@ -46,13 +45,10 @@ describe('Fastify REST API Gateway Skeleton', () => {
         url: '/documentation/json',
       });
 
-      assert.equal(response.statusCode, 200);
+      expect(response.statusCode).toBe(200);
       const payload = response.json<{ openapi: string; info: { title: string } }>();
-      assert.ok(payload.openapi);
-      assert.equal(
-        payload.info.title,
-        'Repository Intelligence & Code Review Platform API Gateway',
-      );
+      expect(payload.openapi).toBeDefined();
+      expect(payload.info.title).toBe('Repository Intelligence & Code Review Platform API Gateway');
       await app.close();
     });
 
@@ -63,7 +59,7 @@ describe('Fastify REST API Gateway Skeleton', () => {
         url: '/documentation',
       });
 
-      assert.ok([200, 302].includes(response.statusCode));
+      expect([200, 302]).toContain(response.statusCode);
       await app.close();
     });
   });
@@ -81,8 +77,8 @@ describe('Fastify REST API Gateway Skeleton', () => {
         },
       });
 
-      assert.equal(response.statusCode, 200);
-      assert.equal(response.headers['x-request-id'], customId);
+      expect(response.statusCode).toBe(200);
+      expect(response.headers['x-request-id']).toBe(customId);
       await app.close();
     });
 
@@ -93,9 +89,9 @@ describe('Fastify REST API Gateway Skeleton', () => {
         url: '/healthz',
       });
 
-      assert.equal(response.statusCode, 200);
+      expect(response.statusCode).toBe(200);
       const generatedId = String(response.headers['x-request-id'] ?? '');
-      assert.ok(generatedId.length > 10);
+      expect(generatedId.length).toBeGreaterThan(10);
       await app.close();
     });
   });
@@ -108,18 +104,17 @@ describe('Fastify REST API Gateway Skeleton', () => {
         url: '/non-existent-endpoint-route',
       });
 
-      assert.equal(response.statusCode, 404);
+      expect(response.statusCode).toBe(404);
       const payload = response.json<StandardErrorResponse>();
-      assert.equal(payload.error.code, 'NOT_FOUND');
-      assert.equal(payload.error.message, 'Route GET /non-existent-endpoint-route not found');
-      assert.ok(payload.error.requestId);
-      assert.ok(payload.error.timestamp);
+      expect(payload.error.code).toBe('NOT_FOUND');
+      expect(payload.error.message).toBe('Route GET /non-existent-endpoint-route not found');
+      expect(payload.error.requestId).toBeDefined();
+      expect(payload.error.timestamp).toBeDefined();
       await app.close();
     });
 
     test('formats uncaught errors using standard error JSON structure', async () => {
       const app = createAppServer();
-      // Register a temporary route throwing an error for testing
       app.get('/test-error-trigger', async () => {
         throw new Error('Simulated runtime error');
       });
@@ -129,12 +124,12 @@ describe('Fastify REST API Gateway Skeleton', () => {
         url: '/test-error-trigger',
       });
 
-      assert.equal(response.statusCode, 500);
+      expect(response.statusCode).toBe(500);
       const payload = response.json<StandardErrorResponse>();
-      assert.equal(payload.error.code, 'INTERNAL_SERVER_ERROR');
-      assert.equal(payload.error.message, 'An unexpected internal error occurred');
-      assert.ok(payload.error.requestId);
-      assert.ok(payload.error.timestamp);
+      expect(payload.error.code).toBe('INTERNAL_SERVER_ERROR');
+      expect(payload.error.message).toBe('An unexpected internal error occurred');
+      expect(payload.error.requestId).toBeDefined();
+      expect(payload.error.timestamp).toBeDefined();
       await app.close();
     });
   });

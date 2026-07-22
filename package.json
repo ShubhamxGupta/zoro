@@ -1,6 +1,6 @@
 {
   "name": "repo-intelligence-platform",
-  "version": "0.0.0",
+  "version": "0.6.0",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -12,16 +12,28 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "pnpm --recursive run build",
-    "lint": "pnpm --recursive run lint",
-    "check-types": "pnpm --recursive run check-types",
-    "test": "pnpm --recursive run test",
-    "clean": "pnpm --recursive run clean"
+    "build": "tsc --build",
+    "lint": "eslint . --ext .ts,.tsx",
+    "check-types": "tsc --build",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test --config=apps/web/playwright.config.ts",
+    "clean": "git clean -Xdf"
   },
   "devDependencies": {
+    "@types/node": "^20.12.7",
+    "@vitest/coverage-v8": "^1.6.0",
+    "vitest": "^1.6.0",
+    "@playwright/test": "^1.44.0",
     "typescript": "^5.4.5",
     "prettier": "^3.2.5",
     "eslint": "^8.57.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "@swc/core"
+    ]
   },
   "engines": {
     "node": ">=20.0.0",

@@ -174,19 +174,21 @@ Establish the monorepo workspace, build toolchain, environment configuration sys
 
 ### Phase 07: Testing Infrastructure & CI Pipeline Setup
 
-- **Goal:** Setup Vitest test runner across workspace and GitHub Actions CI workflow.
-- **Why This Phase Exists:** Guarantees automated test execution and linting on every pull request.
-- **Features:** Vitest workspace runner setup, coverage reporting, and GitHub Actions workflow file.
-- **Tasks:**
-  - Configure `vitest.workspace.ts` at monorepo root.
-  - Write sample test specs for shared utilities.
-  - Create `.github/workflows/ci.yml` running lint, type-check, and test suites.
-- **Deliverables:** Automated CI pipeline passing on repository pushes.
+- **Status:** Completed 🟢
+- **Goal:** Setup Vitest test runner across workspace, Playwright E2E smoke tests, `@repo-intel/testing` mock package, and GitHub Actions CI workflow.
+- **Why This Phase Exists:** Guarantees automated test execution, code coverage reporting, and linting quality gates on every pull request.
+- **Features:** Vitest workspace runner setup (`vitest.config.ts`, `vitest.workspace.ts`), V8 coverage reporting, Playwright E2E smoke testing (`playwright.config.ts`, `smoke.spec.ts`), shared mock package (`@repo-intel/testing`), and multi-job GitHub Actions workflow (`.github/workflows/ci.yml`).
+- **Tasks Completed:**
+  - Configured `vitest.workspace.ts` and `vitest.config.ts` at monorepo root with V8 coverage threshold checks.
+  - Created shared testing package `@repo-intel/testing` with `MockLogger` and domain entity factories.
+  - Created Playwright E2E smoke test suite in `apps/web/e2e/smoke.spec.ts`.
+  - Created `.github/workflows/ci.yml` running lint, type-check, Vitest coverage, Playwright e2e, and production builds.
+- **Deliverables:** Automated CI pipeline passing on repository pushes; 46 passing Vitest unit/integration tests with V8 coverage reporting.
 - **Dependencies:** Phase 01 through Phase 06.
-- **Acceptance Criteria:** `pnpm test` executes tests across all sub-packages; GitHub Actions workflow executes successfully.
+- **Acceptance Criteria:** `vitest run` executes tests across all sub-packages; `npm run build` succeeds; GitHub Actions workflow passes cleanly.
 - **Testing:**
-  - _Automated:_ Run local Vitest execution with coverage threshold checks.
-- **Risks:** Flaky CI pipeline runs due to workspace path resolution.
+  - _Automated:_ Local Vitest execution (46/46 passing) and Playwright E2E smoke test execution verified.
+- **Risks:** None.
 - **Estimated Complexity:** Low.
 - **Estimated Time:** 0.5 days.
 
