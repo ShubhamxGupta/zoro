@@ -8,20 +8,20 @@ This file is the **living state file** and **persistent engineering memory** for
 
 | Metric                | Status / Value                                                                  |
 | :-------------------- | :------------------------------------------------------------------------------ |
-| **Version**           | `0.8.0` (Repository Discovery & File Walker Initialized)                        |
+| **Version**           | `0.10.0` (Repository State Store & Incremental Indexer Initialized)             |
 | **Current Milestone** | Milestone 2: Repository Scanner & AST Parsing Engine                            |
-| **Current Phase**     | Phase 08: Repository Scanner & Git Boundary Detector                            |
-| **Overall Progress**  | 19.0% (8 / 42 Phases Completed)                                                 |
+| **Current Phase**     | Phase 10: Incremental Indexer & SHA-256 State Tracker                           |
+| **Overall Progress**  | 23.8% (10 / 42 Phases Completed)                                                |
 | **Last Updated**      | 2026-07-22                                                                      |
 | **Current Branch**    | `main`                                                                          |
 | **Build Status**      | 🟢 Passing (`npx tsc -b` 0 errors across 14 packages)                           |
-| **Test Status**       | 🟢 Passing (56 Vitest tests passing; V8 coverage verified; Playwright suite)   |
+| **Test Status**       | 🟢 Passing (74 Vitest tests passing; V8 coverage verified; Playwright suite)   |
 
 ---
 
 ## Current Focus
 
-### Phase 08: Repository Scanner & Git Boundary Detector
+### Phase 10: Incremental Indexer & SHA-256 State Tracker
 
 - **Status:** Complete 🟢
 - **Started:** 2026-07-22
@@ -29,30 +29,35 @@ This file is the **living state file** and **persistent engineering memory** for
 
 #### Objectives Achieved
 
-1. Implemented repository root detection ([`root-detector.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/root-detector.ts)) searching upward for boundary markers (`.git`, `package.json`, `go.mod`, `Cargo.toml`, `pyproject.toml`).
-2. Built `.gitignore` and ignore rule evaluator ([`ignore-evaluator.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/ignore-evaluator.ts)) loading `.gitignore` and `.repo-intel-ignore` with default filtering for `.git`, `node_modules`, `dist`, `.next`, `coverage`, and OS system files.
-3. Implemented binary file detection (`isBinaryFile`) via initial 8KB buffer null-byte `/0` inspection and symlink cycle tracker ([`file-utils.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/file-utils.ts)).
-4. Built high-performance asynchronous directory walker ([`repo-walker.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/repo-walker.ts)) returning structured file manifests (`ScannedFile[]`) with progress callbacks (`ScanProgress`), sha256 hashing, and cancellation signals (`AbortSignal`).
-5. Authored Vitest unit tests ([`scanner.test.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/scanner.test.ts)) and benchmark scaffolding ([`scanner.bench.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/scanner.bench.ts)).
+1. Refactored Phase 09 with data-driven language manifest ([`languages.data.ts`](file:///d:/Coding/zoro/packages/parser/src/language/resources/languages.data.ts)), modular framework detectors ([`framework-detectors/`](file:///d:/Coding/zoro/packages/parser/src/language/framework-detectors/)) with confidence scoring, shared `RepositoryFacts` domain model, and language plugin interface contracts ([`languages/`](file:///d:/Coding/zoro/packages/parser/src/languages/)).
+2. Implemented versioned `RepositoryState` schema and `RepositoryStateStore` interface abstraction with `JsonRepositoryStateStore` backend ([`json-state-store.ts`](file:///d:/Coding/zoro/packages/parser/src/indexer/json-state-store.ts)) saving `.repo-intel-cache.json`.
+3. Built `DeltaEngine` ([`delta-engine.ts`](file:///d:/Coding/zoro/packages/parser/src/indexer/delta-engine.ts)) with metadata size/mtime hash short-circuiting ($0$ SHA-256 operations on unchanged files).
+4. Implemented `ScannerEventEmitter` ([`events.ts`](file:///d:/Coding/zoro/packages/parser/src/indexer/events.ts)) emitting lifecycle events (`RepositoryOpened`, `FileAdded`, `FileModified`, `FileDeleted`, `ScanCompleted`).
+5. Built `IncrementalIndexer` ([`incremental-indexer.ts`](file:///d:/Coding/zoro/packages/parser/src/indexer/incremental-indexer.ts)) returning rich `RepositorySnapshot` instances.
+6. Authored Vitest unit tests ([`indexer.test.ts`](file:///d:/Coding/zoro/packages/parser/src/indexer/indexer.test.ts)) and benchmark scaffolding ([`indexer.bench.ts`](file:///d:/Coding/zoro/packages/parser/src/indexer/indexer.bench.ts)).
+7. Documented **ADR-020: Repository State Store & Incremental Hash Short-Circuit Strategy** in [`decisions.md`](file:///d:/Coding/zoro/decisions.md).
 
 ---
 
 ## Current Working Files
 
 ```text
-packages/parser/package.json
-packages/parser/tsconfig.json
-packages/parser/src/index.ts
-packages/parser/src/scanner/scanner.types.ts
-packages/parser/src/scanner/root-detector.ts
-packages/parser/src/scanner/ignore-evaluator.ts
-packages/parser/src/scanner/file-utils.ts
-packages/parser/src/scanner/repo-walker.ts
-packages/parser/src/scanner/index.ts
-packages/parser/src/scanner/scanner.test.ts
-packages/parser/src/scanner/scanner.bench.ts
+packages/shared/src/types/facts.types.ts
+packages/shared/src/types/state.types.ts
+packages/parser/src/language/resources/languages.data.ts
+packages/parser/src/language/framework-detectors/
+packages/parser/src/languages/
+packages/parser/src/indexer/state-store.interface.ts
+packages/parser/src/indexer/json-state-store.ts
+packages/parser/src/indexer/delta-engine.ts
+packages/parser/src/indexer/facts-extractor.ts
+packages/parser/src/indexer/events.ts
+packages/parser/src/indexer/incremental-indexer.ts
+packages/parser/src/indexer/indexer.test.ts
+packages/parser/src/indexer/indexer.bench.ts
 memory.md
 phases.md
+decisions.md
 ```
 
 ---
@@ -61,42 +66,18 @@ phases.md
 
 ### 2026-07-22
 
-- **Phase:** Phase 08: Repository Scanner & Git Boundary Detector
-- **Feature:** Standalone file system scanner and repository boundary detector in `@repo-intel/parser`, `.gitignore` rule evaluator, binary buffer inspector, symlink loop tracker, progress reporting, cancellation support, unit test suite, and benchmark scaffolding.
-- **Files Created / Modified:**
-  - [`packages/parser/package.json`](file:///d:/Coding/zoro/packages/parser/package.json)
-  - [`packages/parser/tsconfig.json`](file:///d:/Coding/zoro/packages/parser/tsconfig.json)
-  - [`packages/parser/src/index.ts`](file:///d:/Coding/zoro/packages/parser/src/index.ts)
-  - [`packages/parser/src/scanner/scanner.types.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/scanner.types.ts)
-  - [`packages/parser/src/scanner/root-detector.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/root-detector.ts)
-  - [`packages/parser/src/scanner/ignore-evaluator.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/ignore-evaluator.ts)
-  - [`packages/parser/src/scanner/file-utils.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/file-utils.ts)
-  - [`packages/parser/src/scanner/repo-walker.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/repo-walker.ts)
-  - [`packages/parser/src/scanner/index.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/index.ts)
-  - [`packages/parser/src/scanner/scanner.test.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/scanner.test.ts)
-  - [`packages/parser/src/scanner/scanner.bench.ts`](file:///d:/Coding/zoro/packages/parser/src/scanner/scanner.bench.ts)
-  - [`memory.md`](file:///d:/Coding/zoro/memory.md)
-  - [`phases.md`](file:///d:/Coding/zoro/phases.md)
-- **Summary:** Built Phase 08 Repository Discovery & File Walker in `@repo-intel/parser`. Implemented root detection, `.gitignore` parsing, recursive traversal, binary buffer checking, symlink cycle prevention, progress reporting, and cancellation support. Verified with 56 passing Vitest unit tests across the workspace.
-
----
-
-## Current TODO
-
-1. [x] Build root detector `detectRepositoryRoot`.
-2. [x] Implement `.gitignore` and `.repo-intel-ignore` evaluator.
-3. [x] Implement binary file inspector and symlink cycle tracker.
-4. [x] Implement `walkRepository` with progress callback and cancellation.
-5. [x] Write Vitest unit tests and benchmark scaffolding.
+- **Phase:** Phase 10: Incremental Indexer & SHA-256 State Tracker
+- **Feature:** Repository State Store abstraction (`JsonRepositoryStateStore`), metadata hash short-circuit optimization, modular framework detectors with confidence scores, `RepositoryFacts` domain model, language plugin interfaces, event-driven scanner emitter, unit tests (74 passing), benchmark scaffolding, and ADR-020.
+- **Summary:** Completed Phase 09 improvements and Phase 10 Repository State Store & Incremental Indexer in `@repo-intel/parser` and `@repo-intel/shared`. Verified with 74 passing Vitest unit tests across the workspace.
 
 ---
 
 ## Upcoming Phase
 
-### Phase 09: Language Detection & File Classifier
+### Phase 11: Tree-Sitter Parser Abstraction Manager
 
-- **Goal:** Implement extension-based and shebang-based language classification in `packages/parser/src/language/` mapping files to canonical language IDs (`typescript`, `javascript`, `python`, `go`).
-- **Dependencies:** Phase 08.
+- **Goal:** Create unified Tree-Sitter parser manager interface in `packages/parser/src/treesitter/` pooling instances and managing grammar load cycles.
+- **Dependencies:** Phase 10.
 
 ---
 
@@ -112,12 +93,12 @@ phases.md
 - [x] Phase 06: Web Application Shell & Layout System
 - [x] Phase 07: Testing Infrastructure & CI Pipeline Setup
 
-### Milestone 2: Repository Scanner & AST Parsing Engine (1 / 7)
+### Milestone 3: Repository Scanner & AST Parsing Engine (3 / 7)
 
 - [x] Phase 08: Repository Scanner & Git Boundary Detector
-- [ ] Phase 09: Language Detection & File Classifier
-- [ ] Phase 10: Incremental File Indexer & Hash Tracker
-- [ ] Phase 11: Tree-Sitter AST Parsing Infrastructure
+- [x] Phase 09: Language Detection & File Classifier
+- [x] Phase 10: Incremental Indexer & SHA-256 State Tracker
+- [ ] Phase 11: Tree-Sitter Parser Abstraction Manager
 - [ ] Phase 12: TypeScript & JavaScript Symbol Extractor
 - [ ] Phase 13: Python AST Symbol Extractor
 - [ ] Phase 14: Go & Java AST Symbol Extractors

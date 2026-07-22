@@ -62,8 +62,8 @@ export async function classifyFile(file: ScannedFile): Promise<ClassifiedFile> {
   if (spec) {
     languageId = spec.languageId;
     category = spec.defaultCategory;
-    treeSitterGrammar = spec.treeSitterGrammar;
-    isSupportedByParser = spec.isSupportedByParser;
+    treeSitterGrammar = spec.treeSitterGrammar ?? undefined;
+    isSupportedByParser = spec.isSupportedByParser ?? false;
   } else {
     // Fallback: Shebang detection for files without standard extensions
     const shebangLang = await detectLanguageByShebang(file.absolutePath);
@@ -71,7 +71,7 @@ export async function classifyFile(file: ScannedFile): Promise<ClassifiedFile> {
       languageId = shebangLang;
       category = 'source';
       const shebangSpec = getLanguageSpecByExtension(shebangLang === 'javascript' ? '.js' : '.py');
-      treeSitterGrammar = shebangSpec?.treeSitterGrammar;
+      treeSitterGrammar = shebangSpec?.treeSitterGrammar ?? undefined;
       isSupportedByParser = shebangSpec?.isSupportedByParser ?? false;
     }
   }

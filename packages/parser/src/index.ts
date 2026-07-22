@@ -4,3 +4,5 @@
 
 export * from './scanner/index.js';
 export * from './language/index.js';
+export * from './languages/index.js';
+export * from './indexer/index.js';

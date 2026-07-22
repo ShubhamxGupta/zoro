@@ -4,3 +4,5 @@ export * from './finding.types.js';
 export * from './pal.types.js';
 export * from './diff.types.js';
 export * from './language.types.js';
+export * from './facts.types.js';
+export * from './state.types.js';

@@ -13,6 +13,8 @@ const DEFAULT_ALWAYS_IGNORED = [
   '.next/**',
   'coverage',
   'coverage/**',
+  '.repo-intel-cache.json',
+  '.repo-intel-cache.json*',
   '.DS_Store',
   'Thumbs.db',
 ];
