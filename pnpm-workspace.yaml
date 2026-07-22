@@ -3,6 +3,6 @@ packages:
   - 'packages/*'
   - 'services/*'
 
-onlyBuiltDependencies:
-  - esbuild
-  - '@swc/core'
+allowBuilds:
+  esbuild: true
+  '@swc/core': true
