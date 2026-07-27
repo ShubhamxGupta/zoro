@@ -1,16 +1,6 @@
-; Python Symbol Extraction Queries
-; Phase 13 will implement these using real tree-sitter-python grammar.
-;
-; Expected captures:
-;   @function.name   — top-level function definitions
-;   @class.name      — class definitions
-;   @import.source   — import statement targets
-
-(function_definition
-  name: (identifier) @function.name)
-
-(class_definition
-  name: (identifier) @class.name)
-
-(import_statement
-  name: (dotted_name) @import.source)
+; Python Symbol Extraction S-Expression Queries
+(function_definition name: (identifier) @function.name) @function.def
+(class_definition name: (identifier) @class.name) @class.def
+(import_statement) @import.statement
+(import_from_statement) @import.from_statement
+(comment) @comment.node

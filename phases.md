@@ -340,9 +340,10 @@ Build high-speed file system discovery, incremental git indexers, Tree-Sitter pa
 
 ---
 
-### Phase 14: Go & Java AST Symbol Extractors
+### Phase 14: Multi-Language AST Symbol Extractors (Python, Go, Java)
 
-- **Goal:** Implement AST symbol extractors for Go (`go-extractor.ts`) and Java (`java-extractor.ts`).
+- **Status:** Completed 🟢
+- **Goal:** Implement AST symbol extractors for Python (`py-extractor.ts`), Go (`go-extractor.ts`), and Java (`java-extractor.ts`).
 - **Why This Phase Exists:** Expands multi-language coverage to compile-time typed languages.
 - **Features:** Tree-Sitter queries for Go structs/interfaces/functions and Java classes/interfaces/methods.
 - **Tasks:**

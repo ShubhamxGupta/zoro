@@ -63,5 +63,34 @@ export function createDefaultQueryRegistry(): QueryRegistry {
   registry.registerQuery('typescript', 'symbols', tsSymbolsQuery);
   registry.registerQuery('javascript', 'symbols', tsSymbolsQuery);
 
+  const pySymbolsQuery = `; Python Symbol Extraction S-Expression Queries
+(function_definition name: (identifier) @function.name) @function.def
+(class_definition name: (identifier) @class.name) @class.def
+(import_statement) @import.statement
+(import_from_statement) @import.from_statement
+(comment) @comment.node
+`;
+  registry.registerQuery('python', 'symbols', pySymbolsQuery);
+
+  const goSymbolsQuery = `; Go Symbol Extraction S-Expression Queries
+(function_declaration name: (identifier) @function.name) @function.def
+(method_declaration name: (field_identifier) @method.name) @method.def
+(type_declaration (type_spec name: (type_identifier) @type.name)) @type.def
+(import_declaration) @import.statement
+(comment) @comment.node
+`;
+  registry.registerQuery('go', 'symbols', goSymbolsQuery);
+
+  const javaSymbolsQuery = `; Java Symbol Extraction S-Expression Queries
+(class_declaration name: (identifier) @class.name) @class.def
+(interface_declaration name: (identifier) @interface.name) @interface.def
+(enum_declaration name: (identifier) @enum.name) @enum.def
+(method_declaration name: (identifier) @method.name) @method.def
+(constructor_declaration name: (identifier) @constructor.name) @constructor.def
+(import_declaration) @import.statement
+(comment) @comment.node
+`;
+  registry.registerQuery('java', 'symbols', javaSymbolsQuery);
+
   return registry;
 }

@@ -8,24 +8,40 @@ This file is the **living state file** and **persistent engineering memory** for
 
 | Metric                | Status / Value                                                                 |
 | :-------------------- | :----------------------------------------------------------------------------- |
-| **Version**           | `0.13.0` (Semantic Relationship Extraction & Knowledge Graph Builder)          |
-| **Current Milestone** | Milestone 3: Knowledge Graph & Context Retrieval Engine                        |
-| **Current Phase**     | Phase 13: Semantic Relationship Extraction & Knowledge Graph Builder ✅        |
-| **Overall Progress**  | 31.0% (13 / 42 Phases Completed)                                               |
+| **Version**           | `0.14.0` (Multi-Language AST Symbol Extractors - Python, Go, Java)             |
+| **Current Milestone** | Milestone 2: Repository Scanner & AST Parsing Engine (COMPLETE 🟢)             |
+| **Current Phase**     | Phase 14: Multi-Language AST Symbol Extractors ✅                              |
+| **Overall Progress**  | 33.3% (14 / 42 Phases Completed)                                               |
 | **Last Updated**      | 2026-07-27                                                                     |
 | **Current Branch**    | `main`                                                                         |
 | **Build Status**      | 🟢 Passing (`npm run build` 0 errors across workspace)                         |
-| **Test Status**       | 🟢 Passing (138/138 Vitest tests; 16 new Phase 13 tests; V8 coverage verified) |
+| **Test Status**       | 🟢 Passing (156/156 Vitest tests; 18 new Phase 14 tests; V8 coverage verified) |
 
 ---
 
 ## Current Focus
 
-### Phase 13: Semantic Relationship Extraction & Knowledge Graph Builder
+### Phase 14: Multi-Language AST Symbol Extractors (Python, Go, Java)
 
 - **Status:** Complete 🟢
 - **Started:** 2026-07-27
 - **Completed:** 2026-07-27
+
+#### Objectives Achieved
+
+1. **Python Symbol Extractor** (`packages/parser/src/extractors/py-extractor.ts`):
+   - Implemented `PythonExtractor` handling Python class definitions, methods, top-level functions, `async def` definitions, return types, parameters, docstrings (`"""..."""`), `import`/`import_from` statements, and export visibility.
+
+2. **Go Symbol Extractor** (`packages/parser/src/extractors/go-extractor.ts`):
+   - Implemented `GoExtractor` handling package declarations, functions, receiver methods (`func (s *Service) Handle()`), structs, interfaces, package import declarations, doc comments (`// ...`), and Go capital letter export detection (`[A-Z]...`).
+
+3. **Java Symbol Extractor** (`packages/parser/src/extractors/java-extractor.ts`):
+   - Implemented `JavaExtractor` handling package declarations, `class`, `interface`, `enum` declarations, methods, constructors, visibility modifiers (`public`, `private`, `protected`, `static`, `abstract`), JavaDoc comments (`/** ... */`), and import statements (`import java.util.List`).
+
+4. **Multi-Language Query Registry & Tests:**
+   - Pre-populated Python, Go, and Java S-expression query manifests in `QueryRegistry`.
+   - Added 18 new unit tests across `py-extractor.test.ts`, `go-extractor.test.ts`, and `java-extractor.test.ts` (156/156 monorepo tests passing).
+
 
 #### Objectives Achieved
 
