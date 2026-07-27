@@ -10,5 +10,8 @@
     "check-types": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
     "clean": "rimraf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@repo-intel/shared": "workspace:*"
   }
 }

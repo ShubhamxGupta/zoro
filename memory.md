@@ -6,22 +6,22 @@ This file is the **living state file** and **persistent engineering memory** for
 
 ### Project Status
 
-| Metric                | Status / Value                                                                 |
-| :-------------------- | :----------------------------------------------------------------------------- |
-| **Version**           | `0.17.0` (GraphRAG Retrieval Engine)                                           |
-| **Current Milestone** | Milestone 3: Knowledge Graph & Context Retrieval Engine (COMPLETE 🟢)          |
-| **Current Phase**     | Phase 17: GraphRAG Retrieval Engine ✅                                         |
-| **Overall Progress**  | 40.5% (17 / 42 Phases Completed)                                               |
-| **Last Updated**      | 2026-07-27                                                                     |
-| **Current Branch**    | `main`                                                                         |
-| **Build Status**      | 🟢 Passing (`npm run build` 0 errors across workspace)                         |
-| **Test Status**       | 🟢 Passing (194/194 Vitest tests; 10 new Phase 17 tests; V8 coverage verified) |
+| Metric                | Status / Value                                                                     |
+| :-------------------- | :--------------------------------------------------------------------------------- |
+| **Version**           | `0.18.0` (AI Platform Layer, Multi-Agent Review Engine & CI Modernization)         |
+| **Current Milestone** | Milestone 4: Multi-Agent AI Review & Patch Generation Pipeline                     |
+| **Current Phase**     | Phase 18: AI Platform Layer (PAL), Multi-Agent Review Engine & CI Modernization ✅ |
+| **Overall Progress**  | 42.9% (18 / 42 Phases Completed)                                                   |
+| **Last Updated**      | 2026-07-27                                                                         |
+| **Current Branch**    | `main`                                                                             |
+| **Build Status**      | 🟢 Passing (`npm run build` 0 errors across workspace)                             |
+| **Test Status**       | 🟢 Passing (202/202 Vitest tests; 8 new Phase 18 tests; V8 coverage verified)      |
 
 ---
 
 ## Current Focus
 
-### Phase 17: GraphRAG Retrieval Engine
+### Phase 18: AI Platform Layer (PAL), Multi-Agent Review Engine & CI Modernization
 
 - **Status:** Complete 🟢
 - **Started:** 2026-07-27
@@ -29,7 +29,24 @@ This file is the **living state file** and **persistent engineering memory** for
 
 #### Objectives Achieved
 
-1. **Phase 16 Architectural Improvements (`@repo-intel/retrieval` & `@repo-intel/shared`):**
+1. **Phase 18A — Repository Health & CI Stabilization:**
+   - Updated `.github/workflows/ci.yml` supporting `workflow_dispatch`, Node 22 LTS environment, frozen lockfile enforcement, composite typechecking, Vitest coverage artifact uploads, and npm security audit.
+   - Configured static security analysis in `.github/workflows/codeql.yml` and automated dependency updates in `.github/dependabot.yml`.
+
+2. **Phase 18B — AI Platform Layer (PAL) (`@repo-intel/ai`):**
+   - Introduced `AIProvider` interface (`chat`, `stream`, `embeddings`, `health`, `metadata`).
+   - Implemented `MockAIProvider`, `OpenAIProvider`, and `OllamaProvider`.
+   - Implemented `ProviderRegistry` (dynamic provider registration, health monitoring, automatic failover chains) and `ModelRegistry`.
+   - Built `PromptTemplateManager` separating prompt templates from application logic.
+
+3. **Phase 18C — Multi-Agent Review Engine (`@repo-intel/review-engine`):**
+   - Implemented 6 decoupled specialized review agents (`ArchitectureAgent`, `BugDetectionAgent`, `PerformanceAgent`, `SecurityAgent`, `CodeQualityAgent`, `DocumentationAgent`).
+   - Implemented `AgentOrchestrator` orchestrating parallel agent execution, 10s timeouts, retries, fallback providers, and finding aggregation into standard `ExplainableFinding[]`.
+
+4. **Phase 18D — Patch Planning Engine (`@repo-intel/patch-gen`):**
+   - Implemented `PatchPlanner` generating structured `PatchPlan` objects (affected files, affected symbols, rationale, estimated complexity, dependency impact, risk score) without source code mutation.
+
+5. **Phase 16 Architectural Improvements (`@repo-intel/retrieval` & `@repo-intel/shared`):**
    - **Retrieval Pipeline Interface:** Introduced `RetrievalPipeline` (`retrieve(query): Promise<RetrievalBundle>`).
    - **Query Intent Model:** Built `QueryAnalyzer` classifying questions into 8 intent categories (`bug_investigation`, `architecture`, `dependency`, `performance`, `security`, `documentation`, `refactoring`, `general_search`).
    - **Retrieval Planner:** Built `DefaultRetrievalPlanner` computing optimal `vectorK`, `maxHops`, expansion strategies, and token budget.
@@ -38,7 +55,7 @@ This file is the **living state file** and **persistent engineering memory** for
    - **Entity Provenance & Metrics:** Tracked `EntityRetrievalProvenance` and recorded stage latency metrics (`RetrievalMetrics`).
    - **Standardized Agent Payload:** Created `RetrievalBundle` payload model for downstream AI review agents.
 
-2. **GraphRAG Retrieval Engine (`@repo-intel/retrieval`):**
+6. **GraphRAG Retrieval Engine (`@repo-intel/retrieval`):**
    - Implemented `GraphRAGRetrievalEngine` orchestrating intent analysis, retrieval planning, vector search, multi-hop graph expansion, context compression, score ranking, and retrieval bundle payload generation.
 
 #### Objectives Achieved

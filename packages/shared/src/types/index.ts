@@ -22,3 +22,5 @@ export * from './retrieval-planner.types.js';
 export * from './retrieval-provenance.types.js';
 export * from './retrieval-bundle.types.js';
 export * from './retrieval-pipeline.types.js';
+export * from './pal-provider.types.js';
+export * from './patch-plan.types.js';

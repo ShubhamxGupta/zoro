@@ -1,5 +1,10 @@
 /**
- * AI Provider Abstraction Layer (PAL) Interface & Model Adapters
+ * AI Platform Layer (PAL) & Provider Abstraction Entry Point
  */
 
-export const AI_PACKAGE_VERSION = '0.0.0';
+export * from './providers/mock-ai-provider.js';
+export * from './providers/openai-provider.js';
+export * from './providers/ollama-provider.js';
+export * from './registry/provider-registry.js';
+export * from './registry/model-registry.js';
+export * from './prompts/prompt-template-manager.js';

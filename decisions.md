@@ -819,6 +819,94 @@ GraphRAG guarantees that AI review agents receive concise ($< 2,000$ tokens), hi
 
 ---
 
+### ADR-026: AI Platform Layer (PAL) & Provider Abstraction
+
+- **Status:** Accepted
+- **Date:** 2026-07-27
+
+#### Context
+
+Code intelligence features must avoid vendor lock-in to specific AI foundation model providers (e.g., OpenAI, Anthropic, Google Gemini, Ollama, OpenRouter). System business logic, review agents, and patch planners should consume a provider-agnostic interface capable of runtime provider switching, automatic health monitoring, and failover execution.
+
+#### Alternatives Considered
+
+1. **Direct SDK Import (e.g., `openai` or `@google/generative-ai` in review code):** Tightly couples review agents to proprietary vendor APIs, making air-gapped local LLM deployments (Ollama) impossible.
+2. **Provider-Independent AI Platform Layer (`AIProvider`, `ProviderRegistry`, `ModelRegistry`):**
+   - **`AIProvider` Interface:** `chat`, `stream`, `embeddings`, `health`, `metadata`.
+   - **`ProviderRegistry`:** Dynamic provider registration, active provider selection, and health-based failover chains (`openai` -> `ollama` -> `mock`).
+   - **`ModelRegistry`:** Context window specs, token pricing, reasoning, tool support, streaming, and vision capabilities.
+   - **`PromptTemplateManager`:** Decoupled external prompt templates for `architecture`, `bug`, `performance`, `security`, `code_quality`, `documentation`.
+
+#### Why This Option Was Chosen
+
+`AIProvider` guarantees total provider independence, zero-downtime failover, and seamless switching between cloud LLMs and air-gapped local models.
+
+#### Consequences
+
+- **Positive:** Zero vendor lock-in, air-gap compatibility via `OllamaProvider`, deterministic offline testing via `MockAIProvider`.
+- **Negative:** Requires mapping provider-specific response formats to standard `AIChatResponse`.
+- **Affected Modules:** `@repo-intel/shared`, `@repo-intel/ai`, `@repo-intel/review-engine`.
+
+---
+
+### ADR-027: Multi-Agent Review Architecture
+
+- **Status:** Accepted
+- **Date:** 2026-07-27
+
+#### Context
+
+Code review requires multidimensional inspection (architecture, security, performance, logic bugs, code quality, documentation). A monolithic single-prompt LLM call suffers from context pollution, high latency, and poor specialized analysis.
+
+#### Alternatives Considered
+
+1. **Monolithic Prompt LLM Review:** Passing the entire context to a single prompt asking for "all issues" produces surface-level, inconsistent feedback.
+2. **Decoupled Multi-Agent Review Engine (`AgentOrchestrator` & 6 Specialized Agents):**
+   - **Specialized Agents:** `ArchitectureAgent`, `BugDetectionAgent`, `PerformanceAgent`, `SecurityAgent`, `CodeQualityAgent`, `DocumentationAgent`.
+   - **Independent Execution:** Every agent operates in isolation, receiving `RetrievalBundle` subgraphs and selecting domain-specific prompts.
+   - **`AgentOrchestrator`:** Orchestrates parallel agent execution with configurable timeouts (10s), retry logic, fallback providers, and finding aggregation into standard `ExplainableFinding[]`.
+
+#### Why This Option Was Chosen
+
+Multi-agent parallelism provides deep, specialized analysis across domain concerns while reducing review latency via concurrent provider calls.
+
+#### Consequences
+
+- **Positive:** High audit precision, parallel review execution, fault isolation, standardized `ExplainableFinding` payloads.
+- **Negative:** Increases token consumption across concurrent LLM API calls.
+- **Affected Modules:** `@repo-intel/shared`, `@repo-intel/ai`, `@repo-intel/review-engine`.
+
+---
+
+### ADR-028: CI/CD & Release Pipeline Strategy
+
+- **Status:** Accepted
+- **Date:** 2026-07-27
+
+#### Context
+
+Monorepo stability and security require rigorous continuous integration quality gates on Node 22 LTS, frozen lockfile enforcement, composite TypeScript compilation, unit test coverage reporting, static CodeQL security analysis, and automated dependency management.
+
+#### Alternatives Considered
+
+1. **Ad-hoc Unstructured CI Scripts:** Leads to non-reproducible builds, lockfile drift, and silent type failures.
+2. **Stage-Gated GitHub Actions Workflows (`ci.yml`, `codeql.yml`, `dependabot.yml`):**
+   - **Quality Gates:** Lockfile verification (`pnpm install --frozen-lockfile`), format checking, `tsc --build` composite typecheck.
+   - **Testing & Artifacts:** Vitest suite execution with JUnit test reporting and V8 coverage artifact uploads.
+   - **Security:** Static security analysis via GitHub CodeQL (`javascript-typescript`) and weekly Dependabot dependency checks.
+
+#### Why This Option Was Chosen
+
+Stage-gated CI enforces strict build hygiene and prevents broken code or security vulnerabilities from reaching `main`.
+
+#### Consequences
+
+- **Positive:** Automated lockfile hygiene, zero type errors, security vulnerability prevention, reproducible builds.
+- **Negative:** Requires managing GitHub Actions runner execution times.
+- **Affected Modules:** `.github/workflows/`, root repository configuration.
+
+---
+
 ## Decision Rules & Governance
 
 A new Architecture Decision Record (**ADR**) **MUST** be created whenever:

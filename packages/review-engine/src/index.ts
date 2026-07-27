@@ -1,5 +1,8 @@
 /**
- * Multi-Agent Review Framework & Finding Aggregator Engine
+ * Multi-Agent Review Engine Entry Point
  */
 
-export const REVIEW_ENGINE_PACKAGE_VERSION = '0.0.0';
+export * from './agents/agent.interface.js';
+export * from './agents/base-agent.js';
+export * from './agents/specialized-agents.js';
+export * from './orchestrator/agent-orchestrator.js';

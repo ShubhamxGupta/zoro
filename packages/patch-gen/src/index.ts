@@ -1,5 +1,5 @@
 /**
- * Unified Patch Generator & Auto-Fix Framework
+ * Unified Patch Generator & Auto-Fix Framework Entry Point
  */
 
-export const PATCH_GEN_PACKAGE_VERSION = '0.0.0';
+export * from './planner/patch-planner.js';
