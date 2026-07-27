@@ -1,28 +1,56 @@
 ; TypeScript / JavaScript Symbol Extraction Queries
-; Phase 12 will implement these using real Tree-Sitter grammar bindings.
-;
-; Expected captures:
-;   @function.name   — top-level function declarations
-;   @class.name      — class declarations
-;   @method.name     — method definitions
-;   @interface.name  — interface declarations (TypeScript only)
-;   @import.source   — import statement specifiers
-;   @export.name     — exported symbol names
+; Comprehensive S-expression patterns for Tree-Sitter parsing
 
-; Function declarations
+; --- Function Declarations ---
 (function_declaration
-  name: (identifier) @function.name)
+  name: (identifier) @function.name) @function.def
 
-; Arrow function assigned to variable
+(generator_function_declaration
+  name: (identifier) @function.name) @function.def
+
+; --- Arrow Functions & Function Expressions assigned to variables ---
 (lexical_declaration
   (variable_declarator
     name: (identifier) @function.name
-    value: (arrow_function)))
+    value: (arrow_function))) @function.def
 
-; Class declarations
+(lexical_declaration
+  (variable_declarator
+    name: (identifier) @function.name
+    value: (function_expression))) @function.def
+
+(variable_declaration
+  (variable_declarator
+    name: (identifier) @function.name
+    value: (arrow_function))) @function.def
+
+; --- Class Declarations ---
 (class_declaration
-  name: (type_identifier) @class.name)
+  name: (type_identifier) @class.name) @class.def
 
-; Method definitions
+(abstract_class_declaration
+  name: (type_identifier) @class.name) @class.def
+
+; --- Method Definitions ---
 (method_definition
-  name: (property_identifier) @method.name)
+  name: (property_identifier) @method.name) @method.def
+
+(abstract_method_signature
+  name: (property_identifier) @method.name) @method.def
+
+; --- Interfaces ---
+(interface_declaration
+  name: (type_identifier) @interface.name) @interface.def
+
+; --- Type Aliases ---
+(type_alias_declaration
+  name: (type_identifier) @type_alias.name) @type_alias.def
+
+; --- Enums ---
+(enum_declaration
+  name: (identifier) @enum.name) @enum.def
+
+; --- Imports & Exports ---
+(import_statement) @import.statement
+(export_statement) @export.statement
+(comment) @comment.node

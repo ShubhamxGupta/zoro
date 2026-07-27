@@ -8,24 +8,41 @@ This file is the **living state file** and **persistent engineering memory** for
 
 | Metric                | Status / Value                                                                 |
 | :-------------------- | :----------------------------------------------------------------------------- |
-| **Version**           | `0.11.0` (Tree-Sitter Parser Abstraction Manager)                              |
+| **Version**           | `0.12.0` (TypeScript & JavaScript AST Symbol Extractor)                        |
 | **Current Milestone** | Milestone 2: Repository Scanner & AST Parsing Engine                           |
-| **Current Phase**     | Phase 11: Tree-Sitter Parser Abstraction Manager ✅                            |
-| **Overall Progress**  | 26.2% (11 / 42 Phases Completed)                                               |
-| **Last Updated**      | 2026-07-22                                                                     |
+| **Current Phase**     | Phase 12: TypeScript & JavaScript AST Symbol Extractor ✅                      |
+| **Overall Progress**  | 28.5% (12 / 42 Phases Completed)                                               |
+| **Last Updated**      | 2026-07-27                                                                     |
 | **Current Branch**    | `main`                                                                         |
-| **Build Status**      | 🟢 Passing (`npx tsc -b` 0 errors across 14 packages)                          |
-| **Test Status**       | 🟢 Passing (108/108 Vitest tests; 16 new Phase 11 tests; V8 coverage verified) |
+| **Build Status**      | 🟢 Passing (`npx tsc -b` 0 errors across workspace)                            |
+| **Test Status**       | 🟢 Passing (122/122 Vitest tests; 14 new Phase 12 tests; V8 coverage verified) |
 
 ---
 
 ## Current Focus
 
-### Phase 11: Tree-Sitter Parser Abstraction Manager
+### Phase 12: TypeScript & JavaScript AST Symbol Extractor
 
 - **Status:** Complete 🟢
-- **Started:** 2026-07-22
-- **Completed:** 2026-07-22
+- **Started:** 2026-07-27
+- **Completed:** 2026-07-27
+
+#### Objectives Achieved
+
+1. **Symbol Extractor Abstraction** (`packages/parser/src/extractors/extractor.interface.ts`):
+   - Defined `SymbolExtractor` interface (`languageId`, `supportedExtensions`, `extract(tree, filePath): ExtractedFileSymbols`).
+   - Standardized `ExtractedFileSymbols` payload structure returning `symbols: SymbolNode[]`, `imports: ImportStatement[]`, `exports: string[]`, `loc: number`.
+
+2. **TypeScript & JavaScript S-Expression Query Manifest** (`packages/parser/queries/typescript/symbols.scm`):
+   - Extended queries for functions, arrow functions, classes, methods, interfaces, type aliases, enums, imports, and exports.
+
+3. **TypeScript Extractor Implementation** (`packages/parser/src/extractors/ts-extractor.ts`):
+   - Built `TypeScriptExtractor` handling function declarations, arrow function variable declarators, class declarations, interface declarations, type aliases, enums, constructor/method signatures, modifiers (`export`, `async`, `public`, `private`, `protected`, `static`), JSDoc docstrings, named/default/wildcard imports, and exports.
+
+4. **Tests & Barrels** (`packages/parser/src/extractors/ts-extractor.test.ts`, `index.ts`):
+   - Added 14 unit tests verifying symbol node IDs, kind classification, signatures, docstrings, imports, exports, and empty tree handling.
+   - Exported extractor module from `@repo-intel/parser`.
+
 
 #### Objectives Achieved
 

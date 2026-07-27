@@ -298,6 +298,7 @@ Build high-speed file system discovery, incremental git indexers, Tree-Sitter pa
 
 ### Phase 12: TypeScript & JavaScript AST Symbol Extractor
 
+- **Status:** Completed 🟢
 - **Goal:** Build symbol extraction queries for TypeScript/JavaScript in `packages/parser/src/extractors/ts-extractor.ts`.
 - **Why This Phase Exists:** Must extract functions, classes, interfaces, methods, and variables from TS/JS code.
 - **Features:** Tree-Sitter query handler for TypeScript symbol declarations, line ranges, and imports.
