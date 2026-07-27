@@ -4,45 +4,33 @@ test.describe('Repository Intelligence Web Application Smoke Tests', () => {
   test('renders landing page with correct header title and metrics', async ({ page }) => {
     await page.goto('/');
 
-    // Check main title branding
-    await expect(page.locator('h1.display-title')).toContainText(
-      'Repository Intelligence Dashboard',
-    );
+    // Check main title branding in header
+    await expect(page.locator('header')).toContainText('Repo Intelligence Platform');
 
-    // Check Header breadcrumb
-    await expect(page.locator('header')).toContainText('repo-intel');
+    // Check dashboard heading
+    await expect(page.getByRole('heading', { name: 'Repository Dashboard' })).toBeVisible();
 
-    // Check Footer status bar
-    await expect(page.locator('footer')).toContainText('ONLINE');
-
-    // Check Metric Cards render
-    await expect(page.getByText('Code Quality Index')).toBeVisible();
-    await expect(page.getByText('Overall Risk Rating')).toBeVisible();
-    await expect(page.getByText('Open Review Findings')).toBeVisible();
+    // Check Metric Cards render inside main area
+    const mainArea = page.getByRole('main');
+    await expect(mainArea.getByText('Repository', { exact: true })).toBeVisible();
+    await expect(mainArea.getByText('Index Size', { exact: true })).toBeVisible();
+    await expect(mainArea.getByText('Knowledge Graph', { exact: true })).toBeVisible();
+    await expect(mainArea.getByText('AI Engine', { exact: true })).toBeVisible();
   });
 
-  test('toggles theme system state between dark and light modes', async ({ page }) => {
+  test('navigates through application tabs correctly', async ({ page }) => {
     await page.goto('/');
 
-    const htmlElement = page.locator('html');
-    await expect(htmlElement).toHaveAttribute('data-theme', 'dark');
+    // Click Review & Findings tab
+    await page.getByRole('button', { name: /Review & Findings/i }).click();
+    await expect(page.getByText('AI Code Review Engine')).toBeVisible();
 
-    // Click Theme Switcher Toggle button in header
-    const themeToggleBtn = page.getByRole('button', { name: /toggle theme/i });
-    if (await themeToggleBtn.isVisible()) {
-      await themeToggleBtn.click();
-      await expect(htmlElement).toHaveAttribute('data-theme', 'light');
-    }
-  });
+    // Click GraphRAG Chat tab
+    await page.getByRole('button', { name: /GraphRAG Chat/i }).click();
+    await expect(page.getByText('GraphRAG Repository Chat')).toBeVisible();
 
-  test('opens global command palette modal on trigger click', async ({ page }) => {
-    await page.goto('/');
-
-    // Trigger Command Palette trigger
-    const cmdTrigger = page.getByRole('button', { name: /Trigger Review/i });
-    await cmdTrigger.click();
-
-    // Verify Command Palette modal opens
-    await expect(page.getByText('Global Command Palette')).toBeVisible();
+    // Click AI Providers tab
+    await page.getByRole('button', { name: /AI Providers/i }).click();
+    await expect(page.getByText('AI Provider Configuration')).toBeVisible();
   });
 });

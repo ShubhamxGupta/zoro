@@ -18,7 +18,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run start --workspace=@repo-intel/web',
+    command: 'npx next start apps/web -p 3001',
+    cwd: '../../',
     url: 'http://localhost:3001',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
