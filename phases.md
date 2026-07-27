@@ -389,21 +389,23 @@ Construct the Repository Knowledge Graph (RKG), resolve symbol references across
 
 ---
 
-### Phase 16: Module Dependency & Import Graph Builder
+### Phase 16: Embeddings & Semantic Search Foundation
 
-- **Goal:** Build file-level and module-level import/export dependency graphs in `packages/graph/src/builder/`.
-- **Why This Phase Exists:** Necessary for architectural layer analysis and circular dependency detection.
-- **Features:** Import graph builder creating `IMPORTS` and `BELONGS_TO` edges between File and Module nodes.
-- **Tasks:**
-  - Process extracted file imports.
-  - Create `FileNode` and `ModuleNode` instances.
-  - Create directional `IMPORTS` edges between source and target files.
-  - Detect circular import cycles ($A \rightarrow B \rightarrow A$).
-- **Deliverables:** Import Dependency Graph generator.
-- **Dependencies:** Phase 15.
-- **Acceptance Criteria:** Builds complete dependency graph for a repository and correctly flags circular imports.
-- **Testing:**
-  - _Unit Tests:_ Test dependency graph generation on mock 10-file repository with circular references.
+- **Status:** Completed 🟢
+- **Goal:** Implement the vector embedding pipeline, vector storage abstraction (`VectorStore`), context builder (`ContextBuilder`), incremental embedding engine, hybrid search interfaces, ranking service (`RankingService`), and semantic search engine (`SemanticSearchEngine`) in `@repo-intel/retrieval`.
+- **Why This Phase Exists:** Unifies structural Knowledge Graph semantics with vector similarity search for context retrieval and semantic code discovery.
+- **Features:**
+  - `EmbeddingProvider` abstraction & `MockEmbeddingProvider` (128-d vectors).
+  - `ContextBuilder` generating rich semantic text for `Repository`, `File`, `Symbol`, and `Module` graph nodes.
+  - `VectorStore` interface & `InMemoryVectorStore` using cosine similarity math and metadata filtering (`language`, `repositoryId`, `kind`).
+  - `EmbeddingMetadata` model for vector model migration tracking.
+  - `IncrementalEmbeddingEngine` regenerating embeddings only for affected graph entities.
+  - `RankingService` combining vector similarity ($w_v = 0.50$), graph proximity ($w_g = 0.25$), lexical relevance ($w_l = 0.15$), and symbol importance ($w_i = 0.10$).
+  - `SemanticSearchEngine` executing top-k vector searches with score reranking and metadata filtering.
+- **Deliverables:** `@repo-intel/retrieval` package providing vector store abstractions, embedding pipelines, and semantic search engines.
+- **Dependencies:** Phase 13, Phase 14, Phase 15.
+- **Acceptance Criteria:** Executes semantic search queries with sub-100ms search latency and top-k score reranking.
+- **Testing:** Unit tests (184/184 passing monorepo-wide across 56 test files) and embedding benchmark (`embedding.bench.ts`).
 - **Risks:** Cycle detection performance on large graphs.
 - **Estimated Complexity:** Medium.
 - **Estimated Time:** 1.5 days.

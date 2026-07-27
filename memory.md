@@ -8,24 +8,38 @@ This file is the **living state file** and **persistent engineering memory** for
 
 | Metric                | Status / Value                                                                 |
 | :-------------------- | :----------------------------------------------------------------------------- |
-| **Version**           | `0.15.0` (Graph Enrichment & Cross-Language Resolution)                        |
+| **Version**           | `0.16.0` (Embeddings & Semantic Search Foundation)                             |
 | **Current Milestone** | Milestone 3: Knowledge Graph & Context Retrieval Engine                        |
-| **Current Phase**     | Phase 15: Graph Enrichment & Cross-Language Resolution ✅                      |
-| **Overall Progress**  | 35.7% (15 / 42 Phases Completed)                                               |
+| **Current Phase**     | Phase 16: Embeddings & Semantic Search Foundation ✅                           |
+| **Overall Progress**  | 38.1% (16 / 42 Phases Completed)                                               |
 | **Last Updated**      | 2026-07-27                                                                     |
 | **Current Branch**    | `main`                                                                         |
 | **Build Status**      | 🟢 Passing (`npm run build` 0 errors across workspace)                         |
-| **Test Status**       | 🟢 Passing (172/172 Vitest tests; 16 new Phase 15 tests; V8 coverage verified) |
+| **Test Status**       | 🟢 Passing (184/184 Vitest tests; 12 new Phase 16 tests; V8 coverage verified) |
 
 ---
 
 ## Current Focus
 
-### Phase 15: Graph Enrichment & Cross-Language Resolution
+### Phase 16: Embeddings & Semantic Search Foundation
 
 - **Status:** Complete 🟢
 - **Started:** 2026-07-27
 - **Completed:** 2026-07-27
+
+#### Objectives Achieved
+
+1. **Phase 15 Architectural Improvements (`@repo-intel/retrieval`):**
+   - **Embedding Provider Abstraction:** Defined `EmbeddingProvider` (`embed`, `embedBatch`, `dimensions`, `model`) and implemented `MockEmbeddingProvider` (128-d deterministic vectors).
+   - **Rich Context Builder:** Built `ContextBuilder` extracting text representations for `Repository`, `File`, `Symbol`, and `Module` graph entities incorporating names, signatures, documentation, modifiers, imports, and 1-hop graph neighbourhoods.
+   - **Vector Store Abstraction:** Defined `VectorStore` (`upsert`, `search`, `delete`, `get`) and implemented `InMemoryVectorStore` with cosine similarity math and metadata filtering (`language`, `repositoryId`, `kind`).
+   - **Embedding Metadata Model:** Defined `EmbeddingMetadata` (`provider`, `model`, `dimensions`, `graphVersion`, `contentHash`, `createdAt`).
+   - **Incremental Embedding Engine:** Built `IncrementalEmbeddingEngine` regenerating embeddings only for modified graph entities.
+   - **Search Ranking Service:** Built `RankingService` combining vector similarity ($w_v = 0.50$), graph proximity ($w_g = 0.25$), lexical relevance ($w_l = 0.15$), and symbol importance ($w_i = 0.10$).
+
+2. **Embedding Pipeline & Semantic Search Engine (`@repo-intel/retrieval`):**
+   - Implemented `EmbeddingPipeline` orchestrating context construction, vector generation, and vector store upserting across all graph entity kinds.
+   - Implemented `SemanticSearchEngine` (`searchVector`) executing top-k semantic vector searches with score reranking and metadata filtering.
 
 #### Objectives Achieved
 

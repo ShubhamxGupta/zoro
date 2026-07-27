@@ -762,6 +762,32 @@ Decoupling resolution guarantees that AST extraction remains high-speed and stat
 
 ---
 
+### ADR-024: Vector Embedding Architecture, Vector Store Abstraction, and Hybrid Search Strategy
+
+- **Status:** Accepted
+- **Date:** 2026-07-27
+
+#### Context
+
+The Context Retrieval Engine (CRE) requires combining structural Knowledge Graph entities with semantic vector embeddings to enable similarity search, hybrid search, and code context payload construction. The vector storage and embedding provider layers must be database-decoupled to support both cloud model embeddings (OpenAI `text-embedding-3-small`) and air-gapped local embeddings (Ollama / SentenceTransformers) without lock-in to a specific vector database.
+
+#### Alternatives Considered
+
+1. **Direct Coupling to a Specific Vector Database (e.g. LanceDB or Qdrant):** Embeds specific vector database drivers directly into code analysis logic, making unit testing and local offline runs complex.
+2. **Decoupled Provider & Vector Store Abstraction (`EmbeddingProvider`, `VectorStore`, `ContextBuilder`, `RankingService`):** Introduce `EmbeddingProvider` (`embed`, `embedBatch`, `dimensions`, `model`) and `VectorStore` (`upsert`, `search`, `delete`, `get`) interfaces in `@repo-intel/shared`. `ContextBuilder` constructs semantic text representations combining entity labels, signatures, docs, modifiers, and 1-hop graph neighbourhoods. `RankingService` combines vector similarity, graph proximity, lexical relevance, and symbol importance into unified scores.
+
+#### Why This Option Was Chosen
+
+`VectorStore` abstraction allows seamless swapping between `InMemoryVectorStore` (used in fast unit tests and zero-dependency environments) and persistent vector engines (LanceDB/Qdrant in future production deployments). `RankingService` guarantees multi-dimensional score normalization across vector and structural graph dimensions.
+
+#### Consequences
+
+- **Positive:** Zero-dependency testing, full vector model migration support via `EmbeddingMetadata`, hybrid vector + graph ranking capability.
+- **Negative:** Requires serializing graph neighbourhood context strings into embedding payloads.
+- **Affected Modules:** `@repo-intel/shared`, `@repo-intel/graph`, `@repo-intel/retrieval`.
+
+---
+
 ## Decision Rules & Governance
 
 A new Architecture Decision Record (**ADR**) **MUST** be created whenever:

@@ -13,3 +13,7 @@ export * from './type-resolver.types.js';
 export * from './module-resolver.types.js';
 export * from './cross-language.types.js';
 export * from './provenance.types.js';
+export * from './embedding-provider.types.js';
+export * from './embedding-metadata.types.js';
+export * from './vector-store.types.js';
+export * from './search-interfaces.types.js';
