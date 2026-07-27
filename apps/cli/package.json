@@ -1,6 +1,6 @@
 {
   "name": "@repo-intel/cli",
-  "version": "0.0.0",
+  "version": "0.6.0",
   "private": true,
   "type": "module",
   "main": "./dist/index.js",
@@ -13,5 +13,12 @@
     "check-types": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
     "clean": "rimraf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@repo-intel/shared": "workspace:*",
+    "@repo-intel/api": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7"
   }
 }

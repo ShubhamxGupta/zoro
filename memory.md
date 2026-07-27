@@ -8,26 +8,46 @@ This file is the **living state file** and **persistent engineering memory** for
 
 | Metric                | Status / Value                                                                     |
 | :-------------------- | :--------------------------------------------------------------------------------- |
-| **Version**           | `0.20.0` (Patch Generation Engine, AST Transformation Framework & Validation)      |
-| **Current Milestone** | Milestone 4: Multi-Agent AI Review & Patch Generation Pipeline (COMPLETE 🟢)       |
-| **Current Phase**     | Phase 20: Patch Generation Engine, AST Transformation Framework & Validation ✅     |
-| **Overall Progress**  | 47.6% (20 / 42 Phases Completed)                                                   |
+| **Version**           | `0.21.0` (Platform Runtime, Workflow Engine & Internal Service Layer)              |
+| **Current Milestone** | Milestone 5: Enterprise Integration, Platform Runtime & Developer Tools           |
+| **Current Phase**     | Phase 21: Platform Runtime, Workflow Engine & Internal Service Layer ✅            |
+| **Overall Progress**  | 50.0% (21 / 42 Phases Completed)                                                   |
 | **Last Updated**      | 2026-07-27                                                                         |
 | **Current Branch**    | `main`                                                                             |
 | **Build Status**      | 🟢 Passing (`npm run build` 0 errors across workspace)                             |
-| **Test Status**       | 🟢 Passing (230/230 Vitest tests; 16 new Phase 20 tests; V8 coverage verified)    |
+| **Test Status**       | 🟢 Passing (240/240 Vitest tests; 10 new Phase 21 tests; V8 coverage verified)    |
 
 ---
 
 ## Current Focus
 
-### Phase 20: Patch Generation Engine, AST Transformation Framework & Validation Pipeline
+### Phase 21: Platform Runtime, Workflow Engine & Internal Service Layer
 
 - **Status:** Complete 🟢
 - **Started:** 2026-07-27
 - **Completed:** 2026-07-27
 
 #### Objectives Achieved
+
+1. **Phase 21A — Platform Runtime & Lifecycle (`services/api` & `@repo-intel/shared`):**
+   - Introduced `PlatformRuntime` interface (`initialize()`, `shutdown()`, `health()`, `execute()`).
+   - Implemented `DefaultPlatformRuntime` managing dependency wiring, service discovery, runtime configuration, and graceful shutdown.
+
+2. **Phase 21B — Internal Service Layer (`services/api`):**
+   - Implemented high-level domain services (`DefaultRepositoryService`, `DefaultReviewService`, `DefaultRetrievalService`, `DefaultPatchService`, `DefaultSessionService`, `DefaultGraphService`, `DefaultAIService`).
+
+3. **Phase 21C — Workflow Engine (`services/api`):**
+   - Implemented `DefaultWorkflowEngine` managing deterministic, resumable, stage-gated Review, Patch, and Index workflows.
+
+4. **Phase 21D — Typed Event Bus (`services/api`):**
+   - Implemented `TypedEventBus` supporting typed pub/sub event channels (`RepositoryIndexed`, `GraphUpdated`, `RetrievalCompleted`, `ReviewStarted`, `ReviewCompleted`, `PatchGenerated`, `PatchValidated`, `SessionClosed`) with correlation IDs.
+
+5. **Phase 21E — Job Queue Abstraction (`services/api`):**
+   - Implemented `InMemoryJobQueue` supporting async jobs, worker execution, retries, and job status tracking.
+
+6. **Phase 21F — Observability & Diagnostics (`services/api`):**
+   - Implemented `ObservabilityManager` handling structured JSON logging, correlation IDs, execution metrics, and health diagnostics.
+
 
 1. **Phase 20A — AST Transformation Framework & Registry (`@repo-intel/shared` & `@repo-intel/patch-gen`):**
    - Introduced `ASTTransformation` interface (`apply()`, `validate()`, `rollback()`).

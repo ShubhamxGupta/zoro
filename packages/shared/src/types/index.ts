@@ -29,3 +29,8 @@ export * from './developer-context.types.js';
 export * from './review-session.types.js';
 export * from './ast-transformation.types.js';
 export * from './patch-candidate.types.js';
+export * from './platform-runtime.types.js';
+export * from './event-bus.types.js';
+export * from './workflow-engine.types.js';
+export * from './job-queue.types.js';
+export * from './internal-services.types.js';

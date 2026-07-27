@@ -20,6 +20,12 @@
     "@fastify/swagger": "^8.14.0",
     "@fastify/swagger-ui": "^3.0.0",
     "@repo-intel/shared": "workspace:*",
+    "@repo-intel/parser": "workspace:*",
+    "@repo-intel/graph": "workspace:*",
+    "@repo-intel/retrieval": "workspace:*",
+    "@repo-intel/ai": "workspace:*",
+    "@repo-intel/review-engine": "workspace:*",
+    "@repo-intel/patch-gen": "workspace:*",
     "fastify": "^4.26.2"
   },
   "devDependencies": {

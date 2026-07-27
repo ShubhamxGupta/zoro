@@ -1104,6 +1104,119 @@ Explainable patches build developer trust, streamline code reviews, and provide 
 
 ---
 
+### ADR-036: Platform Runtime Architecture & Unified Lifecycle Management
+
+- **Status:** Accepted
+- **Date:** 2026-07-27
+
+#### Context
+
+Clients (API Gateway, CLI, IDE Extension, GitHub App) require a single, centralized runtime interface to orchestrate dependency wiring, lifecycle management, service discovery, configuration, and graceful shutdown without accessing lower-level engine implementations directly.
+
+#### Alternatives Considered
+
+1. **Ad-hoc Service Instantiation in Client Handlers:** Leads to duplicate engine wiring, uncoordinated database connections, and dirty shutdowns.
+2. **Unified `PlatformRuntime` Architecture (`DefaultPlatformRuntime`):**
+   - Implements `initialize()`, `shutdown()`, `health()`, and `execute()` lifecycle interfaces.
+   - Centralizes `EventBus`, `ObservabilityManager`, `JobQueue`, `WorkflowEngine`, and internal domain services.
+   - Enforces that no client bypasses the runtime.
+
+#### Why This Option Was Chosen
+
+`PlatformRuntime` guarantees centralized lifecycle control, robust health monitoring, and uniform command dispatching.
+
+#### Consequences
+
+- **Positive:** Centralized dependency wiring, reliable graceful shutdown, single point of entry for all clients.
+- **Negative:** Requires initial startup initialization phase.
+- **Affected Modules:** `@repo-intel/shared`, `@repo-intel/api`.
+
+---
+
+### ADR-037: Workflow Engine Architecture & Deterministic Stages
+
+- **Status:** Accepted
+- **Date:** 2026-07-27
+
+#### Context
+
+Multi-step platform operations (Review, Patch Generation, Repository Indexing) require deterministic execution stages with progress tracking, retries, cancellation capabilities, and execution history logging.
+
+#### Alternatives Considered
+
+1. **Unstructured Async Function Calls:** Hard to track progress, impossible to cancel mid-flight, and lacks structured execution histories.
+2. **Deterministic `WorkflowEngine` Stage Pipeline (`DefaultWorkflowEngine`):**
+   - Defines `WorkflowStage` steps for `review`, `patch`, and `index` workflows.
+   - Manages stage transitions, stage context accumulation, execution state logging (`WorkflowExecution`), and runtime cancellation.
+
+#### Why This Option Was Chosen
+
+`WorkflowEngine` provides total execution transparency, stage-gated progress reporting, and clean cancellation control.
+
+#### Consequences
+
+- **Positive:** Deterministic stage progress, cancellation support, execution history logging.
+- **Negative:** Requires serializing intermediate stage contexts.
+- **Affected Modules:** `@repo-intel/shared`, `@repo-intel/api`.
+
+---
+
+### ADR-038: Internal Event Bus & Typed Event Messaging Strategy
+
+- **Status:** Accepted
+- **Date:** 2026-07-27
+
+#### Context
+
+Platform components (indexer, graph, retrieval, review engine, patch generator, session store) require asynchronous, decoupled event notifications without direct circular dependencies between modules.
+
+#### Alternatives Considered
+
+1. **Direct Synchronous Method Invocations:** Tightly couples modules, causing circular package references and synchronous latency spikes.
+2. **Typed Pub/Sub Event Bus (`TypedEventBus`):**
+   - Exposes `publish` and `subscribe` for strongly-typed events (`RepositoryIndexed`, `GraphUpdated`, `RetrievalCompleted`, `ReviewStarted`, `ReviewCompleted`, `PatchGenerated`, `PatchValidated`, `SessionClosed`).
+   - Attaches correlation IDs for distributed tracing.
+
+#### Why This Option Was Chosen
+
+`TypedEventBus` decouples domain modules, enables asynchronous event processing, and maintains strict correlation tracing.
+
+#### Consequences
+
+- **Positive:** Decoupled architecture, asynchronous event handling, end-to-end correlation tracing.
+- **Negative:** Requires managing event handler errors to prevent unhandled rejections.
+- **Affected Modules:** `@repo-intel/shared`, `@repo-intel/api`.
+
+---
+
+### ADR-039: Internal Service Layer Architecture & Domain Orchestration
+
+- **Status:** Accepted
+- **Date:** 2026-07-27
+
+#### Context
+
+API routes, CLI commands, and web sockets should consume high-level domain services (`RepositoryService`, `ReviewService`, `RetrievalService`, `PatchService`, `SessionService`, `GraphService`, `AIService`) rather than invoking raw low-level engines (`GraphStore`, `VectorStore`, `SearchEngine`) directly.
+
+#### Alternatives Considered
+
+1. **Direct Engine Usage in Controller Handlers:** Mixes HTTP transport logic with low-level graph and vector store orchestration.
+2. **Internal Service Layer Architecture (`DefaultRepositoryService`, `DefaultReviewService`, etc.):**
+   - High-level domain services orchestrate underlying engines, git providers, and review agents.
+   - Exposes clean, stable contracts defined in `@repo-intel/shared`.
+
+#### Why This Option Was Chosen
+
+The internal service layer enforces clean architectural boundaries, separates transport from domain logic, and simplifies unit testing.
+
+#### Consequences
+
+- **Positive:** Clean architecture boundaries, reusable domain logic across CLI and API, simplified testing.
+- **Negative:** Adds a thin delegation wrapper over internal engines.
+- **Affected Modules:** `@repo-intel/shared`, `@repo-intel/api`.
+
+---
+
 ## Decision Rules & Governance
 
 A new Architecture Decision Record (**ADR**) **MUST** be created whenever:

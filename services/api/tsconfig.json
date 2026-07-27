@@ -7,6 +7,12 @@
   },
   "include": ["src/**/*"],
   "references": [
-    { "path": "../../packages/shared" }
+    { "path": "../../packages/shared" },
+    { "path": "../../packages/parser" },
+    { "path": "../../packages/graph" },
+    { "path": "../../packages/retrieval" },
+    { "path": "../../packages/ai" },
+    { "path": "../../packages/review-engine" },
+    { "path": "../../packages/patch-gen" }
   ]
 }

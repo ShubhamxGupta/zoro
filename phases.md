@@ -11,6 +11,9 @@
 
 This document defines the incremental execution roadmap for building the **Repository Intelligence & Code Review Platform**. To minimize risk, eliminate refactoring overhead, and maintain a continuously runnable project state, the implementation is divided into **42 granular, sequential phases** grouped into **6 major milestones**.
 
+> [!NOTE]
+> **🚀 Prototype / MVP Track Active:** Development is currently focused on completing the end-to-end local **Minimum Lovable Prototype (MVP Track)** (Fastify REST API Gateway + Web UI + CLI + Ollama/OpenAI Integration + GraphRAG Chat + Patch Preview). All remaining advanced phases (Phase 22–42) remain preserved as the long-term source of truth and are designated as **Post-MVP**.
+
 ```mermaid
 graph LR
     M1[Milestone 1: Foundation] --> M2[Milestone 2: Repo & AST Engine]
@@ -498,23 +501,22 @@ Build the AI Provider Abstraction Layer (PAL), implement adapters for cloud LLMs
 
 ---
 
-### Phase 21: Provider Abstraction Layer (PAL) Interface
+### Phase 21: Platform Runtime, Workflow Engine & Internal Service Layer
 
-- **Goal:** Define the unified `ProviderAdapter` interface in `packages/ai/src/base/`.
-- **Why This Phase Exists:** Decouples core review engine logic from specific AI model vendor APIs.
-- **Features:** `ProviderAdapter` interface, capabilities matrix schema, and configuration types.
-- **Tasks:**
-  - Create `packages/ai/src/base/provider.interface.ts`.
-  - Define `complete()`, `streamComplete()`, `validateCapabilities()`, and `getHealthStatus()` method signatures.
-  - Create `ProviderFactory` registry for dynamically instantiating configured adapters.
-- **Deliverables:** PAL abstract framework package.
-- **Dependencies:** Phase 04.
-- **Acceptance Criteria:** All AI provider implementations strictly adhere to the `ProviderAdapter` contract.
-- **Testing:**
-  - _Unit Tests:_ Mock adapter implementation passing factory validation tests.
-- **Risks:** None.
-- **Estimated Complexity:** Low.
-- **Estimated Time:** 1 day.
+- **Status:** Completed 🟢
+- **Goal:** Implement the Platform Runtime (`PlatformRuntime`, `DefaultPlatformRuntime`), Internal Service Layer (`RepositoryService`, `ReviewService`, `RetrievalService`, `PatchService`, `SessionService`, `GraphService`, `AIService`), Workflow Engine (`WorkflowEngine`), Typed Event Bus (`TypedEventBus`), Job Queue (`InMemoryJobQueue`), and Observability Manager (`ObservabilityManager`) in `services/api`.
+- **Why This Phase Exists:** Coordinates all platform services under a single runtime lifecycle, exposes high-level domain contracts, and enables deterministic stage workflows and typed pub/sub event channels.
+- **Features:**
+  - **Platform Runtime (Phase 21A):** `PlatformRuntime` interface (`initialize()`, `shutdown()`, `health()`, `execute()`) and dependency wiring.
+  - **Internal Service Layer (Phase 21B):** High-level domain services (`DefaultRepositoryService`, `DefaultReviewService`, `DefaultRetrievalService`, `DefaultPatchService`, `DefaultSessionService`, `DefaultGraphService`, `DefaultAIService`).
+  - **Workflow Engine (Phase 21C):** `DefaultWorkflowEngine` executing stage-gated `review`, `patch`, and `index` workflows with cancellation and execution logging.
+  - **Typed Event Bus (Phase 21D):** `TypedEventBus` supporting typed events (`RepositoryIndexed`, `GraphUpdated`, `ReviewStarted`, `ReviewCompleted`, `PatchGenerated`, `PatchValidated`, `SessionClosed`).
+  - **Job Queue Abstraction (Phase 21E):** `InMemoryJobQueue` supporting async background job execution, retries, and status tracking.
+  - **Observability Manager (Phase 21F):** `ObservabilityManager` handling structured JSON logging, correlation IDs, execution metrics, and diagnostics.
+- **Deliverables:** `services/api` and `@repo-intel/shared` packages.
+- **Dependencies:** Phase 18, Phase 19, Phase 20.
+- **Acceptance Criteria:** Emits health status in $< 10\text{ms}$, dispatches 500 events in $< 200\text{ms}$, and passes 100% of runtime quality gates.
+- **Testing:** Unit tests (240/240 passing monorepo-wide across 106 test files) and platform runtime benchmark (`platform-runtime.bench.ts`).
 
 ---
 
