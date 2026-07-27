@@ -25,16 +25,34 @@ export interface Location {
   startColumn: number;
   endLine: number;
   endColumn: number;
+  startByte?: number;
+  endByte?: number;
+}
+
+export interface SymbolDocParam {
+  name: string;
+  description: string;
+}
+
+export interface SymbolDoc {
+  summary?: string;
+  parameters?: SymbolDocParam[];
+  returns?: string;
+  examples?: string[];
+  throws?: string[];
+  deprecated?: boolean | string;
 }
 
 export interface SymbolNode {
   id: string;
+  symbolId: string;
   name: string;
   kind: SymbolKind;
   location: Location;
   fileId: string;
   signature?: string;
   documentation?: string;
+  docModel?: SymbolDoc;
   modifiers?: string[];
 }
 

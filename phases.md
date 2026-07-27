@@ -317,23 +317,26 @@ Build high-speed file system discovery, incremental git indexers, Tree-Sitter pa
 
 ---
 
-### Phase 13: Python AST Symbol Extractor
+### Phase 13: Semantic Relationship Extraction & Knowledge Graph Builder
 
-- **Goal:** Build symbol extraction queries for Python in `packages/parser/src/extractors/py-extractor.ts`.
-- **Why This Phase Exists:** Must extract classes, functions, methods, and imports from Python source files.
-- **Features:** Tree-Sitter query handler for Python declarations, docstrings, and imports.
-- **Tasks:**
-  - Write Tree-Sitter S-expression queries for Python classes, function definitions (`def`), async functions, and class methods.
-  - Extract docstrings (`"""..."""`) and type annotations.
-  - Extract `import` and `from ... import ...` statements.
-- **Deliverables:** Python AST Extractor emitting `SymbolNode` objects.
-- **Dependencies:** Phase 11.
-- **Acceptance Criteria:** Accurately extracts Python functions, classes, decorators, and imports.
-- **Testing:**
-  - _Unit Tests:_ Test Python files containing class inheritance, dunder methods, and type hints.
-- **Risks:** Python indentation sensitivity in syntax tree traversals.
-- **Estimated Complexity:** Medium.
-- **Estimated Time:** 1.5 days.
+- **Status:** Completed 🟢
+- **Goal:** Extract language-independent semantic relationships and build the normalized Repository Knowledge Graph (RKG) with a database-decoupled storage abstraction.
+- **Why This Phase Exists:** Enables structural and architectural graph walks, dependency analysis, and multi-hop context retrieval.
+- **Features:**
+  - Stable symbol identity schema (`buildSymbolId`) and byte-accurate source location model.
+  - Normalized structured documentation model (`SymbolDoc`).
+  - Query Registry for managing Tree-Sitter S-expression query files.
+  - Incremental symbol extraction integrated with `DeltaEngine`.
+  - Language-independent `SemanticRelationship` extractor (`CONTAINS`, `CALLS`, `IMPORTS`, `EXPORTS`, `REFERENCES`, `IMPLEMENTS`, `EXTENDS`, `USES`, `DEPENDS_ON`, `OVERRIDES`).
+  - Database-decoupled `GraphStore` interface and `InMemoryGraphStore` backend.
+  - `KnowledgeGraphBuilder` producing graph nodes (`Repository`, `Directory`, `File`, `Symbol`, `Module`) and edges.
+  - Incremental graph update engine (`updateGraphDelta`) and JSON graph serializer (`exportGraphJson`/`importGraphJson`).
+- **Deliverables:** `@repo-intel/graph` package fully integrated with `@repo-intel/parser` and `@repo-intel/shared`.
+- **Dependencies:** Phase 10, Phase 11, Phase 12.
+- **Acceptance Criteria:** Constructs complete, queryable knowledge graphs and executes incremental graph delta updates under 100ms.
+- **Testing:** Unit tests (138/138 passing monorepo-wide) and performance benchmark (`graph.bench.ts`).
+- **Estimated Complexity:** High.
+- **Estimated Time:** 2 days.
 
 ---
 

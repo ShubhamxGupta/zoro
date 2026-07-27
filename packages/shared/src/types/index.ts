@@ -7,3 +7,5 @@ export * from './language.types.js';
 export * from './facts.types.js';
 export * from './state.types.js';
 export * from './ast-domain.types.js';
+export * from './relationship.types.js';
+

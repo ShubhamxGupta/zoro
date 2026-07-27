@@ -8,24 +8,50 @@ This file is the **living state file** and **persistent engineering memory** for
 
 | Metric                | Status / Value                                                                 |
 | :-------------------- | :----------------------------------------------------------------------------- |
-| **Version**           | `0.12.0` (TypeScript & JavaScript AST Symbol Extractor)                        |
-| **Current Milestone** | Milestone 2: Repository Scanner & AST Parsing Engine                           |
-| **Current Phase**     | Phase 12: TypeScript & JavaScript AST Symbol Extractor ✅                      |
-| **Overall Progress**  | 28.5% (12 / 42 Phases Completed)                                               |
+| **Version**           | `0.13.0` (Semantic Relationship Extraction & Knowledge Graph Builder)          |
+| **Current Milestone** | Milestone 3: Knowledge Graph & Context Retrieval Engine                        |
+| **Current Phase**     | Phase 13: Semantic Relationship Extraction & Knowledge Graph Builder ✅        |
+| **Overall Progress**  | 31.0% (13 / 42 Phases Completed)                                               |
 | **Last Updated**      | 2026-07-27                                                                     |
 | **Current Branch**    | `main`                                                                         |
-| **Build Status**      | 🟢 Passing (`npx tsc -b` 0 errors across workspace)                            |
-| **Test Status**       | 🟢 Passing (122/122 Vitest tests; 14 new Phase 12 tests; V8 coverage verified) |
+| **Build Status**      | 🟢 Passing (`npm run build` 0 errors across workspace)                         |
+| **Test Status**       | 🟢 Passing (138/138 Vitest tests; 16 new Phase 13 tests; V8 coverage verified) |
 
 ---
 
 ## Current Focus
 
-### Phase 12: TypeScript & JavaScript AST Symbol Extractor
+### Phase 13: Semantic Relationship Extraction & Knowledge Graph Builder
 
 - **Status:** Complete 🟢
 - **Started:** 2026-07-27
 - **Completed:** 2026-07-27
+
+#### Objectives Achieved
+
+1. **Phase 12 Architectural Improvements:**
+   - **Stable Symbol Identity:** Implemented `buildSymbolId(repoId, filePath, name, parentName, signature)` utility in `@repo-intel/shared`.
+   - **Source Location Model:** Extended `Location` interface with `startByte` and `endByte` properties.
+   - **Structured Documentation Model:** Introduced `SymbolDoc` interface (`summary`, `parameters`, `returns`, `examples`, `throws`, `deprecated`) and parsed JSDoc blocks in `TypeScriptExtractor`.
+   - **Extraction Diagnostics:** Added `ParseDiagnostic[]` emissions to `ExtractedFileSymbols` tracking parse recovery, skipped nodes, and syntax warnings.
+   - **Query Registry:** Created `QueryRegistry` (`packages/parser/src/treesitter/query-registry.ts`) loading and caching S-expression queries by language and query type.
+   - **Incremental Extraction:** Integrated `IncrementalExtractor` with `DeltaEngine` and `JsonRepositoryStateStore` to bypass re-parsing unchanged files.
+
+2. **Semantic Relationship Extraction Engine** (`packages/parser/src/extractors/relationship-extractor.ts`):
+   - Defined language-independent `SemanticRelationship` domain contract (`CONTAINS`, `CALLS`, `IMPORTS`, `EXPORTS`, `REFERENCES`, `IMPLEMENTS`, `EXTENDS`, `USES`, `DEPENDS_ON`, `OVERRIDES`).
+   - Implemented `RelationshipExtractor` mapping AST symbol hierarchies, inheritance, call signatures, and module imports to semantic relationships.
+
+3. **Knowledge Graph Engine & Storage Abstraction** (`packages/graph/`):
+   - Defined database-decoupled `GraphStore` interface (`addNode`, `addEdge`, `removeNode`, `removeEdge`, `getNode`, `getEdge`, `queryNodes`, `queryEdges`, `commit`, `clear`).
+   - Implemented in-memory Map-backed `InMemoryGraphStore` with indexed lookup methods.
+   - Implemented `KnowledgeGraphBuilder` constructing normalized graph entities (`Repository`, `Directory`, `File`, `Symbol`, `Module`) and directional edges (`CONTAINS`, `IMPORTS`, `EXPORTS`, `CALLS`, `EXTENDS`, `IMPLEMENTS`, `DEPENDS_ON`).
+   - Implemented incremental graph update algorithm (`updateGraphDelta`) purging deleted/modified file subgraphs and appending updated delta nodes/edges.
+   - Implemented graph serialization (`exportGraphJson`, `importGraphJson`).
+
+4. **Testing, Benchmarks & ADRs:**
+   - Added 16 unit tests across `relationship-extractor.test.ts`, `in-memory-graph-store.test.ts`, `knowledge-graph-builder.test.ts`, `graph-serialization.test.ts` (138/138 monorepo tests passing).
+   - Created benchmark scaffolding (`graph.bench.ts`) verifying sub-100ms processing for 1,000 nodes / 2,000 edges.
+   - Authored **ADR-022: Knowledge Graph Abstraction and Storage Strategy** in `decisions.md`.
 
 #### Objectives Achieved
 
@@ -42,7 +68,6 @@ This file is the **living state file** and **persistent engineering memory** for
 4. **Tests & Barrels** (`packages/parser/src/extractors/ts-extractor.test.ts`, `index.ts`):
    - Added 14 unit tests verifying symbol node IDs, kind classification, signatures, docstrings, imports, exports, and empty tree handling.
    - Exported extractor module from `@repo-intel/parser`.
-
 
 #### Objectives Achieved
 

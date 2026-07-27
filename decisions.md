@@ -35,6 +35,7 @@ The **Repository Intelligence & Code Review Platform** is an enterprise-grade, g
 | **ADR-019** | Repository Scanner Event-Driven Architecture            | Accepted | 2026-07-22 |
 | **ADR-020** | JSON File-Based Repository State Store Strategy         | Accepted | 2026-07-22 |
 | **ADR-021** | Tree-Sitter Abstraction & Parser Pooling Strategy       | Accepted | 2026-07-22 |
+| **ADR-022** | Knowledge Graph Abstraction and Storage Strategy        | Accepted | 2026-07-27 |
 
 ---
 
@@ -708,7 +709,30 @@ Four design choices were made:
 - Higher-level packages are fully decoupled from Tree-Sitter internals.
 - The parser pool enables concurrent parsing without re-initialization overhead.
 - Grammar registry supports future hot-swap of grammars without restarts.
-- Placeholder binding keeps CI green across all platforms before C++ compilation requirements are introduced.
+
+### ADR-022: Knowledge Graph Abstraction and Storage Strategy
+
+- **Status:** Accepted
+- **Date:** 2026-07-27
+
+#### Context
+
+The platform requires building an in-memory/embedded **Repository Knowledge Graph (RKG)** containing normalized entities (`Repository`, `Directory`, `File`, `Symbol`, `Module`) and directional semantic relationships (`CONTAINS`, `IMPORTS`, `EXPORTS`, `CALLS`, `REFERENCES`, `IMPLEMENTS`, `EXTENDS`, `DEPENDS_ON`, `USES`, `OVERRIDES`). To prevent vendor lock-in and enable zero-dependency development and testing, graph building must be decoupled from specific underlying graph database drivers (KùzuDB, Neo4j, etc.).
+
+#### Alternatives Considered
+
+1. **Direct Coupling to KùzuDB Native Driver:** Requires native C++ compilation in unit testing and local development, increasing build friction.
+2. **Generic Database Agnostic Interface (`GraphStore`):** Define a clean `GraphStore` interface (`addNode`, `addEdge`, `removeNode`, `removeEdge`, `getNode`, `getEdge`, `queryNodes`, `queryEdges`, `commit`, `clear`) with an in-memory Map-backed implementation (`InMemoryGraphStore`) for rapid local development, testing, and graph serialization.
+
+#### Why This Option Was Chosen
+
+`GraphStore` abstraction guarantees that `KnowledgeGraphBuilder` and graph traversals operate purely against clean domain interfaces. Future storage adapters (e.g. KùzuDB in Phase 17) can be introduced without changing graph construction logic.
+
+#### Consequences
+
+- **Positive:** Fast, zero-dependency unit testing and graph serialization (`exportGraphJson`/`importGraphJson`).
+- **Negative:** Requires mapping graph entities to native storage drivers when introducing persistent graph databases.
+- **Affected Modules:** `@repo-intel/graph`, `@repo-intel/parser`, `@repo-intel/shared`.
 
 ---
 

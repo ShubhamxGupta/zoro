@@ -1,41 +1,75 @@
-import type { ASTNode, ASTTree, SymbolNode, ImportStatement, SymbolKind, Location } from '@repo-intel/shared';
+import type {
+  ASTNode,
+  ASTTree,
+  SymbolNode,
+  ImportStatement,
+  SymbolKind,
+  Location,
+  SymbolDoc,
+  ParseDiagnostic,
+} from '@repo-intel/shared';
+import { buildSymbolId } from '@repo-intel/shared';
 import type { SymbolExtractor, ExtractedFileSymbols } from './extractor.interface.js';
 
 export class TypeScriptExtractor implements SymbolExtractor {
   readonly languageId = 'typescript';
   readonly supportedExtensions = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'] as const;
 
-  extract(tree: ASTTree, filePath: string): ExtractedFileSymbols {
+  extract(tree: ASTTree, filePath: string, repoId = 'local-repo'): ExtractedFileSymbols {
     const symbols: SymbolNode[] = [];
     const imports: ImportStatement[] = [];
     const exportsSet = new Set<string>();
+    const diagnostics: ParseDiagnostic[] = [...(tree.diagnostics ?? [])];
 
     const lines = tree.sourceCode ? tree.sourceCode.split('\n') : [];
     const loc = Math.max(1, lines.length);
 
     if (!tree.rootNode) {
-      return { symbols, imports, exports: [], loc };
+      return { symbols, imports, exports: [], loc, diagnostics };
     }
 
-    this.traverseNode(tree.rootNode, filePath, symbols, imports, exportsSet, undefined);
+    if (tree.hasErrors) {
+      diagnostics.push({
+        severity: 'warning',
+        message: `Tree-Sitter parsing encountered error nodes in file: ${filePath}`,
+        range: tree.rootNode.range,
+        isSyntaxError: true,
+        isMissingNode: false,
+      });
+    }
+
+    this.traverseNode(tree.rootNode, filePath, repoId, symbols, imports, exportsSet, diagnostics, undefined);
 
     return {
       symbols,
       imports,
       exports: Array.from(exportsSet),
       loc,
+      diagnostics,
     };
   }
 
   private traverseNode(
     node: ASTNode,
     filePath: string,
+    repoId: string,
     symbols: SymbolNode[],
     imports: ImportStatement[],
     exportsSet: Set<string>,
+    diagnostics: ParseDiagnostic[],
     parentSymbolName?: string
   ): void {
     const nodeType = node.type;
+
+    if (node.hasError) {
+      diagnostics.push({
+        severity: 'info',
+        message: `Skipped invalid node of type '${nodeType}'`,
+        range: node.range,
+        isSyntaxError: true,
+        isMissingNode: false,
+      });
+    }
 
     // --- Process Imports ---
     if (nodeType === 'import_statement') {
@@ -49,7 +83,6 @@ export class TypeScriptExtractor implements SymbolExtractor {
     // --- Process Exports ---
     if (nodeType === 'export_statement') {
       this.parseExportStatement(node, exportsSet);
-      // Fall through to traverse child declarations inside export statement (e.g. export function ...)
     }
 
     // --- Process Class Declarations ---
@@ -61,27 +94,30 @@ export class TypeScriptExtractor implements SymbolExtractor {
         const isExported = this.hasExportModifier(node);
         if (isExported) exportsSet.add(nameNode.text);
 
-        const doc = this.extractDocComment(node);
+        const { raw: rawDoc, model: docModel } = this.extractDocComment(node);
         const modifiers = this.extractModifiers(node);
+        const signature = `class ${nameNode.text}`;
+        const symbolId = buildSymbolId(repoId, filePath, nameNode.text, parentSymbolName, signature);
         const fullSymbolName = parentSymbolName ? `${parentSymbolName}.${nameNode.text}` : nameNode.text;
 
         const classSymbol: SymbolNode = {
-          id: `${filePath}::${fullSymbolName}#L${node.range.startLine}`,
+          id: symbolId,
+          symbolId,
           name: fullSymbolName,
           kind: 'class',
           fileId: filePath,
           location: this.nodeToLocation(node, filePath),
-          signature: `class ${nameNode.text}`,
-          documentation: doc,
+          signature,
+          documentation: rawDoc,
+          docModel,
           modifiers,
         };
         symbols.push(classSymbol);
 
-        // Process class members
         const bodyNode = node.children.find((c) => c.type === 'class_body');
         if (bodyNode) {
           for (const member of bodyNode.children) {
-            this.traverseNode(member, filePath, symbols, imports, exportsSet, fullSymbolName);
+            this.traverseNode(member, filePath, repoId, symbols, imports, exportsSet, diagnostics, fullSymbolName);
           }
         }
       }
@@ -92,24 +128,26 @@ export class TypeScriptExtractor implements SymbolExtractor {
     if (nodeType === 'interface_declaration') {
       const nameNode = node.children.find((c) => c.type === 'type_identifier' || c.type === 'identifier');
       if (nameNode) {
-        const isExported = this.hasExportModifier(node);
-        if (isExported) exportsSet.add(nameNode.text);
+        if (this.hasExportModifier(node)) exportsSet.add(nameNode.text);
 
-        const doc = this.extractDocComment(node);
+        const { raw: rawDoc, model: docModel } = this.extractDocComment(node);
         const modifiers = this.extractModifiers(node);
+        const signature = `interface ${nameNode.text}`;
+        const symbolId = buildSymbolId(repoId, filePath, nameNode.text, parentSymbolName, signature);
         const fullSymbolName = parentSymbolName ? `${parentSymbolName}.${nameNode.text}` : nameNode.text;
 
-        const interfaceSymbol: SymbolNode = {
-          id: `${filePath}::${fullSymbolName}#L${node.range.startLine}`,
+        symbols.push({
+          id: symbolId,
+          symbolId,
           name: fullSymbolName,
           kind: 'interface',
           fileId: filePath,
           location: this.nodeToLocation(node, filePath),
-          signature: `interface ${nameNode.text}`,
-          documentation: doc,
+          signature,
+          documentation: rawDoc,
+          docModel,
           modifiers,
-        };
-        symbols.push(interfaceSymbol);
+        });
       }
       return;
     }
@@ -120,17 +158,21 @@ export class TypeScriptExtractor implements SymbolExtractor {
       if (nameNode) {
         if (this.hasExportModifier(node)) exportsSet.add(nameNode.text);
 
-        const doc = this.extractDocComment(node);
+        const { raw: rawDoc, model: docModel } = this.extractDocComment(node);
+        const signature = `type ${nameNode.text}`;
+        const symbolId = buildSymbolId(repoId, filePath, nameNode.text, parentSymbolName, signature);
         const fullSymbolName = parentSymbolName ? `${parentSymbolName}.${nameNode.text}` : nameNode.text;
 
         symbols.push({
-          id: `${filePath}::${fullSymbolName}#L${node.range.startLine}`,
+          id: symbolId,
+          symbolId,
           name: fullSymbolName,
           kind: 'type_alias',
           fileId: filePath,
           location: this.nodeToLocation(node, filePath),
-          signature: `type ${nameNode.text}`,
-          documentation: doc,
+          signature,
+          documentation: rawDoc,
+          docModel,
           modifiers: this.extractModifiers(node),
         });
       }
@@ -143,17 +185,21 @@ export class TypeScriptExtractor implements SymbolExtractor {
       if (nameNode) {
         if (this.hasExportModifier(node)) exportsSet.add(nameNode.text);
 
-        const doc = this.extractDocComment(node);
+        const { raw: rawDoc, model: docModel } = this.extractDocComment(node);
+        const signature = `enum ${nameNode.text}`;
+        const symbolId = buildSymbolId(repoId, filePath, nameNode.text, parentSymbolName, signature);
         const fullSymbolName = parentSymbolName ? `${parentSymbolName}.${nameNode.text}` : nameNode.text;
 
         symbols.push({
-          id: `${filePath}::${fullSymbolName}#L${node.range.startLine}`,
+          id: symbolId,
+          symbolId,
           name: fullSymbolName,
           kind: 'enum',
           fileId: filePath,
           location: this.nodeToLocation(node, filePath),
-          signature: `enum ${nameNode.text}`,
-          documentation: doc,
+          signature,
+          documentation: rawDoc,
+          docModel,
           modifiers: this.extractModifiers(node),
         });
       }
@@ -166,19 +212,22 @@ export class TypeScriptExtractor implements SymbolExtractor {
       if (nameNode) {
         if (this.hasExportModifier(node)) exportsSet.add(nameNode.text);
 
-        const doc = this.extractDocComment(node);
+        const { raw: rawDoc, model: docModel } = this.extractDocComment(node);
         const modifiers = this.extractModifiers(node);
         const signature = this.buildFunctionSignature(node, nameNode.text);
+        const symbolId = buildSymbolId(repoId, filePath, nameNode.text, parentSymbolName, signature);
         const fullSymbolName = parentSymbolName ? `${parentSymbolName}.${nameNode.text}` : nameNode.text;
 
         symbols.push({
-          id: `${filePath}::${fullSymbolName}#L${node.range.startLine}`,
+          id: symbolId,
+          symbolId,
           name: fullSymbolName,
           kind: 'function',
           fileId: filePath,
           location: this.nodeToLocation(node, filePath),
           signature,
-          documentation: doc,
+          documentation: rawDoc,
+          docModel,
           modifiers,
         });
       }
@@ -191,26 +240,29 @@ export class TypeScriptExtractor implements SymbolExtractor {
         (c) => c.type === 'property_identifier' || c.type === 'identifier'
       );
       if (nameNode) {
-        const doc = this.extractDocComment(node);
+        const { raw: rawDoc, model: docModel } = this.extractDocComment(node);
         const modifiers = this.extractModifiers(node);
         const signature = this.buildFunctionSignature(node, nameNode.text);
+        const symbolId = buildSymbolId(repoId, filePath, nameNode.text, parentSymbolName, signature);
         const fullSymbolName = parentSymbolName ? `${parentSymbolName}.${nameNode.text}` : nameNode.text;
 
         symbols.push({
-          id: `${filePath}::${fullSymbolName}#L${node.range.startLine}`,
+          id: symbolId,
+          symbolId,
           name: fullSymbolName,
           kind: 'method',
           fileId: filePath,
           location: this.nodeToLocation(node, filePath),
           signature,
-          documentation: doc,
+          documentation: rawDoc,
+          docModel,
           modifiers,
         });
       }
       return;
     }
 
-    // --- Process Variable Declarations (Const / Let / Var / Arrow functions) ---
+    // --- Process Variable Declarations ---
     if (nodeType === 'lexical_declaration' || nodeType === 'variable_declaration') {
       const isConst = node.text.startsWith('const');
       const isExported = this.hasExportModifier(node);
@@ -225,21 +277,24 @@ export class TypeScriptExtractor implements SymbolExtractor {
               (c) => c.type === 'arrow_function' || c.type === 'function_expression'
             );
             const kind: SymbolKind = valueNode ? 'function' : isConst ? 'constant' : 'variable';
-            const doc = this.extractDocComment(node);
+            const { raw: rawDoc, model: docModel } = this.extractDocComment(node);
             const modifiers = this.extractModifiers(node);
             const signature = valueNode
               ? this.buildFunctionSignature(valueNode, nameNode.text)
               : `${isConst ? 'const' : 'let'} ${nameNode.text}`;
+            const symbolId = buildSymbolId(repoId, filePath, nameNode.text, parentSymbolName, signature);
             const fullSymbolName = parentSymbolName ? `${parentSymbolName}.${nameNode.text}` : nameNode.text;
 
             symbols.push({
-              id: `${filePath}::${fullSymbolName}#L${node.range.startLine}`,
+              id: symbolId,
+              symbolId,
               name: fullSymbolName,
               kind,
               fileId: filePath,
               location: this.nodeToLocation(child, filePath),
               signature,
-              documentation: doc,
+              documentation: rawDoc,
+              docModel,
               modifiers,
             });
           }
@@ -248,26 +303,21 @@ export class TypeScriptExtractor implements SymbolExtractor {
       return;
     }
 
-    // --- Recursive Fallthrough for general AST containers ---
+    // --- Fallthrough Traversal ---
     for (const child of node.children) {
-      this.traverseNode(child, filePath, symbols, imports, exportsSet, parentSymbolName);
+      this.traverseNode(child, filePath, repoId, symbols, imports, exportsSet, diagnostics, parentSymbolName);
     }
   }
 
   private parseImportStatement(node: ASTNode): ImportStatement | null {
-    // Extract module source path string (e.g. 'foo' from import { x } from 'foo')
     const stringNode = this.findDeepNode(node, 'string') || this.findDeepNode(node, 'string_fragment');
-    if (!stringNode) {
-      return null;
-    }
+    if (!stringNode) return null;
 
     const sourcePath = stringNode.text.replace(/['"]/g, '');
     const isRelative = sourcePath.startsWith('.');
     const isWildcard = node.text.includes('* as');
 
     const importedSymbols: string[] = [];
-
-    // Extract named imports
     const specifiers = this.findAllDeepNodes(node, 'import_specifier');
     for (const spec of specifiers) {
       const aliasOrName = spec.children[spec.children.length - 1];
@@ -276,7 +326,6 @@ export class TypeScriptExtractor implements SymbolExtractor {
       }
     }
 
-    // Default import or namespace import if empty specifiers
     if (importedSymbols.length === 0) {
       const clause = node.children.find((c) => c.type === 'import_clause');
       if (clause) {
@@ -296,7 +345,6 @@ export class TypeScriptExtractor implements SymbolExtractor {
   }
 
   private parseExportStatement(node: ASTNode, exportsSet: Set<string>): void {
-    // Named export specifiers: export { a, b as c }
     const specifiers = this.findAllDeepNodes(node, 'export_specifier');
     for (const spec of specifiers) {
       const nameNode = spec.children[spec.children.length - 1];
@@ -324,18 +372,66 @@ export class TypeScriptExtractor implements SymbolExtractor {
     return `${name}${paramsText}${returnTypeText}`;
   }
 
-  private extractDocComment(node: ASTNode): string | undefined {
-    // Check if node itself or parent contains comment
+  private extractDocComment(node: ASTNode): { raw?: string; model?: SymbolDoc } {
+    let commentText: string | undefined;
+
     if (node.parent) {
       const idx = node.parent.children.indexOf(node);
       if (idx > 0) {
         const prev = node.parent.children[idx - 1];
         if (prev && (prev.type === 'comment' || prev.type.includes('comment'))) {
-          return this.cleanDocComment(prev.text);
+          commentText = prev.text;
         }
       }
     }
-    return undefined;
+
+    if (!commentText) {
+      return {};
+    }
+
+    const raw = this.cleanDocComment(commentText);
+    const model = this.parseDocModel(raw);
+
+    return { raw, model };
+  }
+
+  private parseDocModel(rawDoc: string): SymbolDoc {
+    const lines = rawDoc.split('\n').map((l) => l.trim()).filter(Boolean);
+    const summaryLines: string[] = [];
+    const params: Array<{ name: string; description: string }> = [];
+    let returns: string | undefined;
+    const examples: string[] = [];
+    const throws: string[] = [];
+    let deprecated: boolean | string | undefined;
+
+    for (const line of lines) {
+      if (line.startsWith('@param')) {
+        const parts = line.replace('@param', '').trim().split(/\s+/);
+        const name = parts[0] || 'param';
+        const description = parts.slice(1).join(' ');
+        params.push({ name, description });
+      } else if (line.startsWith('@returns') || line.startsWith('@return')) {
+        returns = line.replace(/@returns?/, '').trim();
+      } else if (line.startsWith('@example')) {
+        examples.push(line.replace('@example', '').trim());
+      } else if (line.startsWith('@throws')) {
+        throws.push(line.replace('@throws', '').trim());
+      } else if (line.startsWith('@deprecated')) {
+        const depReason = line.replace('@deprecated', '').trim();
+        deprecated = depReason.length > 0 ? depReason : true;
+      } else {
+        summaryLines.push(line);
+      }
+    }
+
+    return {
+      summary: summaryLines.join(' '),
+      parameters: params.length > 0 ? params : undefined,
+      returns,
+      examples: examples.length > 0 ? examples : undefined,
+      throws: throws.length > 0 ? throws : undefined,
+      deprecated,
+    };
   }
 
   private cleanDocComment(text: string): string {
@@ -345,7 +441,7 @@ export class TypeScriptExtractor implements SymbolExtractor {
       .split('\n')
       .map((line) => line.replace(/^\s*\*?\s?/, '').trim())
       .filter(Boolean)
-      .join(' ');
+      .join('\n');
   }
 
   private extractModifiers(node: ASTNode): string[] {
@@ -381,6 +477,8 @@ export class TypeScriptExtractor implements SymbolExtractor {
       startColumn: node.range.startColumn,
       endLine: node.range.endLine,
       endColumn: node.range.endColumn,
+      startByte: node.range.startByte,
+      endByte: node.range.endByte,
     };
   }
 

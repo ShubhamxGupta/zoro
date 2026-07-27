@@ -12,6 +12,7 @@ describe('Shared Domain Models & Type Verification', () => {
   test('constructs valid AST Symbol & File nodes', () => {
     const symbol: SymbolNode = {
       id: 'sym-001',
+      symbolId: 'sym-001',
       name: 'UserService',
       kind: 'class',
       fileId: 'file-001',
