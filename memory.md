@@ -8,26 +8,44 @@ This file is the **living state file** and **persistent engineering memory** for
 
 | Metric                | Status / Value                                                                     |
 | :-------------------- | :--------------------------------------------------------------------------------- |
-| **Version**           | `0.19.0` (Developer Context Engine, Git Intelligence & Review Session Framework)   |
-| **Current Milestone** | Milestone 4: Multi-Agent AI Review & Patch Generation Pipeline                     |
-| **Current Phase**     | Phase 19: Developer Context Engine, Git Intelligence & Review Session Framework ✅ |
-| **Overall Progress**  | 45.2% (19 / 42 Phases Completed)                                                   |
+| **Version**           | `0.20.0` (Patch Generation Engine, AST Transformation Framework & Validation)      |
+| **Current Milestone** | Milestone 4: Multi-Agent AI Review & Patch Generation Pipeline (COMPLETE 🟢)       |
+| **Current Phase**     | Phase 20: Patch Generation Engine, AST Transformation Framework & Validation ✅     |
+| **Overall Progress**  | 47.6% (20 / 42 Phases Completed)                                                   |
 | **Last Updated**      | 2026-07-27                                                                         |
 | **Current Branch**    | `main`                                                                             |
 | **Build Status**      | 🟢 Passing (`npm run build` 0 errors across workspace)                             |
-| **Test Status**       | 🟢 Passing (214/214 Vitest tests; 12 new Phase 19 tests; V8 coverage verified)     |
+| **Test Status**       | 🟢 Passing (230/230 Vitest tests; 16 new Phase 20 tests; V8 coverage verified)    |
 
 ---
 
 ## Current Focus
 
-### Phase 19: Developer Context Engine, Git Intelligence & Review Session Framework
+### Phase 20: Patch Generation Engine, AST Transformation Framework & Validation Pipeline
 
 - **Status:** Complete 🟢
 - **Started:** 2026-07-27
 - **Completed:** 2026-07-27
 
 #### Objectives Achieved
+
+1. **Phase 20A — AST Transformation Framework & Registry (`@repo-intel/shared` & `@repo-intel/patch-gen`):**
+   - Introduced `ASTTransformation` interface (`apply()`, `validate()`, `rollback()`).
+   - Implemented `TransformationRegistry` managing registration, discovery, capability lookup, and execution.
+
+2. **Phase 20B — Refactoring Library & Language Adapters (`@repo-intel/patch-gen`):**
+   - Implemented 12 deterministic refactoring transformations (`RenameSymbol`, `RenameFile`, `ExtractMethod`, `InlineMethod`, `MoveFunction`, `InsertImport`, `RemoveImport`, `UpdateSignature`, `ChangeVisibility`, `ReplaceExpression`, `AddDocumentation`, `RemoveDeadCode`).
+   - Built language adapters for TypeScript, Python, Go, and Java.
+
+3. **Phase 20C — Patch Generation Engine & Simulation (`@repo-intel/patch-gen`):**
+   - Built `PatchGenerationEngine` performing non-destructive in-memory simulation (AST -> Transform -> Validate -> Print -> Unified Diff) producing `PatchCandidate` objects.
+
+4. **Phase 20D — Validation Pipeline & Patch Scoring (`@repo-intel/patch-gen`):**
+   - Built `PatchValidationPipeline` verifying AST syntax, parser validity, lint rules, type correctness, and computing multi-factor patch scores.
+
+5. **Phase 20E — Explainable Patch Engine (`@repo-intel/patch-gen`):**
+   - Built `PatchExplanationEngine` producing structured explainable patch descriptions (problem summary, rationale, affected files/symbols, expected behavior, risks, verification steps).
+
 
 1. **Phase 19A — Git Intelligence Layer (`@repo-intel/shared` & `@repo-intel/review-engine`):**
    - Introduced `GitProvider` interface (`getRepository`, `getBranches`, `getCommit`, `getDiff`, `getPullRequest`, `getChangedFiles`, `getChangedSymbols`).

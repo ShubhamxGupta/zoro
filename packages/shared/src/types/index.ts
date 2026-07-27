@@ -27,3 +27,5 @@ export * from './patch-plan.types.js';
 export * from './git-provider.types.js';
 export * from './developer-context.types.js';
 export * from './review-session.types.js';
+export * from './ast-transformation.types.js';
+export * from './patch-candidate.types.js';

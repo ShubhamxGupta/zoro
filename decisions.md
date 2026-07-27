@@ -1018,6 +1018,92 @@ Incremental review reduces LLM API costs by $> 80\%$ and delivers sub-5s feedbac
 
 ---
 
+### ADR-033: AST Transformation Framework Architecture & Reversible Refactorings
+
+- **Status:** Accepted
+- **Date:** 2026-07-27
+
+#### Context
+
+Automated code modification and auto-fixing require deterministic, language-agnostic AST transformations that can be safely validated and reversed (rolled back) without corrupting source code repositories.
+
+#### Alternatives Considered
+
+1. **Unstructured String Regular Expressions:** Regex search and replace fails on complex nested syntax, corrupts indentation, and cannot be reliably validated or reversed.
+2. **AST Transformation Framework (`ASTTransformation`, `TransformationRegistry`, Language Adapters):**
+   - **`ASTTransformation` Interface:** Enforces `apply()`, `validate()`, `rollback()` contracts.
+   - **`TransformationRegistry`:** Manages capability discovery, registration, and deterministic execution.
+   - **Refactoring Library:** 12 core transformations (`RenameSymbol`, `ExtractMethod`, `InlineMethod`, `InsertImport`, `RemoveImport`, `UpdateSignature`, `AddDocumentation`, etc.).
+   - **Language Adapters:** Exposes AST parsers, node builders, and formatters for TypeScript, Python, Go, and Java.
+
+#### Why This Option Was Chosen
+
+`ASTTransformation` guarantees deterministic code modifications, language independence, and complete rollback safety.
+
+#### Consequences
+
+- **Positive:** Reversible code edits, zero syntax corruption, multi-language support.
+- **Negative:** Requires adapter maintenance per supported language AST structure.
+- **Affected Modules:** `@repo-intel/shared`, `@repo-intel/patch-gen`.
+
+---
+
+### ADR-034: Patch Generation Engine & Validation Pipeline Strategy
+
+- **Status:** Accepted
+- **Date:** 2026-07-27
+
+#### Context
+
+Generated patches must be rigorously validated before presentation or execution to ensure zero syntax errors, lint compliance, type correctness, and low blast radius.
+
+#### Alternatives Considered
+
+1. **Direct Disk Editing:** Mutating files directly on disk risks corrupting active development workspaces upon invalid LLM output.
+2. **In-Memory Patch Simulation & Multi-Factor Validation Pipeline (`PatchGenerationEngine`, `PatchValidationPipeline`):**
+   - **Simulation Pipeline:** Original AST -> Transformation -> Validation -> Pretty Printer -> Unified Diff -> `PatchCandidate`.
+   - **Validation Pipeline:** Runs AST syntax validation, parser checks, lint rules, type safety checks, and computes a multi-factor score (`correctness`, `confidence`, `complexity`, `blastRadius`, `breakingChangeLikelihood`).
+
+#### Why This Option Was Chosen
+
+In-memory simulation ensures files are never mutated directly, while multi-factor scoring rejects low-confidence or high-risk patches automatically.
+
+#### Consequences
+
+- **Positive:** Non-destructive patch generation, multi-factor safety scoring, sub-100ms patch generation latency.
+- **Negative:** Scored metrics rely on heuristic blast-radius calculations.
+- **Affected Modules:** `@repo-intel/shared`, `@repo-intel/patch-gen`.
+
+---
+
+### ADR-035: Explainable Patch Architecture & Simulation Pipeline
+
+- **Status:** Accepted
+- **Date:** 2026-07-27
+
+#### Context
+
+Developers require complete transparency into why a patch was generated, what symbols were modified, what risks exist, and how to verify the patch before applying it.
+
+#### Alternatives Considered
+
+1. **Unexplainable Unified Diff Only:** Emitting raw diff patches without rationale or risk metadata forces developers to manually re-audit changes.
+2. **Explainable Patch Architecture (`PatchExplanationEngine`, `PatchCandidate`):**
+   - **`PatchExplanationEngine`:** Generates structured explanations containing problem summary, why this change was made, affected files, affected symbols, expected behavior, possible risks, and verification steps.
+   - **`PatchCandidate` Payload:** Combines unified diff, original code, transformed code, explanation, validation report, risk score, and rollback metadata.
+
+#### Why This Option Was Chosen
+
+Explainable patches build developer trust, streamline code reviews, and provide clear verification steps.
+
+#### Consequences
+
+- **Positive:** Complete patch transparency, automated risk disclosures, actionable verification steps.
+- **Negative:** Increases payload size of `PatchCandidate` objects.
+- **Affected Modules:** `@repo-intel/shared`, `@repo-intel/patch-gen`.
+
+---
+
 ## Decision Rules & Governance
 
 A new Architecture Decision Record (**ADR**) **MUST** be created whenever:

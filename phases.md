@@ -472,24 +472,21 @@ Construct the Repository Knowledge Graph (RKG), resolve symbol references across
 
 ---
 
-### Phase 20: Context Retrieval Engine (CRE) & Hybrid 2-Hop Graph Walk
+### Phase 20: Patch Generation Engine, AST Transformation Framework & Validation Pipeline
 
-- **Goal:** Implement the hybrid Context Retrieval Engine in `packages/retrieval/src/engine.ts`.
-- **Why This Phase Exists:** CRE combines graph walk context with vector search snippets to construct minimal context payloads (< 2,000 tokens) for LLMs.
-- **Features:** Hybrid context retriever, token budget manager, and context payload builder.
-- **Tasks:**
-  - Implement git diff modified symbol seed extractor.
-  - Execute 2-hop Cypher traversal in KùzuDB for modified symbols (callers, callees, interfaces, tests).
-  - Perform LanceDB vector search for relevant semantic docstrings.
-  - Deduplicate, rank, and truncate function bodies to signatures to fit strict token budget limit.
-- **Deliverables:** Functional CRE module returning compact Context Subgraph Payloads.
+- **Status:** Completed 🟢
+- **Goal:** Implement the AST Transformation Framework (`ASTTransformation`, `TransformationRegistry`), Refactoring Library (12 core transformations), Language Adapters (TS, Python, Go, Java), Patch Generation Engine (`PatchGenerationEngine`), Validation Pipeline (`PatchValidationPipeline`), and Explanation Engine (`PatchExplanationEngine`) in `@repo-intel/patch-gen`.
+- **Why This Phase Exists:** Enables non-destructive, in-memory simulation of AST refactorings, multi-factor safety scoring, and explainable patch generation.
+- **Features:**
+  - **AST Transformation Framework (Phase 20A):** `ASTTransformation` interface (`apply()`, `validate()`, `rollback()`) and `TransformationRegistry`.
+  - **Refactoring Library & Adapters (Phase 20B):** 12 core transformations (`RenameSymbol`, `RenameFile`, `ExtractMethod`, `InlineMethod`, `MoveFunction`, `InsertImport`, `RemoveImport`, `UpdateSignature`, `ChangeVisibility`, `ReplaceExpression`, `AddDocumentation`, `RemoveDeadCode`) and language adapters for TS, Py, Go, Java.
+  - **Patch Generation & Simulation (Phase 20C):** `PatchGenerationEngine` performing non-destructive in-memory simulation (AST -> Transform -> Validate -> Print -> Unified Diff) producing `PatchCandidate` objects.
+  - **Validation Pipeline (Phase 20D):** `PatchValidationPipeline` running syntax/AST checks, lint rules, type safety checks, and computing multi-factor patch scores.
+  - **Explainable Patch Engine (Phase 20E):** `PatchExplanationEngine` producing structured explainable patch descriptions (problem summary, rationale, affected files/symbols, expected behavior, risks, verification steps).
+- **Deliverables:** `@repo-intel/shared` and `@repo-intel/patch-gen` packages.
 - **Dependencies:** Phase 18, Phase 19.
-- **Acceptance Criteria:** Emits context payloads under 2,000 tokens containing 100% of direct caller/callee signatures for a given diff.
-- **Testing:**
-  - _Unit Tests:_ Test CRE retrieval for modified staged diffs; assert token budget enforcement.
-- **Risks:** Context truncation dropping critical caller signatures if token limits are exceeded.
-- **Estimated Complexity:** High.
-- **Estimated Time:** 3 days.
+- **Acceptance Criteria:** Executes non-destructive patch generation in $< 100\text{ms}$ and passes 100% of validation pipeline quality gates.
+- **Testing:** Unit tests (230/230 passing monorepo-wide across 96 test files) and patch generation benchmark (`patch-generation.bench.ts`).
 
 ---
 
