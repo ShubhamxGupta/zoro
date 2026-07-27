@@ -14,38 +14,80 @@ export function SettingsPage() {
   };
 
   return (
-    <div className="p-5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm space-y-6 max-w-2xl">
-      <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-4">
-        <div className="flex items-center space-x-2">
-          <Settings className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-          <h2 className="text-lg font-semibold">Platform Preferences & Settings</h2>
+    <div
+      style={{
+        padding: 'var(--space-5, 20px)',
+        borderRadius: 'var(--radius-xl)',
+        border: '1px solid var(--border-default)',
+        backgroundColor: 'var(--bg-surface)',
+        boxShadow: 'var(--shadow-sm)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 'var(--space-6)',
+        maxWidth: '640px',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-default)', paddingBottom: 'var(--space-4)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+          <Settings size={18} color="var(--text-secondary)" />
+          <h2 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>Platform Preferences & Settings</h2>
         </div>
         <button
           onClick={saveSettings}
-          className="flex items-center space-x-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '8px 16px',
+            backgroundColor: 'var(--accent-primary)',
+            color: '#ffffff',
+            border: 'none',
+            borderRadius: 'var(--radius-md)',
+            fontSize: '12px',
+            fontWeight: 500,
+            cursor: 'pointer',
+          }}
         >
-          <Save className="w-4 h-4" />
+          <Save size={14} />
           <span>{isSaved ? 'Saved!' : 'Save Changes'}</span>
         </button>
       </div>
 
-      <div className="space-y-4 text-xs">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', fontSize: '12px' }}>
         <div>
-          <label className="font-semibold text-gray-700 dark:text-gray-300 block mb-1">Ollama Base URL</label>
+          <label style={{ fontWeight: 600, color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Ollama Base URL</label>
           <input
             type="text"
             value={ollamaUrl}
             onChange={(e) => setOllamaUrl(e.target.value)}
-            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg"
+            style={{
+              width: '100%',
+              padding: '8px 12px',
+              backgroundColor: 'var(--bg-surface-elevated)',
+              border: '1px solid var(--border-default)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--text-primary)',
+              fontSize: '12px',
+              outline: 'none',
+            }}
           />
         </div>
 
         <div>
-          <label className="font-semibold text-gray-700 dark:text-gray-300 block mb-1">Default Review Depth</label>
+          <label style={{ fontWeight: 600, color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>Default Review Depth</label>
           <select
             value={reviewDepth}
             onChange={(e) => setReviewDepth(e.target.value)}
-            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg"
+            style={{
+              width: '100%',
+              padding: '8px 12px',
+              backgroundColor: 'var(--bg-surface-elevated)',
+              border: '1px solid var(--border-default)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--text-primary)',
+              fontSize: '12px',
+              outline: 'none',
+            }}
           >
             <option value="shallow">Shallow (Fast, Diff Only)</option>
             <option value="standard">Standard (Diff + 1-Hop Subgraph)</option>

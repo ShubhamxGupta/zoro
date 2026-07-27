@@ -1,79 +1,181 @@
 'use client';
 
-import React from 'react';
-import { HardDrive, Code, Cpu, Activity, CheckCircle2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { HardDrive, Code, Cpu, Activity, CheckCircle2, RefreshCw } from 'lucide-react';
+import { fetchApi } from '../../lib/api-client';
 
-export interface RepositoryDashboardProps {
-  repoName?: string;
-  languages?: string[];
-  filesCount?: number;
-  symbolsCount?: number;
-  nodeCount?: number;
-  edgeCount?: number;
-  lastIndexedTime?: string;
-  activeProvider?: string;
-  selectedModel?: string;
-}
+export function RepositoryDashboard() {
+  const [data, setData] = useState({
+    status: 'ready',
+    languages: ['TypeScript', 'JSON', 'Markdown'],
+    filesCount: 25,
+    symbolsCount: 142,
+    nodeCount: 142,
+    edgeCount: 320,
+    lastIndexedTime: 'Just now',
+    activeProvider: 'ollama',
+    selectedModel: 'llama3',
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
-export function RepositoryDashboard({
-  repoName = 'zoro',
-  languages = ['TypeScript', 'JSON', 'Markdown'],
-  filesCount = 25,
-  symbolsCount = 142,
-  nodeCount = 142,
-  edgeCount = 320,
-  lastIndexedTime = 'Just now',
-  activeProvider = 'ollama',
-  selectedModel = 'llama3',
-}: RepositoryDashboardProps) {
+  const loadStatus = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetchApi<any>('/repositories/status');
+      if (res) {
+        setData({
+          status: res.status ?? 'ready',
+          languages: res.languages ?? ['TypeScript', 'JSON', 'Markdown'],
+          filesCount: res.indexedFiles ?? 25,
+          symbolsCount: res.symbolsCount ?? 142,
+          nodeCount: res.graphStats?.nodeCount ?? 142,
+          edgeCount: res.graphStats?.edgeCount ?? 320,
+          lastIndexedTime: new Date(res.lastIndexedTime ?? Date.now()).toLocaleTimeString(),
+          activeProvider: 'ollama',
+          selectedModel: 'llama3',
+        });
+      }
+    } catch {
+      // Keep static defaults on offline fallback
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadStatus();
+  }, []);
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+      {/* Title Bar */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Repository Dashboard</h1>
-          <p className="text-sm text-gray-500">Overview of repository index, knowledge graph, and AI runtime status.</p>
+          <h1 className="h1" style={{ color: 'var(--text-primary)', margin: 0 }}>Repository Dashboard</h1>
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+            Live status from PlatformRuntime REST API Gateway (`http://localhost:3000/api/v1`).
+          </p>
         </div>
-        <div className="flex items-center space-x-2 bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300 px-3 py-1.5 rounded-full text-xs font-medium border border-green-200 dark:border-green-800">
-          <CheckCircle2 className="w-3.5 h-3.5" />
-          <span>Status: Ready</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+          <button
+            onClick={loadStatus}
+            style={{
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: 'var(--bg-surface-elevated)',
+              border: '1px solid var(--border-default)',
+              color: 'var(--text-primary)',
+              fontSize: '12px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
+            <span>Refresh API Status</span>
+          </button>
+
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-full)',
+              backgroundColor: 'var(--sev-info-bg)',
+              border: '1px solid var(--sev-info-border)',
+              color: 'var(--sev-info-text)',
+              fontSize: '12px',
+              fontWeight: 500,
+            }}
+          >
+            <CheckCircle2 size={14} />
+            <span style={{ textTransform: 'capitalize' }}>Status: {data.status}</span>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm space-y-2">
-          <div className="flex items-center justify-between text-gray-500">
-            <span className="text-xs font-medium uppercase tracking-wider">Repository</span>
-            <HardDrive className="w-4 h-4 text-blue-500" />
+      {/* Stats Cards Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-4)' }}>
+        <div
+          style={{
+            padding: 'var(--space-4)',
+            borderRadius: 'var(--radius-xl)',
+            border: '1px solid var(--border-default)',
+            backgroundColor: 'var(--bg-surface)',
+            boxShadow: 'var(--shadow-sm)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--space-2)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Repository</span>
+            <HardDrive size={16} color="var(--accent-primary)" />
           </div>
-          <div className="text-xl font-bold">{repoName}</div>
-          <div className="text-xs text-gray-400">Languages: {languages.join(', ')}</div>
+          <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)' }}>zoro</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Languages: {data.languages.join(', ')}</div>
         </div>
 
-        <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm space-y-2">
-          <div className="flex items-center justify-between text-gray-500">
-            <span className="text-xs font-medium uppercase tracking-wider">Index Size</span>
-            <Code className="w-4 h-4 text-indigo-500" />
+        <div
+          style={{
+            padding: 'var(--space-4)',
+            borderRadius: 'var(--radius-xl)',
+            border: '1px solid var(--border-default)',
+            backgroundColor: 'var(--bg-surface)',
+            boxShadow: 'var(--shadow-sm)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--space-2)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Index Size</span>
+            <Code size={16} color="#818cf8" />
           </div>
-          <div className="text-xl font-bold">{filesCount} Files ({lastIndexedTime})</div>
-          <div className="text-xs text-gray-400">{symbolsCount} Symbols Extracted</div>
+          <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)' }}>{data.filesCount} Files</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{data.symbolsCount} Symbols Extracted ({data.lastIndexedTime})</div>
         </div>
 
-        <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm space-y-2">
-          <div className="flex items-center justify-between text-gray-500">
-            <span className="text-xs font-medium uppercase tracking-wider">Knowledge Graph</span>
-            <Activity className="w-4 h-4 text-purple-500" />
+        <div
+          style={{
+            padding: 'var(--space-4)',
+            borderRadius: 'var(--radius-xl)',
+            border: '1px solid var(--border-default)',
+            backgroundColor: 'var(--bg-surface)',
+            boxShadow: 'var(--shadow-sm)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--space-2)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Knowledge Graph</span>
+            <Activity size={16} color="#c084fc" />
           </div>
-          <div className="text-xl font-bold">{nodeCount} Nodes</div>
-          <div className="text-xs text-gray-400">{edgeCount} Semantic Edges</div>
+          <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)' }}>{data.nodeCount} Nodes</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{data.edgeCount} Semantic Edges</div>
         </div>
 
-        <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm space-y-2">
-          <div className="flex items-center justify-between text-gray-500">
-            <span className="text-xs font-medium uppercase tracking-wider">AI Engine</span>
-            <Cpu className="w-4 h-4 text-emerald-500" />
+        <div
+          style={{
+            padding: 'var(--space-4)',
+            borderRadius: 'var(--radius-xl)',
+            border: '1px solid var(--border-default)',
+            backgroundColor: 'var(--bg-surface)',
+            boxShadow: 'var(--shadow-sm)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--space-2)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>AI Engine</span>
+            <Cpu size={16} color="#34d399" />
           </div>
-          <div className="text-xl font-bold capitalize">{activeProvider}</div>
-          <div className="text-xs text-gray-400">Model: {selectedModel}</div>
+          <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)', textTransform: 'capitalize' }}>{data.activeProvider}</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Model: {data.selectedModel}</div>
         </div>
       </div>
     </div>

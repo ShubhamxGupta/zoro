@@ -56,36 +56,57 @@ export function FindingsExplorer({
     return matchesSearch && matchesSev;
   });
 
-  const getSeverityBadge = (severity: string) => {
+  const getSeverityStyle = (severity: string) => {
     switch (severity) {
       case 'CRITICAL':
       case 'HIGH':
-        return 'bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300 border-red-200 dark:border-red-800';
+        return { bg: 'var(--sev-critical-bg)', color: 'var(--sev-critical-text)', border: 'var(--sev-critical-border)' };
       case 'MEDIUM':
-        return 'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 border-amber-200 dark:border-amber-800';
+        return { bg: 'var(--sev-medium-bg)', color: 'var(--sev-medium-text)', border: 'var(--sev-medium-border)' };
       default:
-        return 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 border-blue-200 dark:border-blue-800';
+        return { bg: 'var(--sev-low-bg)', color: 'var(--sev-low-text)', border: 'var(--sev-low-border)' };
     }
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-3 justify-between">
-        <div className="relative flex-1">
-          <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+      {/* Search & Filter Bar */}
+      <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+        <div style={{ position: 'relative', flex: 1, minWidth: '240px' }}>
+          <Search size={14} style={{ position: 'absolute', left: '12px', top: '10px', color: 'var(--text-muted)' }} />
           <input
             type="text"
             placeholder="Search findings by file or description..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{
+              width: '100%',
+              paddingLeft: '34px',
+              paddingRight: '12px',
+              paddingTop: '8px',
+              paddingBottom: '8px',
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--border-default)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--text-primary)',
+              fontSize: '13px',
+              outline: 'none',
+            }}
           />
         </div>
 
         <select
           value={selectedSeverity}
           onChange={(e) => setSelectedSeverity(e.target.value)}
-          className="px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          style={{
+            padding: '8px 12px',
+            backgroundColor: 'var(--bg-surface)',
+            border: '1px solid var(--border-default)',
+            borderRadius: 'var(--radius-md)',
+            color: 'var(--text-primary)',
+            fontSize: '13px',
+            outline: 'none',
+          }}
         >
           <option value="ALL">All Severities</option>
           <option value="CRITICAL">Critical</option>
@@ -95,28 +116,53 @@ export function FindingsExplorer({
         </select>
       </div>
 
-      <div className="space-y-3">
-        {filtered.map((item) => (
-          <div
-            key={item.findingId}
-            className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm space-y-2"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getSeverityBadge(item.severity)}`}>
-                  {item.severity}
-                </span>
-                <span className="text-xs font-mono text-gray-500">
-                  {item.filePath}:{item.lineRange.startLine}-{item.lineRange.endLine}
+      {/* Findings List */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+        {filtered.map((item) => {
+          const sevStyle = getSeverityStyle(item.severity);
+          return (
+            <div
+              key={item.findingId}
+              style={{
+                padding: 'var(--space-4)',
+                borderRadius: 'var(--radius-xl)',
+                border: '1px solid var(--border-default)',
+                backgroundColor: 'var(--bg-surface)',
+                boxShadow: 'var(--shadow-sm)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--space-2)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                  <span
+                    style={{
+                      padding: '2px 8px',
+                      borderRadius: 'var(--radius-full)',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      backgroundColor: sevStyle.bg,
+                      color: sevStyle.color,
+                      border: `1px solid ${sevStyle.border}`,
+                    }}
+                  >
+                    {item.severity}
+                  </span>
+                  <span style={{ fontSize: '12px', fontFamily: 'monospace', color: 'var(--text-secondary)' }}>
+                    {item.filePath}:{item.lineRange.startLine}-{item.lineRange.endLine}
+                  </span>
+                </div>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                  Confidence: {(item.confidenceScore * 100).toFixed(0)}%
                 </span>
               </div>
-              <span className="text-xs text-gray-400">Confidence: {(item.confidenceScore * 100).toFixed(0)}%</span>
-            </div>
 
-            <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">{item.explanation.whatIsWrong}</div>
-            <div className="text-xs text-gray-500">{item.explanation.whyItMatters}</div>
-          </div>
-        ))}
+              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>{item.explanation.whatIsWrong}</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{item.explanation.whyItMatters}</div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

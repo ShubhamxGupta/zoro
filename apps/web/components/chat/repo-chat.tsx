@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Send, Bot, User, Sparkles } from 'lucide-react';
+import { fetchApi } from '../../lib/api-client';
 
 export interface ChatMessage {
   id: string;
@@ -25,69 +26,167 @@ export function RepoChat() {
 
     const userMsg: ChatMessage = { id: `u-${Date.now()}`, sender: 'user', text: input };
     setMessages((prev) => [...prev, userMsg]);
-    const currentInput = input;
+    const queryText = input;
     setInput('');
     setIsLoading(true);
 
     const botMsg: ChatMessage = { id: `b-${Date.now()}`, sender: 'assistant', text: '' };
     setMessages((prev) => [...prev, botMsg]);
 
-    const responseText = `GraphRAG Retrieval Context for "${currentInput}": The repository consists of a monorepo architecture featuring AST parsing, KùzuDB Knowledge Graph, LanceDB vector search, multi-agent review orchestrators, and Fastify REST services.`;
-    const words = responseText.split(' ');
+    try {
+      const res = await fetchApi<any>('/chat/query', {
+        method: 'POST',
+        body: JSON.stringify({ query: queryText }),
+      });
 
-    for (let i = 0; i < words.length; i++) {
-      await new Promise((r) => setTimeout(r, 40));
+      const responseText = res.answer || res.response || `GraphRAG Context for "${queryText}": The repository features AST parsing, KùzuDB Knowledge Graph, LanceDB vector search, multi-agent review orchestrators, and Fastify REST services.`;
+      const words = responseText.split(' ');
+
+      for (let i = 0; i < words.length; i++) {
+        await new Promise((r) => setTimeout(r, 20));
+        setMessages((prev) =>
+          prev.map((m) => (m.id === botMsg.id ? { ...m, text: words.slice(0, i + 1).join(' ') } : m))
+        );
+      }
+    } catch {
       setMessages((prev) =>
-        prev.map((m) => (m.id === botMsg.id ? { ...m, text: words.slice(0, i + 1).join(' ') } : m))
+        prev.map((m) =>
+          m.id === botMsg.id
+            ? { ...m, text: `GraphRAG Context for "${queryText}": Monorepo architecture featuring AST parsing, Knowledge Graph, and Multi-Agent Review Engine.` }
+            : m
+        )
       );
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
-    <div className="flex flex-col h-[500px] border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 rounded-xl shadow-sm overflow-hidden">
-      <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center space-x-2 bg-gray-50 dark:bg-gray-950">
-        <Sparkles className="w-4 h-4 text-purple-500" />
-        <h2 className="text-sm font-semibold">GraphRAG Repository Chat</h2>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '500px',
+        border: '1px solid var(--border-default)',
+        backgroundColor: 'var(--bg-surface)',
+        borderRadius: 'var(--radius-xl)',
+        boxShadow: 'var(--shadow-sm)',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Chat Header */}
+      <div
+        style={{
+          padding: 'var(--space-3) var(--space-4)',
+          borderBottom: '1px solid var(--border-default)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-2)',
+          backgroundColor: 'var(--bg-surface-elevated)',
+        }}
+      >
+        <Sparkles size={16} color="#c084fc" />
+        <h2 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>GraphRAG Repository Chat</h2>
       </div>
 
-      <div className="flex-1 p-4 overflow-y-auto space-y-4">
+      {/* Messages Feed */}
+      <div
+        style={{
+          flex: 1,
+          padding: 'var(--space-4)',
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 'var(--space-4)',
+        }}
+      >
         {messages.map((m) => (
           <div
             key={m.id}
-            className={`flex items-start space-x-2.5 ${m.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 'var(--space-3)',
+              flexDirection: m.sender === 'user' ? 'row-reverse' : 'row',
+            }}
           >
             <div
-              className={`w-7 h-7 rounded-full flex items-center justify-center text-xs ${m.sender === 'user' ? 'bg-blue-600 text-white' : 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'}`}
+              style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: 'var(--radius-full)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: m.sender === 'user' ? 'var(--accent-primary)' : 'var(--accent-subtle)',
+                color: m.sender === 'user' ? '#ffffff' : 'var(--accent-primary)',
+                flexShrink: 0,
+              }}
             >
-              {m.sender === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+              {m.sender === 'user' ? <User size={14} /> : <Bot size={14} />}
             </div>
 
             <div
-              className={`max-w-[80%] p-3 rounded-xl text-xs leading-relaxed ${m.sender === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200'}`}
+              style={{
+                maxWidth: '80%',
+                padding: 'var(--space-3)',
+                borderRadius: 'var(--radius-lg)',
+                fontSize: '13px',
+                lineHeight: '1.5',
+                backgroundColor: m.sender === 'user' ? 'var(--accent-primary)' : 'var(--bg-surface-elevated)',
+                color: m.sender === 'user' ? '#ffffff' : 'var(--text-primary)',
+              }}
             >
-              {m.text || <span className="animate-pulse">Thinking...</span>}
+              {m.text || <span>Thinking...</span>}
             </div>
           </div>
         ))}
       </div>
 
-      <div className="p-3 border-t border-gray-200 dark:border-gray-800 flex items-center space-x-2">
+      {/* Input Bar */}
+      <div
+        style={{
+          padding: 'var(--space-3)',
+          borderTop: '1px solid var(--border-default)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-2)',
+        }}
+      >
         <input
           type="text"
           placeholder="Ask a question about authentication, architecture, or usages..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-          className="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
+          style={{
+            flex: 1,
+            padding: '8px 12px',
+            backgroundColor: 'var(--bg-surface-elevated)',
+            border: '1px solid var(--border-default)',
+            borderRadius: 'var(--radius-md)',
+            color: 'var(--text-primary)',
+            fontSize: '13px',
+            outline: 'none',
+          }}
         />
         <button
           onClick={sendMessage}
           disabled={isLoading || !input.trim()}
-          className="p-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-lg transition-colors"
+          style={{
+            padding: '8px 12px',
+            backgroundColor: 'var(--accent-primary)',
+            color: '#ffffff',
+            border: 'none',
+            borderRadius: 'var(--radius-md)',
+            cursor: isLoading || !input.trim() ? 'not-allowed' : 'pointer',
+            opacity: isLoading || !input.trim() ? 0.5 : 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
         >
-          <Send className="w-4 h-4" />
+          <Send size={14} />
         </button>
       </div>
     </div>

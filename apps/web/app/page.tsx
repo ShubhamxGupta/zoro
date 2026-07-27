@@ -9,6 +9,7 @@ import { RepoChat } from '../components/chat/repo-chat';
 import { GraphViewer } from '../components/graph/graph-viewer';
 import { ProviderSelector } from '../components/providers/provider-selector';
 import { SettingsPage } from '../components/settings/settings-page';
+import { SetupWizard } from '../components/onboarding/setup-wizard';
 import {
   LayoutDashboard,
   ShieldCheck,
@@ -17,94 +18,123 @@ import {
   Network,
   Cpu,
   Settings,
+  Sparkles,
+  CheckCircle2,
 } from 'lucide-react';
 
 export default function MVPAppPage() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'review' | 'patch' | 'chat' | 'graph' | 'providers' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'review' | 'patch' | 'chat' | 'graph' | 'providers' | 'settings' | 'onboarding'>('dashboard');
+
+  const navItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={16} /> },
+    { id: 'review', label: 'Review & Findings', icon: <ShieldCheck size={16} /> },
+    { id: 'patch', label: 'Patch Preview', icon: <FileDiff size={16} /> },
+    { id: 'chat', label: 'GraphRAG Chat', icon: <MessageSquareText size={16} /> },
+    { id: 'graph', label: 'Knowledge Graph', icon: <Network size={16} /> },
+    { id: 'providers', label: 'AI Providers', icon: <Cpu size={16} /> },
+    { id: 'settings', label: 'Settings', icon: <Settings size={16} /> },
+    { id: 'onboarding', label: 'Setup Wizard', icon: <Sparkles size={16} /> },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex flex-col font-sans">
-      {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-6 py-3 flex items-center justify-between shadow-sm">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)', fontFamily: 'Inter, system-ui, sans-serif', overflow: 'hidden' }}>
+      {/* Header Bar */}
+      <header
+        style={{
+          height: '56px',
+          padding: '0 var(--space-6)',
+          backgroundColor: 'var(--bg-surface)',
+          borderBottom: '1px solid var(--border-default)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexShrink: 0,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+          <div
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: 'var(--accent-primary)',
+              color: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 700,
+              fontSize: '14px',
+            }}
+          >
             ZI
           </div>
           <div>
-            <h1 className="font-bold text-sm leading-none">Repo Intelligence Platform</h1>
-            <span className="text-[11px] text-gray-500 font-medium">Minimum Lovable Prototype (MVP Track)</span>
+            <h1 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>Repo Intelligence Platform</h1>
+            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Beta Release (v0.1.0-beta)</span>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: '4px 10px', borderRadius: 'var(--radius-full)', backgroundColor: 'var(--sev-info-bg)', border: '1px solid var(--sev-info-border)', color: 'var(--sev-info-text)', fontSize: '12px', fontWeight: 500 }}>
+            <CheckCircle2 size={14} />
+            <span>Ollama Connected</span>
           </div>
         </div>
       </header>
 
-      {/* Main Layout */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Navigation Sidebar */}
-        <aside className="w-64 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 flex flex-col space-y-1">
-          <button
-            onClick={() => setActiveTab('dashboard')}
-            className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${activeTab === 'dashboard' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
-          >
-            <LayoutDashboard className="w-4 h-4 text-blue-500" />
-            <span>Dashboard</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('review')}
-            className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${activeTab === 'review' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
-          >
-            <ShieldCheck className="w-4 h-4 text-emerald-500" />
-            <span>Review & Findings</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('patch')}
-            className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${activeTab === 'patch' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
-          >
-            <FileDiff className="w-4 h-4 text-indigo-500" />
-            <span>Patch Preview</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('chat')}
-            className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${activeTab === 'chat' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
-          >
-            <MessageSquareText className="w-4 h-4 text-purple-500" />
-            <span>GraphRAG Chat</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('graph')}
-            className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${activeTab === 'graph' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
-          >
-            <Network className="w-4 h-4 text-amber-500" />
-            <span>Knowledge Graph</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('providers')}
-            className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${activeTab === 'providers' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
-          >
-            <Cpu className="w-4 h-4 text-emerald-500" />
-            <span>AI Providers</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('settings')}
-            className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${activeTab === 'settings' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
-          >
-            <Settings className="w-4 h-4 text-gray-500" />
-            <span>Settings</span>
-          </button>
+      {/* Main Body */}
+      <div style={{ display: 'flex', flex: 1, minHeight: 0, width: '100%' }}>
+        {/* Sidebar Navigation */}
+        <aside
+          style={{
+            width: '240px',
+            backgroundColor: 'var(--bg-surface)',
+            borderRight: '1px solid var(--border-default)',
+            padding: 'var(--space-3)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px',
+            flexShrink: 0,
+          }}
+        >
+          {navItems.map((item) => {
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id as any)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-3)',
+                  height: '38px',
+                  width: '100%',
+                  padding: '0 var(--space-3)',
+                  borderRadius: 'var(--radius-md)',
+                  border: 'none',
+                  backgroundColor: isActive ? 'var(--accent-subtle)' : 'transparent',
+                  color: isActive ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                  fontWeight: isActive ? 600 : 500,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  transition: 'all var(--duration-fast) var(--ease-default)',
+                  textAlign: 'left',
+                }}
+              >
+                <span>{item.icon}</span>
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
         </aside>
 
         {/* Viewport Content */}
-        <main className="flex-1 p-6 overflow-y-auto">
-          <div className="max-w-6xl mx-auto space-y-6">
+        <main style={{ flex: 1, overflowY: 'auto', padding: 'var(--space-6)', backgroundColor: 'var(--bg-base)' }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
             {activeTab === 'dashboard' && <RepositoryDashboard />}
 
             {activeTab === 'review' && (
-              <div className="space-y-6">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
                 <ReviewRunner />
                 <FindingsExplorer />
               </div>
@@ -119,6 +149,8 @@ export default function MVPAppPage() {
             {activeTab === 'providers' && <ProviderSelector />}
 
             {activeTab === 'settings' && <SettingsPage />}
+
+            {activeTab === 'onboarding' && <SetupWizard onComplete={() => setActiveTab('dashboard')} />}
           </div>
         </main>
       </div>

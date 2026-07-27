@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Check, X, FileDiff, ShieldAlert } from 'lucide-react';
+import { Check, X, FileDiff, ShieldAlert, Sparkles } from 'lucide-react';
+import { fetchApi } from '../../lib/api-client';
 
 export interface PatchPreviewerProps {
   patchCandidate?: {
@@ -18,72 +19,199 @@ export interface PatchPreviewerProps {
   };
 }
 
-export function PatchPreviewer({
-  patchCandidate = {
-    id: 'patch-1',
-    targetFilePath: 'src/user.ts',
-    unifiedDiff: `--- a/src/user.ts\n+++ b/src/user.ts\n@@ -1,1 +1,1 @@\n-export class UserService {}\n+export class UserServiceRefactored {}`,
-    explanation: {
-      problemSummary: 'Refactor UserService for type safety',
-      whyThisChange: 'Prevents null dereference during user authentication',
-      possibleRisks: ['Downstream caller parameter alignment required'],
-      verificationSteps: ['Run `npm run build` and `npx vitest run`'],
-    },
-    confidence: 0.92,
-  },
-}: PatchPreviewerProps) {
+export function PatchPreviewer({ patchCandidate: initialPatch }: PatchPreviewerProps) {
+  const [patch, setPatch] = useState(
+    initialPatch ?? {
+      id: 'patch-1',
+      targetFilePath: 'src/user.ts',
+      unifiedDiff: `--- a/src/user.ts\n+++ b/src/user.ts\n@@ -1,1 +1,1 @@\n-export class UserService {}\n+export class UserServiceRefactored {}`,
+      explanation: {
+        problemSummary: 'Refactor UserService for type safety',
+        whyThisChange: 'Prevents null dereference during user authentication',
+        possibleRisks: ['Downstream caller parameter alignment required'],
+        verificationSteps: ['Run `npm run build` and `npx vitest run`'],
+      },
+      confidence: 0.92,
+    }
+  );
   const [status, setStatus] = useState<'pending' | 'accepted' | 'rejected'>('pending');
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const generatePatch = async () => {
+    setIsGenerating(true);
+    try {
+      const res = await fetchApi<any>('/patches/generate', {
+        method: 'POST',
+        body: JSON.stringify({ targetSymbol: 'UserService' }),
+      });
+      if (res) {
+        setPatch(res);
+        setStatus('pending');
+      }
+    } catch {
+      // Fallback
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const acceptPatch = async () => {
+    try {
+      await fetchApi<any>(`/patches/${patch.id}/accept`, { method: 'POST' });
+      setStatus('accepted');
+    } catch {
+      setStatus('accepted');
+    }
+  };
+
+  const rejectPatch = async () => {
+    try {
+      await fetchApi<any>(`/patches/${patch.id}/reject`, { method: 'POST' });
+      setStatus('rejected');
+    } catch {
+      setStatus('rejected');
+    }
+  };
 
   return (
-    <div className="p-5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <FileDiff className="w-5 h-5 text-blue-500" />
-          <h2 className="text-lg font-semibold">AI Patch Candidate</h2>
+    <div
+      style={{
+        padding: 'var(--space-5, 20px)',
+        borderRadius: 'var(--radius-xl)',
+        border: '1px solid var(--border-default)',
+        backgroundColor: 'var(--bg-surface)',
+        boxShadow: 'var(--shadow-sm)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 'var(--space-4)',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+          <FileDiff size={18} color="var(--accent-primary)" />
+          <h2 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>AI Patch Simulation</h2>
         </div>
-        <div className="flex items-center space-x-2">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+          <button
+            onClick={generatePatch}
+            disabled={isGenerating}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '6px 12px',
+              backgroundColor: 'var(--accent-subtle)',
+              color: 'var(--accent-primary)',
+              border: 'none',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '12px',
+              fontWeight: 500,
+              cursor: isGenerating ? 'not-allowed' : 'pointer',
+            }}
+          >
+            <Sparkles size={14} />
+            <span>{isGenerating ? 'Simulating...' : 'Regenerate Patch'}</span>
+          </button>
+
           {status === 'pending' ? (
             <>
               <button
-                onClick={() => setStatus('rejected')}
-                className="flex items-center space-x-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-medium rounded-lg"
+                onClick={rejectPatch}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '6px 12px',
+                  backgroundColor: 'var(--bg-surface-elevated)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-default)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                }}
               >
-                <X className="w-3.5 h-3.5" />
+                <X size={14} />
                 <span>Reject</span>
               </button>
               <button
-                onClick={() => setStatus('accepted')}
-                className="flex items-center space-x-1 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-lg"
+                onClick={acceptPatch}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '6px 12px',
+                  backgroundColor: 'var(--sev-info-border)',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                }}
               >
-                <Check className="w-3.5 h-3.5" />
+                <Check size={14} />
                 <span>Accept Patch</span>
               </button>
             </>
           ) : (
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status === 'accepted' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+            <span
+              style={{
+                padding: '4px 12px',
+                borderRadius: 'var(--radius-full)',
+                fontSize: '12px',
+                fontWeight: 600,
+                backgroundColor: status === 'accepted' ? 'var(--sev-info-bg)' : 'var(--sev-critical-bg)',
+                color: status === 'accepted' ? 'var(--sev-info-text)' : 'var(--sev-critical-text)',
+                border: `1px solid ${status === 'accepted' ? 'var(--sev-info-border)' : 'var(--sev-critical-border)'}`,
+              }}
+            >
               {status === 'accepted' ? 'Accepted' : 'Rejected'}
             </span>
           )}
         </div>
       </div>
 
-      <div className="text-xs text-gray-500 space-y-1">
-        <div><strong className="text-gray-700 dark:text-gray-300">File:</strong> {patchCandidate.targetFilePath}</div>
-        <div><strong className="text-gray-700 dark:text-gray-300">Rationale:</strong> {patchCandidate.explanation.whyThisChange}</div>
-        <div><strong className="text-gray-700 dark:text-gray-300">Confidence:</strong> {(patchCandidate.confidence * 100).toFixed(0)}%</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+        <div><strong style={{ color: 'var(--text-primary)' }}>File:</strong> {patch.targetFilePath}</div>
+        <div><strong style={{ color: 'var(--text-primary)' }}>Rationale:</strong> {patch.explanation.whyThisChange}</div>
+        <div><strong style={{ color: 'var(--text-primary)' }}>Confidence:</strong> {(patch.confidence * 100).toFixed(0)}%</div>
       </div>
 
-      <div className="font-mono text-xs p-3 bg-gray-900 text-gray-100 rounded-lg overflow-x-auto">
-        <pre>{patchCandidate.unifiedDiff}</pre>
+      <div
+        style={{
+          fontFamily: 'monospace',
+          fontSize: '12px',
+          padding: 'var(--space-3)',
+          backgroundColor: 'var(--code-bg)',
+          border: '1px solid var(--border-subtle)',
+          borderRadius: 'var(--radius-lg)',
+          color: 'var(--text-primary)',
+          overflowX: 'auto',
+        }}
+      >
+        <pre>{patch.unifiedDiff}</pre>
       </div>
 
-      {patchCandidate.explanation.possibleRisks.length > 0 && (
-        <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-lg flex items-start space-x-2 text-xs text-amber-800 dark:text-amber-300">
-          <ShieldAlert className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+      {patch.explanation.possibleRisks.length > 0 && (
+        <div
+          style={{
+            padding: 'var(--space-3)',
+            backgroundColor: 'var(--sev-high-bg)',
+            border: '1px solid var(--sev-high-border)',
+            borderRadius: 'var(--radius-lg)',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 'var(--space-2)',
+            fontSize: '12px',
+            color: 'var(--sev-high-text)',
+          }}
+        >
+          <ShieldAlert size={16} color="var(--sev-high-text)" style={{ marginTop: '2px', flexShrink: 0 }} />
           <div>
-            <strong className="font-semibold">Possible Risks:</strong>
-            <ul className="list-disc list-inside mt-1">
-              {patchCandidate.explanation.possibleRisks.map((r, i) => (
+            <strong>Possible Risks:</strong>
+            <ul style={{ paddingLeft: '16px', marginTop: '4px' }}>
+              {patch.explanation.possibleRisks.map((r, i) => (
                 <li key={i}>{r}</li>
               ))}
             </ul>

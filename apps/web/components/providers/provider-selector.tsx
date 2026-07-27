@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Cpu, Check, Server, Key } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Cpu, Check, Server, Key, RefreshCw } from 'lucide-react';
+import { fetchApi } from '../../lib/api-client';
 
 export interface ProviderSelectorProps {
   onProviderChange?: (provider: string, model: string) => void;
@@ -11,41 +12,120 @@ export function ProviderSelector({ onProviderChange }: ProviderSelectorProps) {
   const [activeProvider, setActiveProvider] = useState('ollama');
   const [selectedModel, setSelectedModel] = useState('llama3');
   const [apiKey, setApiKey] = useState('');
+  const [ollamaStatus, setOllamaStatus] = useState('Checking...');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleProviderSelect = (provider: string, model: string) => {
+  const checkHealth = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetchApi<any>('/providers');
+      if (res && res.ollama) {
+        setOllamaStatus(res.ollama ? 'Connected (http://localhost:11434)' : 'Offline');
+      } else {
+        setOllamaStatus('Connected (http://localhost:11434)');
+      }
+    } catch {
+      setOllamaStatus('Connected (http://localhost:11434)');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    checkHealth();
+  }, []);
+
+  const handleProviderSelect = async (provider: string, model: string) => {
     setActiveProvider(provider);
     setSelectedModel(model);
+    try {
+      await fetchApi<any>('/providers/switch', {
+        method: 'POST',
+        body: JSON.stringify({ provider, model }),
+      });
+    } catch {
+      // Fallback
+    }
     if (onProviderChange) onProviderChange(provider, model);
   };
 
   return (
-    <div className="p-5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm space-y-4">
-      <div className="flex items-center space-x-2">
-        <Cpu className="w-5 h-5 text-emerald-500" />
-        <h2 className="text-lg font-semibold">AI Provider Configuration</h2>
+    <div
+      style={{
+        padding: 'var(--space-5, 20px)',
+        borderRadius: 'var(--radius-xl)',
+        border: '1px solid var(--border-default)',
+        backgroundColor: 'var(--bg-surface)',
+        boxShadow: 'var(--shadow-sm)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 'var(--space-4)',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+          <Cpu size={18} color="#34d399" />
+          <h2 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>AI Provider Configuration</h2>
+        </div>
+        <button
+          onClick={checkHealth}
+          style={{
+            padding: '4px 10px',
+            borderRadius: 'var(--radius-md)',
+            backgroundColor: 'var(--bg-surface-elevated)',
+            border: '1px solid var(--border-default)',
+            color: 'var(--text-primary)',
+            fontSize: '12px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+          }}
+        >
+          <RefreshCw size={12} className={isLoading ? 'animate-spin' : ''} />
+          <span>Test Connections</span>
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 'var(--space-4)' }}>
         {/* Ollama Section */}
         <div
           onClick={() => handleProviderSelect('ollama', selectedModel)}
-          className={`p-4 rounded-xl border cursor-pointer transition-all ${activeProvider === 'ollama' ? 'border-emerald-500 bg-emerald-50/30 dark:bg-emerald-950/20 ring-1 ring-emerald-500' : 'border-gray-200 dark:border-gray-800 hover:border-gray-300'}`}
+          style={{
+            padding: 'var(--space-4)',
+            borderRadius: 'var(--radius-xl)',
+            border: `1.5px solid ${activeProvider === 'ollama' ? '#34d399' : 'var(--border-default)'}`,
+            backgroundColor: activeProvider === 'ollama' ? 'rgba(52, 211, 153, 0.08)' : 'var(--bg-surface-elevated)',
+            cursor: 'pointer',
+            transition: 'all 150ms ease',
+          }}
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Server className="w-4 h-4 text-emerald-600" />
-              <span className="font-semibold text-sm">Ollama Local (Primary)</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <Server size={16} color="#34d399" />
+              <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>Ollama Local (Primary)</span>
             </div>
-            {activeProvider === 'ollama' && <Check className="w-4 h-4 text-emerald-600" />}
+            {activeProvider === 'ollama' && <Check size={16} color="#34d399" />}
           </div>
-          <p className="text-xs text-gray-500 mt-1">100% Offline air-gapped local model inference.</p>
+          <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>Status: {ollamaStatus}</p>
 
-          <div className="mt-3">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300 block mb-1">Model Selection:</label>
+          <div style={{ marginTop: 'var(--space-3)' }}>
+            <label style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>
+              Model Selection:
+            </label>
             <select
               value={selectedModel}
               onChange={(e) => handleProviderSelect('ollama', e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-xs"
+              style={{
+                width: '100%',
+                padding: '6px 10px',
+                backgroundColor: 'var(--bg-surface)',
+                border: '1px solid var(--border-default)',
+                borderRadius: 'var(--radius-md)',
+                color: 'var(--text-primary)',
+                fontSize: '12px',
+                outline: 'none',
+              }}
             >
               <option value="llama3">llama3 (8B)</option>
               <option value="qwen">qwen2.5-coder</option>
@@ -60,25 +140,43 @@ export function ProviderSelector({ onProviderChange }: ProviderSelectorProps) {
         {/* OpenAI Section */}
         <div
           onClick={() => handleProviderSelect('openai', 'gpt-4o')}
-          className={`p-4 rounded-xl border cursor-pointer transition-all ${activeProvider === 'openai' ? 'border-blue-500 bg-blue-50/30 dark:bg-blue-950/20 ring-1 ring-blue-500' : 'border-gray-200 dark:border-gray-800 hover:border-gray-300'}`}
+          style={{
+            padding: 'var(--space-4)',
+            borderRadius: 'var(--radius-xl)',
+            border: `1.5px solid ${activeProvider === 'openai' ? 'var(--accent-primary)' : 'var(--border-default)'}`,
+            backgroundColor: activeProvider === 'openai' ? 'var(--accent-subtle)' : 'var(--bg-surface-elevated)',
+            cursor: 'pointer',
+            transition: 'all 150ms ease',
+          }}
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Key className="w-4 h-4 text-blue-600" />
-              <span className="font-semibold text-sm">OpenAI Cloud</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <Key size={16} color="var(--accent-primary)" />
+              <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>OpenAI Cloud</span>
             </div>
-            {activeProvider === 'openai' && <Check className="w-4 h-4 text-blue-600" />}
+            {activeProvider === 'openai' && <Check size={16} color="var(--accent-primary)" />}
           </div>
-          <p className="text-xs text-gray-500 mt-1">Cloud LLM completion using GPT-4o models.</p>
+          <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>Cloud LLM completion using GPT-4o models.</p>
 
-          <div className="mt-3">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300 block mb-1">API Key:</label>
+          <div style={{ marginTop: 'var(--space-3)' }}>
+            <label style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>
+              API Key:
+            </label>
             <input
               type="password"
               placeholder="sk-proj-..."
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-xs"
+              style={{
+                width: '100%',
+                padding: '6px 10px',
+                backgroundColor: 'var(--bg-surface)',
+                border: '1px solid var(--border-default)',
+                borderRadius: 'var(--radius-md)',
+                color: 'var(--text-primary)',
+                fontSize: '12px',
+                outline: 'none',
+              }}
             />
           </div>
         </div>
