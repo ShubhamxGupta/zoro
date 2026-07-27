@@ -736,6 +736,32 @@ The platform requires building an in-memory/embedded **Repository Knowledge Grap
 
 ---
 
+### ADR-023: Graph Enrichment, Provenance, and Cross-Language Resolution Strategy
+
+- **Status:** Accepted
+- **Date:** 2026-07-27
+
+#### Context
+
+The Repository Knowledge Graph (RKG) requires multi-pass semantic enrichment to resolve import specifiers to target file nodes, compute inheritance chains and method overrides, and track evidence and confidence scores. Furthermore, multi-language repositories (TypeScript, Python, Go, Java) necessitate a normalized semantic layer (`ClassLike`, `FunctionLike`, `InterfaceLike`, `EnumLike`, `ModuleLike`) to allow unified, language-agnostic graph queries.
+
+#### Alternatives Considered
+
+1. **Embedding Resolution in Language Extractors:** Bundling import and type resolution directly inside AST extractors couples parsing with graph state and duplicates resolution logic across languages.
+2. **Modular Resolvers & Graph Enrichment Engine (`ModuleResolver`, `TypeResolver`, `GraphEnricher`, `CrossLanguageResolver`):** Decouple resolution into standalone language-independent resolvers. `GraphEnricher` performs multi-pass graph resolution while attaching `GraphProvenance` metadata (`extractor`, `language`, `evidence`, `confidence`, `timestamp`) to enriched edges. `CrossLanguageResolver` maps language-specific nodes to unified `NormalizedConcept` abstractions.
+
+#### Why This Option Was Chosen
+
+Decoupling resolution guarantees that AST extraction remains high-speed and stateless. Attaching explicit provenance metadata to enriched edges enables full explainability during AI code review and graph walks. High-speed resolution caching (`ResolutionCache`) ensures monorepo scalability.
+
+#### Consequences
+
+- **Positive:** Clean architectural separation, language-agnostic graph queries, full provenance explainability, and high-performance resolution caching.
+- **Negative:** Requires multi-pass execution during knowledge graph construction.
+- **Affected Modules:** `@repo-intel/shared`, `@repo-intel/parser`, `@repo-intel/graph`.
+
+---
+
 ## Decision Rules & Governance
 
 A new Architecture Decision Record (**ADR**) **MUST** be created whenever:

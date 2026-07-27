@@ -8,4 +8,6 @@ export * from './languages/index.js';
 export * from './indexer/index.js';
 export * from './treesitter/index.js';
 export * from './extractors/index.js';
+export * from './resolver/index.js';
+
 

@@ -8,24 +8,39 @@ This file is the **living state file** and **persistent engineering memory** for
 
 | Metric                | Status / Value                                                                 |
 | :-------------------- | :----------------------------------------------------------------------------- |
-| **Version**           | `0.14.0` (Multi-Language AST Symbol Extractors - Python, Go, Java)             |
-| **Current Milestone** | Milestone 2: Repository Scanner & AST Parsing Engine (COMPLETE 🟢)             |
-| **Current Phase**     | Phase 14: Multi-Language AST Symbol Extractors ✅                              |
-| **Overall Progress**  | 33.3% (14 / 42 Phases Completed)                                               |
+| **Version**           | `0.15.0` (Graph Enrichment & Cross-Language Resolution)                        |
+| **Current Milestone** | Milestone 3: Knowledge Graph & Context Retrieval Engine                        |
+| **Current Phase**     | Phase 15: Graph Enrichment & Cross-Language Resolution ✅                      |
+| **Overall Progress**  | 35.7% (15 / 42 Phases Completed)                                               |
 | **Last Updated**      | 2026-07-27                                                                     |
 | **Current Branch**    | `main`                                                                         |
 | **Build Status**      | 🟢 Passing (`npm run build` 0 errors across workspace)                         |
-| **Test Status**       | 🟢 Passing (156/156 Vitest tests; 18 new Phase 14 tests; V8 coverage verified) |
+| **Test Status**       | 🟢 Passing (172/172 Vitest tests; 16 new Phase 15 tests; V8 coverage verified) |
 
 ---
 
 ## Current Focus
 
-### Phase 14: Multi-Language AST Symbol Extractors (Python, Go, Java)
+### Phase 15: Graph Enrichment & Cross-Language Resolution
 
 - **Status:** Complete 🟢
 - **Started:** 2026-07-27
 - **Completed:** 2026-07-27
+
+#### Objectives Achieved
+
+1. **Phase 14 Architectural Improvements:**
+   - **Language Capability Registry:** Implemented `LanguageCapabilityRegistry` (`supportsClasses`, `supportsInterfaces`, `supportsInheritance`, `supportsGenerics`, `supportsAsync`, `supportsStructs`, `supportsNamespaces`).
+   - **Symbol Fingerprints:** Implemented `generateSymbolFingerprint()` for rename detection and duplicate identification.
+   - **Modular Type & Module Resolvers:** Created `DefaultTypeResolver` and `DefaultModuleResolver` decoupled from extractors.
+   - **Resolution Cache:** Built `ResolutionCache` tracking hit/miss ratios for fast resolution in monorepos.
+
+2. **Graph Enrichment Engine (`@repo-intel/graph`):**
+   - Implemented `GraphEnricher` performing multi-pass graph enrichment (resolving `IMPORTS` to target file nodes, computing inheritance chains and `OVERRIDES` edges).
+   - Attached `GraphProvenance` metadata (`extractor`, `language`, `evidence`, `confidence`, `timestamp`) to enriched edges.
+
+3. **Cross-Language Resolution Engine (`@repo-intel/graph`):**
+   - Implemented `CrossLanguageResolver` attaching `concept` properties (`ClassLike`, `FunctionLike`, `InterfaceLike`, `EnumLike`, `ModuleLike`) to symbol nodes.
 
 #### Objectives Achieved
 
@@ -41,7 +56,6 @@ This file is the **living state file** and **persistent engineering memory** for
 4. **Multi-Language Query Registry & Tests:**
    - Pre-populated Python, Go, and Java S-expression query manifests in `QueryRegistry`.
    - Added 18 new unit tests across `py-extractor.test.ts`, `go-extractor.test.ts`, and `java-extractor.test.ts` (156/156 monorepo tests passing).
-
 
 #### Objectives Achieved
 

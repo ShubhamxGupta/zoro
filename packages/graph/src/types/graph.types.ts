@@ -16,10 +16,13 @@ export type GraphEdgeKind =
   | 'USES'
   | 'OVERRIDES';
 
+import type { NormalizedConcept, GraphProvenance } from '@repo-intel/shared';
+
 export interface GraphNode {
   id: string;
   kind: GraphNodeKind;
   label: string;
+  concept?: NormalizedConcept;
   properties: Record<string, unknown>;
 }
 
@@ -28,6 +31,7 @@ export interface GraphEdge {
   kind: GraphEdgeKind;
   sourceId: string;
   targetId: string;
+  provenance?: GraphProvenance;
   properties?: Record<string, unknown>;
 }
 

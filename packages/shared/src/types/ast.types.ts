@@ -54,6 +54,7 @@ export interface SymbolNode {
   documentation?: string;
   docModel?: SymbolDoc;
   modifiers?: string[];
+  fingerprint?: string;
 }
 
 export interface ImportStatement {

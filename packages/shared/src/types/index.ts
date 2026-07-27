@@ -8,4 +8,8 @@ export * from './facts.types.js';
 export * from './state.types.js';
 export * from './ast-domain.types.js';
 export * from './relationship.types.js';
-
+export * from './language-capabilities.types.js';
+export * from './type-resolver.types.js';
+export * from './module-resolver.types.js';
+export * from './cross-language.types.js';
+export * from './provenance.types.js';
