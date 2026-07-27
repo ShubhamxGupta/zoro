@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
@@ -35,7 +35,7 @@ jobs:
     needs: repository-validation
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
@@ -57,7 +57,7 @@ jobs:
     needs: type-check
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
@@ -86,7 +86,7 @@ jobs:
     needs: type-check
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
@@ -108,7 +108,7 @@ jobs:
     needs: repository-validation
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
