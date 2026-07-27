@@ -72,7 +72,14 @@ importers:
 
   packages/ai: {}
 
-  packages/graph: {}
+  packages/graph:
+    dependencies:
+      '@repo-intel/parser':
+        specifier: workspace:*
+        version: link:../parser
+      '@repo-intel/shared':
+        specifier: workspace:*
+        version: link:../shared
 
   packages/parser:
     dependencies:
