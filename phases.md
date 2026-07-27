@@ -412,21 +412,22 @@ Construct the Repository Knowledge Graph (RKG), resolve symbol references across
 
 ---
 
-### Phase 17: Call Graph Generator & Inheritance Hierarchy Engine
+### Phase 17: GraphRAG Retrieval Engine
 
-- **Goal:** Construct function `CALLS`, `INHERITS_IMPLEMENTS`, and `TESTED_BY` relationships.
-- **Why This Phase Exists:** Required by the Context Retrieval Engine to walk 2-hop caller/callee subgraphs.
-- **Features:** Call graph generator and class inheritance tree builder.
-- **Tasks:**
-  - Extract function call invocations within method bodies.
-  - Create `CALLS` edges between caller symbols and resolved callee symbols.
-  - Create `INHERITS_IMPLEMENTS` edges for class extensions and interface implementations.
-  - Map unit test files to target symbols creating `TESTED_BY` edges.
-- **Deliverables:** Call Graph Engine emitting complete symbol graph edges.
-- **Dependencies:** Phase 16.
-- **Acceptance Criteria:** Given a changed function, correctly lists all immediate callers, callees, and unit tests.
-- **Testing:**
-  - _Unit Tests:_ Assert call graph edges for nested callers and interface implementations.
+- **Status:** Completed 🟢
+- **Goal:** Implement the GraphRAG hybrid retrieval engine (`GraphRAGRetrievalEngine`), query intent analyzer (`QueryAnalyzer`), retrieval planner (`DefaultRetrievalPlanner`), multi-hop graph expander (`GraphExpander`), context compressor (`ContextCompressor`), and standardized `RetrievalBundle` payload generator in `@repo-intel/retrieval`.
+- **Why This Phase Exists:** Produces self-contained, budget-constrained context payload bundles (`RetrievalBundle`) for downstream AI review agents.
+- **Features:**
+  - `RetrievalPipeline` interface (`retrieve(query): Promise<RetrievalBundle>`).
+  - `QueryAnalyzer` classifying questions into 8 intent categories (`bug_investigation`, `architecture`, `dependency`, `performance`, `security`, `documentation`, `refactoring`, `general_search`).
+  - `DefaultRetrievalPlanner` computing optimal `vectorK`, `maxHops`, expansion strategies, and token budget.
+  - `GraphExpander` executing multi-hop walks over `CALLS`, `IMPORTS`, `EXTENDS`, `IMPLEMENTS`, and `DEPENDS_ON` edges.
+  - `ContextCompressor` deduplicating entities, merging overlapping nodes, and enforcing token budget pruning.
+  - `RetrievalBundle` standard agent payload containing summary, intent, plan, compressed entities with `EntityRetrievalProvenance`, relationships, file/symbol IDs, evidence text, and `RetrievalMetrics`.
+- **Deliverables:** `@repo-intel/retrieval` package producing standardized `RetrievalBundle` payloads for AI agents.
+- **Dependencies:** Phase 13, Phase 14, Phase 15, Phase 16.
+- **Acceptance Criteria:** Executes end-to-end GraphRAG retrieval in $< 500\text{ms}$ returning concise payload subgraphs ($< 2,000$ tokens).
+- **Testing:** Unit tests (194/194 passing monorepo-wide across 66 test files) and retrieval benchmark (`retrieval.bench.ts`).
 - **Risks:** Disambiguating overloaded functions or polymorphic method calls.
 - **Estimated Complexity:** High.
 - **Estimated Time:** 2.5 days.

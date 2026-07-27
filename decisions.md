@@ -788,6 +788,37 @@ The Context Retrieval Engine (CRE) requires combining structural Knowledge Graph
 
 ---
 
+### ADR-025: GraphRAG Retrieval Engine Architecture, Retrieval Planner, and Retrieval Bundle Payload Specification
+
+- **Status:** Accepted
+- **Date:** 2026-07-27
+
+#### Context
+
+Downstream multi-agent AI review pipelines and patch generators require a standardized, budget-constrained context payload payload bundle (`RetrievalBundle`) extracted from the repository. Raw vector similarity searches miss structural graph dependencies (call chains, inheritance, import relationships), while pure graph walks lack semantic query understanding. A hybrid GraphRAG retrieval pipeline combining intent analysis, retrieval planning, vector search, multi-hop graph expansion, context compression, and provenance tracking is required.
+
+#### Alternatives Considered
+
+1. **Unstructured Text Snippet Assembly:** Passing raw file diffs or unranked text chunks to LLM prompts risks context window overflow ($> 128,000$ tokens) and introduces hallucination.
+2. **Stage-Gated GraphRAG Retrieval Pipeline (`GraphRAGRetrievalEngine`):**
+   - **Query Intent Analysis (`QueryAnalyzer`):** Classifies queries into 8 intent categories (`bug_investigation`, `architecture`, `dependency`, `performance`, `security`, `documentation`, `refactoring`, `general_search`).
+   - **Retrieval Planner (`DefaultRetrievalPlanner`):** Computes `vectorK`, `maxHops`, `expansionStrategies`, `tokenBudget`, and ranking policy.
+   - **Multi-Hop Graph Expander (`GraphExpander`):** Walks `CALLS`, `IMPORTS`, `EXTENDS`, `IMPLEMENTS`, and `DEPENDS_ON` edges.
+   - **Context Compressor (`ContextCompressor`):** Merges duplicate entities and prunes context payloads to strictly fit LLM token budgets.
+   - **Standardized Payload Model (`RetrievalBundle`):** Assembles summary, intent, plan, compressed entities with `EntityRetrievalProvenance`, relationships, file/symbol IDs, evidence text, and latency metrics.
+
+#### Why This Option Was Chosen
+
+GraphRAG guarantees that AI review agents receive concise ($< 2,000$ tokens), highly relevant, structurally sound subgraphs with complete provenance explainability.
+
+#### Consequences
+
+- **Positive:** Concise context payloads, zero prompt pollution, complete retrieval explainability, multi-hop structural context, and sub-500ms retrieval latency.
+- **Negative:** Requires maintaining graph expansion policies and query intent keyword rules.
+- **Affected Modules:** `@repo-intel/shared`, `@repo-intel/graph`, `@repo-intel/retrieval`.
+
+---
+
 ## Decision Rules & Governance
 
 A new Architecture Decision Record (**ADR**) **MUST** be created whenever:

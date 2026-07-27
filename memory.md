@@ -8,24 +8,38 @@ This file is the **living state file** and **persistent engineering memory** for
 
 | Metric                | Status / Value                                                                 |
 | :-------------------- | :----------------------------------------------------------------------------- |
-| **Version**           | `0.16.0` (Embeddings & Semantic Search Foundation)                             |
-| **Current Milestone** | Milestone 3: Knowledge Graph & Context Retrieval Engine                        |
-| **Current Phase**     | Phase 16: Embeddings & Semantic Search Foundation ✅                           |
-| **Overall Progress**  | 38.1% (16 / 42 Phases Completed)                                               |
+| **Version**           | `0.17.0` (GraphRAG Retrieval Engine)                                           |
+| **Current Milestone** | Milestone 3: Knowledge Graph & Context Retrieval Engine (COMPLETE 🟢)          |
+| **Current Phase**     | Phase 17: GraphRAG Retrieval Engine ✅                                         |
+| **Overall Progress**  | 40.5% (17 / 42 Phases Completed)                                               |
 | **Last Updated**      | 2026-07-27                                                                     |
 | **Current Branch**    | `main`                                                                         |
 | **Build Status**      | 🟢 Passing (`npm run build` 0 errors across workspace)                         |
-| **Test Status**       | 🟢 Passing (184/184 Vitest tests; 12 new Phase 16 tests; V8 coverage verified) |
+| **Test Status**       | 🟢 Passing (194/194 Vitest tests; 10 new Phase 17 tests; V8 coverage verified) |
 
 ---
 
 ## Current Focus
 
-### Phase 16: Embeddings & Semantic Search Foundation
+### Phase 17: GraphRAG Retrieval Engine
 
 - **Status:** Complete 🟢
 - **Started:** 2026-07-27
 - **Completed:** 2026-07-27
+
+#### Objectives Achieved
+
+1. **Phase 16 Architectural Improvements (`@repo-intel/retrieval` & `@repo-intel/shared`):**
+   - **Retrieval Pipeline Interface:** Introduced `RetrievalPipeline` (`retrieve(query): Promise<RetrievalBundle>`).
+   - **Query Intent Model:** Built `QueryAnalyzer` classifying questions into 8 intent categories (`bug_investigation`, `architecture`, `dependency`, `performance`, `security`, `documentation`, `refactoring`, `general_search`).
+   - **Retrieval Planner:** Built `DefaultRetrievalPlanner` computing optimal `vectorK`, `maxHops`, expansion strategies, and token budget.
+   - **Graph Expansion Policies:** Built `GraphExpander` executing multi-hop walks over `CALLS`, `IMPORTS`, `EXTENDS`, `IMPLEMENTS`, and `DEPENDS_ON` edges.
+   - **Context Compression Engine:** Built `ContextCompressor` deduplicating entities, merging overlapping nodes, and enforcing token budget pruning.
+   - **Entity Provenance & Metrics:** Tracked `EntityRetrievalProvenance` and recorded stage latency metrics (`RetrievalMetrics`).
+   - **Standardized Agent Payload:** Created `RetrievalBundle` payload model for downstream AI review agents.
+
+2. **GraphRAG Retrieval Engine (`@repo-intel/retrieval`):**
+   - Implemented `GraphRAGRetrievalEngine` orchestrating intent analysis, retrieval planning, vector search, multi-hop graph expansion, context compression, score ranking, and retrieval bundle payload generation.
 
 #### Objectives Achieved
 

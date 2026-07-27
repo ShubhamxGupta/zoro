@@ -17,3 +17,8 @@ export * from './embedding-provider.types.js';
 export * from './embedding-metadata.types.js';
 export * from './vector-store.types.js';
 export * from './search-interfaces.types.js';
+export * from './retrieval-intent.types.js';
+export * from './retrieval-planner.types.js';
+export * from './retrieval-provenance.types.js';
+export * from './retrieval-bundle.types.js';
+export * from './retrieval-pipeline.types.js';

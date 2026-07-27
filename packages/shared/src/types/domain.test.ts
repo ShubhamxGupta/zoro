@@ -44,21 +44,21 @@ describe('Shared Domain Models & Type Verification', () => {
   test('constructs valid Graph Nodes & Edges', () => {
     const graphNode: GraphNode = {
       id: 'node-001',
-      type: 'Class',
+      kind: 'Symbol',
       label: 'UserService',
       properties: { name: 'UserService' },
     };
 
     const graphEdge: GraphEdge = {
       id: 'edge-001',
+      kind: 'CALLS',
       sourceId: 'node-001',
       targetId: 'node-002',
-      relation: 'CALLS',
     };
 
-    expect(graphNode.type).toBe('Class');
+    expect(graphNode.kind).toBe('Symbol');
     expect(graphNode.label).toBe('UserService');
-    expect(graphEdge.relation).toBe('CALLS');
+    expect(graphEdge.kind).toBe('CALLS');
   });
 
   test('constructs valid ExplainableFinding & RiskScore payload', () => {
