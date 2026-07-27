@@ -1,0 +1,47 @@
+name: Release Pipeline & Package Publishing
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Build, Test & Release Artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Enable Corepack & pnpm
+        run: corepack enable
+
+      - name: Install Monorepo Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Composite TypeScript Typecheck
+        run: npm run build
+
+      - name: Execute Vitest Test Suite
+        run: npx vitest run
+
+      - name: Generate Changelog & Release Notes
+        run: npx conventional-changelog -p angular -i CHANGELOG.md -s -r 0 || true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.tgz
+            coverage/
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
