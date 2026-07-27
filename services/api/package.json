@@ -29,6 +29,6 @@
     "fastify": "^4.26.2"
   },
   "devDependencies": {
-    "@types/node": "^20.12.7"
+    "@types/node": "^26.1.1"
   }
 }

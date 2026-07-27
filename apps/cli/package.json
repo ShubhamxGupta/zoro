@@ -19,6 +19,6 @@
     "@repo-intel/api": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^20.12.7"
+    "@types/node": "^26.1.1"
   }
 }

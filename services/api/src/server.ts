@@ -72,7 +72,7 @@ export function createAppServer(options: ServerOptions = {}): FastifyInstance {
   void app.register(healthRoutes);
 
   // Register Versioned API v1 Routes
-  void app.register(apiV1Routes, { prefix: '/api/v1' });
+  void app.register(apiV1Routes);
 
   // Custom 404 Handler
   app.setNotFoundHandler((request: FastifyRequest, reply: FastifyReply) => {

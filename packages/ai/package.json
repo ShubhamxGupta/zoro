@@ -13,5 +13,8 @@
   },
   "dependencies": {
     "@repo-intel/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1"
   }
 }

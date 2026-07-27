@@ -44,7 +44,7 @@ describe('Fastify REST API Gateway Integration & Verification Suite', () => {
     const res = await app.inject({ method: 'GET', url: '/api/v1/providers' });
     expect(res.statusCode).toBe(200);
     const body = res.json();
-    expect(body.data.ollama).toBe(true);
+    expect(body.data.ollama.available).toBe(true);
   });
 
   it('verifies POST /api/v1/providers/switch endpoint', async () => {

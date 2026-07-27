@@ -1,5 +1,4 @@
 import type { FastifyInstance, FastifyPluginAsync } from 'fastify';
-import { healthRoutes } from './health.js';
 import { repositoryRoutes } from './repositories.js';
 import { reviewRoutes } from './review.js';
 import { providerRoutes } from './providers.js';
@@ -12,7 +11,6 @@ export const apiV1Routes: FastifyPluginAsync = async (fastify: FastifyInstance):
   const runtime = new DefaultPlatformRuntime();
   await runtime.initialize();
 
-  await fastify.register(healthRoutes);
   await fastify.register(async (f) => repositoryRoutes(f, runtime));
   await fastify.register(async (f) => reviewRoutes(f, runtime));
   await fastify.register(async (f) => providerRoutes(f, runtime));

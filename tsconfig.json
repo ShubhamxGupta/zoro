@@ -10,7 +10,6 @@
     { "path": "./packages/review-engine" },
     { "path": "./packages/agents" },
     { "path": "./packages/patch-gen" },
-    { "path": "./apps/web" },
     { "path": "./apps/cli" },
     { "path": "./apps/vscode" },
     { "path": "./services/api" }
