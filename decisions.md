@@ -1217,6 +1217,176 @@ The internal service layer enforces clean architectural boundaries, separates tr
 
 ---
 
+### ADR-040: AI Provider Plugin Architecture
+
+- **Status:** Accepted
+- **Date:** 2026-07-28
+
+#### Context
+
+Adding new AI providers (e.g. OpenAI, Anthropic, Ollama, vLLM) required modifying internal provider registries and factory switch statements. A self-contained plugin model was required so that new providers can be registered without altering core code.
+
+#### Options Considered
+
+1. **Monolithic Factory Switches:** Tightly couples core provider registry code to specific vendor SDK implementations.
+2. **Self-Contained Plugin System (`AIProviderPlugin`):**
+   - Each provider encapsulates `metadata`, `provider`, `models`, `capabilities`, `initialize()`, and `dispose()`.
+   - New providers are added simply by implementing `AIProviderPlugin` and registering with `ProviderManager`.
+
+#### Why This Option Was Chosen
+
+`AIProviderPlugin` provides a modular plugin system enabling third-party or custom LLM adapters to be registered dynamically without modifying core system logic.
+
+#### Consequences
+
+- **Positive:** Zero core code modifications needed when adding new providers.
+- **Negative:** Requires wrapping existing `AIProvider` instances in plugin shells.
+- **Affected Modules:** `@repo-intel/shared`, `@repo-intel/ai`.
+
+---
+
+### ADR-041: Model Capability Framework & Dynamic Feature Toggles
+
+- **Status:** Accepted
+- **Date:** 2026-07-28
+
+#### Context
+
+The application needs to enable or disable features (e.g., streaming, embeddings, vision, reasoning, function calling, long context) based on model capabilities rather than hardcoding vendor check strings like `if (provider === 'openai')`.
+
+#### Options Considered
+
+1. **Vendor Check Conditionals:** Fragile string checks scattered across UI and backend services.
+2. **Capability Framework (`ModelCapabilityMap`):**
+   - Models advertise explicit boolean capability flags (`chat`, `streaming`, `embeddings`, `reasoning`, `vision`, `tools`, `longContext`).
+   - Feature auto-toggle queries (`hasCapability('streaming')`) drive application behavior dynamically.
+
+#### Why This Option Was Chosen
+
+The capability framework decouples feature flags from vendor names, ensuring new models automatically activate supported features.
+
+#### Consequences
+
+- **Positive:** Decoupled feature toggling, dynamic UI capability badges, self-documenting model capabilities.
+- **Negative:** Model capability definitions must be kept updated.
+- **Affected Modules:** `@repo-intel/shared`, `@repo-intel/ai`, `apps/web`.
+
+---
+
+### ADR-042: Provider Lifecycle & Health Monitoring Architecture
+
+- **Status:** Accepted
+- **Date:** 2026-07-28
+
+#### Context
+
+The system requires centralized lifecycle management (`initializeAll`, `disposeAll`), background health checks, hot provider switching without application restart, persistent configuration, and usage analytics.
+
+#### Options Considered
+
+1. **Stateless Unmanaged Providers:** Fails to track latency, request success rates, token usage, or configuration persistence.
+2. **Centralized Provider Manager (`ProviderManager`):**
+   - Manages lifecycle, health monitoring, error rate tracking, and usage metrics aggregation.
+   - Persists settings across sessions to `.repo-intel-providers.json`.
+   - Enables zero-downtime hot switching via REST API and CLI.
+
+#### Why This Option Was Chosen
+
+`ProviderManager` provides enterprise-grade observability, health diagnostics, usage tracking, and hot provider switching across web, CLI, and REST interfaces.
+
+#### Consequences
+
+- **Positive:** Hot provider switching without restart, continuous health diagnostics, persistent configuration.
+- **Negative:** Requires background periodic health polling.
+- **Affected Modules:** `@repo-intel/ai`, `services/api`, `apps/cli`, `apps/web`.
+
+---
+
+### ADR-043: Pull Request Review Architecture & Workflow Engine Integration
+
+- **Status:** Accepted
+- **Date:** 2026-07-28
+
+#### Context
+
+The platform requires automated Pull Request code review capabilities orchestrating `DeveloperContext`, `GraphRAG`, `AgentOrchestrator`, and `PatchPlanner` without automatic code mutation.
+
+#### Options Considered
+
+1. **Monolithic Review Runner:** Combines PR diff fetching, review execution, and comment publishing in single API handler.
+2. **Decoupled PR Workflow Architecture (`PullRequest` Domain Model & Workflow Engine):**
+   - Defines provider-agnostic `PullRequest` domain abstractions.
+   - Orchestrates multi-agent review and report generation via `WorkflowEngine`.
+   - Leaves patch generation optional requiring explicit user approval.
+
+#### Why This Option Was Chosen
+
+Provider-agnostic domain models ensure the review engine can seamlessly support GitHub, GitLab, Azure DevOps, and Bitbucket without redesign.
+
+#### Consequences
+
+- **Positive:** Reusable across Git host providers, zero automatic code mutation risk, transparent execution stages.
+- **Negative:** Requires serializing intermediate review findings.
+- **Affected Modules:** `@repo-intel/shared`, `@repo-intel/review-engine`, `services/api`.
+
+---
+
+### ADR-044: Multi-Format Review Report Generation (Markdown, HTML, JSON, SARIF)
+
+- **Status:** Accepted
+- **Date:** 2026-07-28
+
+#### Context
+
+Code review findings must be exported into standardized report formats for human readability (Markdown, HTML), programmatic consumption (JSON), and CI security tool integration (SARIF).
+
+#### Options Considered
+
+1. **Markdown Only Output:** Limits integration with CI security scanners like GitHub CodeQL.
+2. **Multi-Format Report Generator (`ReviewReportGenerator`):**
+   - Supports Markdown, HTML, JSON, and SARIF 2.1.0 specifications out of the box.
+   - Maps `ExplainableFinding` objects into SARIF rule definitions and physical locations.
+
+#### Why This Option Was Chosen
+
+SARIF export enables seamless integration with GitHub Code Security, SonarQube, and CI security artifact pipelines.
+
+#### Consequences
+
+- **Positive:** Native SARIF compliance, flexible UI preview and export options.
+- **Negative:** Must maintain SARIF 2.1.0 schema compatibility.
+- **Affected Modules:** `@repo-intel/review-engine`, `services/api`, `apps/cli`.
+
+---
+
+### ADR-045: Provider-Agnostic GitHub Integration & Previewable Comment Publishing
+
+- **Status:** Accepted
+- **Date:** 2026-07-28
+
+#### Context
+
+The platform needs to post review summaries and inline comments to GitHub PRs while ensuring publishing is strictly optional and previewable before execution.
+
+#### Options Considered
+
+1. **Automatic Direct Comment Insertion:** Risk of spamming PR threads with unverified bot comments.
+2. **Previewable GitHub Client (`GitHubClient` & `CommentPublisher`):**
+   - Supports personal access tokens and mock preview modes.
+   - Exposes preview capabilities before posting summary Markdown or line-specific comments.
+
+#### Why This Option Was Chosen
+
+Requiring explicit user confirmation before posting prevents unintended GitHub PR comment noise.
+
+#### Consequences
+
+- **Positive:** Zero risk of unintended comment spam, clean preview UI support.
+- **Negative:** Requires an extra approval step before posting comments.
+- **Affected Modules:** `@repo-intel/review-engine`, `services/api`, `apps/web`.
+
+---
+
 ## Decision Rules & Governance
 
 A new Architecture Decision Record (**ADR**) **MUST** be created whenever:

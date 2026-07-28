@@ -1,5 +1,9 @@
 import type { AIProvider, ProviderHealthStatus } from '@repo-intel/shared';
 import { MockAIProvider } from '../providers/mock-ai-provider.js';
+import { OpenAIProvider } from '../providers/openai-provider.js';
+import { OllamaProvider } from '../providers/ollama-provider.js';
+import { ClaudeProvider } from '../providers/claude-provider.js';
+import { VLLMProvider } from '../providers/vllm-provider.js';
 
 export class ProviderRegistry {
   private readonly providers = new Map<string, AIProvider>();
@@ -7,6 +11,11 @@ export class ProviderRegistry {
 
   constructor() {
     this.register('mock', new MockAIProvider());
+    this.register('openai', new OpenAIProvider());
+    this.register('ollama', new OllamaProvider());
+    this.register('anthropic', new ClaudeProvider());
+    this.register('claude', new ClaudeProvider());
+    this.register('vllm', new VLLMProvider());
   }
 
   public register(name: string, provider: AIProvider): void {

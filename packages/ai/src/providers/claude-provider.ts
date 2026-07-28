@@ -7,12 +7,12 @@ import type {
   ModelCapabilities,
 } from '@repo-intel/shared';
 
-export class OpenAIProvider implements AIProvider {
+export class ClaudeProvider implements AIProvider {
   private readonly apiKey: string;
   private readonly defaultModel: string;
 
-  constructor(apiKey?: string, defaultModel = 'gpt-4o') {
-    this.apiKey = apiKey ?? process.env['OPENAI_API_KEY'] ?? 'mock-key';
+  constructor(apiKey?: string, defaultModel = 'claude-3-5-sonnet-20241022') {
+    this.apiKey = apiKey ?? process.env['ANTHROPIC_API_KEY'] ?? 'mock-key';
     this.defaultModel = defaultModel;
   }
 
@@ -22,8 +22,8 @@ export class OpenAIProvider implements AIProvider {
 
     if (this.apiKey === 'mock-key' || !this.apiKey) {
       return {
-        content: `[OpenAI Fallback Mock] Processed prompt for model ${model}`,
-        provider: 'openai',
+        content: `[Claude Fallback Mock] Processed prompt for model ${model}`,
+        provider: 'anthropic',
         model,
         usage: { promptTokens: 100, completionTokens: 50, totalTokens: 150 },
         durationMs: Date.now() - start,
@@ -31,56 +31,52 @@ export class OpenAIProvider implements AIProvider {
     }
 
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.apiKey}`,
+          'x-api-key': this.apiKey,
+          'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
           model,
-          temperature: options?.temperature ?? 0.2,
           max_tokens: options?.maxTokens ?? 4096,
-          messages: [
-            {
-              role: 'system',
-              content: options?.systemPrompt ?? 'You are an expert AI code review assistant.',
-            },
-            { role: 'user', content: prompt },
-          ],
+          temperature: options?.temperature ?? 0.2,
+          system: options?.systemPrompt ?? 'You are an expert AI code review assistant.',
+          messages: [{ role: 'user', content: prompt }],
         }),
       });
 
       if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`OpenAI API Error (${response.status}): ${errText}`);
+        throw new Error(`Anthropic API Error (${response.status}): ${errText}`);
       }
 
       const data = (await response.json()) as {
-        choices: Array<{ message: { content: string } }>;
+        content: Array<{ type: string; text: string }>;
         model: string;
-        usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
+        usage?: { input_tokens: number; output_tokens: number };
       };
 
-      const content = data.choices?.[0]?.message?.content ?? '';
-      const promptTokens = data.usage?.prompt_tokens ?? 0;
-      const completionTokens = data.usage?.completion_tokens ?? 0;
+      const text = data.content?.[0]?.text ?? '';
+      const inputTokens = data.usage?.input_tokens ?? 0;
+      const outputTokens = data.usage?.output_tokens ?? 0;
 
       return {
-        content,
-        provider: 'openai',
+        content: text,
+        provider: 'anthropic',
         model: data.model || model,
         usage: {
-          promptTokens,
-          completionTokens,
-          totalTokens: promptTokens + completionTokens,
+          promptTokens: inputTokens,
+          completionTokens: outputTokens,
+          totalTokens: inputTokens + outputTokens,
         },
         durationMs: Date.now() - start,
       };
     } catch (error) {
       return {
-        content: `[OpenAI Fallback Error] ${(error as Error).message}`,
-        provider: 'openai',
+        content: `[Claude Fallback Error] ${(error as Error).message}`,
+        provider: 'anthropic',
         model,
         durationMs: Date.now() - start,
       };
@@ -91,29 +87,25 @@ export class OpenAIProvider implements AIProvider {
     const model = options?.model ?? this.defaultModel;
 
     if (this.apiKey === 'mock-key' || !this.apiKey) {
-      yield { delta: `[OpenAI Fallback Mock Stream] ${prompt.substring(0, 30)}`, isComplete: true };
+      yield { delta: `[Claude Fallback Mock Stream] ${prompt.substring(0, 30)}`, isComplete: true };
       return;
     }
 
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.apiKey}`,
+          'x-api-key': this.apiKey,
+          'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
           model,
-          temperature: options?.temperature ?? 0.2,
           max_tokens: options?.maxTokens ?? 4096,
+          temperature: options?.temperature ?? 0.2,
+          system: options?.systemPrompt ?? 'You are an expert AI code review assistant.',
+          messages: [{ role: 'user', content: prompt }],
           stream: true,
-          messages: [
-            {
-              role: 'system',
-              content: options?.systemPrompt ?? 'You are an expert AI code review assistant.',
-            },
-            { role: 'user', content: prompt },
-          ],
         }),
       });
 
@@ -137,19 +129,15 @@ export class OpenAIProvider implements AIProvider {
 
         for (const line of lines) {
           const trimmed = line.trim();
-          if (trimmed === 'data: [DONE]') {
-            yield { delta: '', isComplete: true };
-            return;
-          }
           if (trimmed.startsWith('data: ')) {
             const jsonStr = trimmed.slice(6);
             try {
               const event = JSON.parse(jsonStr) as {
-                choices?: Array<{ delta?: { content?: string } }>;
+                type: string;
+                delta?: { text?: string };
               };
-              const content = event.choices?.[0]?.delta?.content;
-              if (content) {
-                yield { delta: content, isComplete: false };
+              if (event.type === 'content_block_delta' && event.delta?.text) {
+                yield { delta: event.delta.text, isComplete: false };
               }
             } catch {
               // Ignore non-JSON lines
@@ -166,53 +154,27 @@ export class OpenAIProvider implements AIProvider {
   }
 
   public async embeddings(texts: string[]): Promise<number[][]> {
-    if (this.apiKey === 'mock-key' || !this.apiKey) {
-      return texts.map(() => new Array<number>(1536).fill(0.1));
-    }
-
-    try {
-      const response = await fetch('https://api.openai.com/v1/embeddings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.apiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'text-embedding-3-small',
-          input: texts,
-        }),
-      });
-
-      if (!response.ok) {
-        return texts.map(() => new Array<number>(1536).fill(0.1));
-      }
-
-      const data = (await response.json()) as {
-        data: Array<{ embedding: number[] }>;
-      };
-
-      return data.data.map((item) => item.embedding);
-    } catch {
-      return texts.map(() => new Array<number>(1536).fill(0.1));
-    }
+    // Anthropic Messages API does not provide a native embeddings endpoint.
+    // Return standard fallback embedding vectors.
+    return texts.map(() => new Array<number>(1536).fill(0.05));
   }
 
   public async health(): Promise<ProviderHealthStatus> {
     const isConfigured = this.apiKey !== 'mock-key' && Boolean(this.apiKey);
     return {
-      provider: 'openai',
+      provider: 'anthropic',
       isAvailable: isConfigured,
-      latencyMs: isConfigured ? 100 : 0,
+      latencyMs: isConfigured ? 150 : 0,
     };
   }
 
   public metadata(): ModelCapabilities {
     return {
-      provider: 'openai',
+      provider: 'anthropic',
       model: this.defaultModel,
-      contextWindow: 128000,
-      pricingPer1kInput: 0.0025,
-      pricingPer1kOutput: 0.01,
+      contextWindow: 200000,
+      pricingPer1kInput: 0.003,
+      pricingPer1kOutput: 0.015,
       supportsReasoning: true,
       supportsTools: true,
       supportsStreaming: true,

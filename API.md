@@ -14,10 +14,15 @@ The REST API Gateway runs on `http://localhost:3000/api/v1`.
 - `POST /api/v1/review/run`: Run multi-agent AI code review across Git diffs.
 - `GET /api/v1/review/stream`: SSE streaming endpoint for review progress updates.
 
-### AI Providers
+### AI Providers & Plugin System
 
-- `GET /api/v1/providers`: Check health status of Ollama and OpenAI providers.
-- `POST /api/v1/providers/switch`: Hot-switch active AI provider and model.
+- `GET /api/v1/providers`: Get installed provider plugins and active configuration.
+- `GET /api/v1/providers/models`: List available models across all provider plugins.
+- `GET /api/v1/providers/health`: Get real-time health metrics and latency.
+- `POST /api/v1/providers/test`: Test connection availability to target provider.
+- `POST /api/v1/providers/switch`: Hot-switch active AI provider and model without application restart.
+- `GET /api/v1/providers/capabilities`: Retrieve capability matrix flags across plugins.
+- `GET /api/v1/providers/usage`: Retrieve usage analytics, token metrics, and cost estimations.
 
 ### GraphRAG Chat
 

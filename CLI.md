@@ -20,6 +20,12 @@ node apps/cli/dist/index.js patch [symbol]
 # Inspect Knowledge Graph statistics
 node apps/cli/dist/index.js graph
 
-# Check AI Provider Health Status
+# Check AI Provider Health & Plugin System Status
 node apps/cli/dist/index.js providers
+node apps/cli/dist/index.js providers list
+node apps/cli/dist/index.js providers health
+node apps/cli/dist/index.js providers switch <provider> [model]
+node apps/cli/dist/index.js providers test [provider]
+node apps/cli/dist/index.js providers models
+node apps/cli/dist/index.js providers capabilities
 ```

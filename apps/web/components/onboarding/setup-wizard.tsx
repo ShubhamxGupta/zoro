@@ -124,22 +124,50 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
           <h3 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>3. Select Target Repository</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', fontSize: '12px' }}>
             <label style={{ color: 'var(--text-secondary)' }}>Local Repository Path:</label>
-            <input
-              type="text"
-              value={repoPath}
-              onChange={(e) => setRepoPath(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px',
-                backgroundColor: 'var(--bg-surface-elevated)',
-                border: '1px solid var(--border-default)',
-                borderRadius: 'var(--radius-md)',
-                color: 'var(--text-primary)',
-                fontFamily: 'monospace',
-                fontSize: '12px',
-                outline: 'none',
-              }}
-            />
+            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+              <input
+                type="text"
+                value={repoPath}
+                onChange={(e) => setRepoPath(e.target.value)}
+                placeholder="C:\Users\Projects\my-app"
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  backgroundColor: 'var(--bg-surface-elevated)',
+                  border: '1px solid var(--border-default)',
+                  borderRadius: 'var(--radius-md)',
+                  color: 'var(--text-primary)',
+                  fontFamily: 'monospace',
+                  fontSize: '12px',
+                  outline: 'none',
+                }}
+              />
+              <button
+                onClick={async () => {
+                  if ('showDirectoryPicker' in window) {
+                    try {
+                      const handle = await (window as any).showDirectoryPicker();
+                      setRepoPath(handle.name);
+                    } catch {
+                      // Cancelled
+                    }
+                  }
+                }}
+                style={{
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  backgroundColor: 'var(--bg-surface-elevated)',
+                  border: '1px solid var(--border-default)',
+                  color: 'var(--text-primary)',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                📁 Browse Folder...
+              </button>
+            </div>
           </div>
         </div>
       )}

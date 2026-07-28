@@ -12,3 +12,5 @@ export * from './context/developer-context-engine.js';
 export * from './prompts/prompt-context-builder.js';
 export * from './session/review-session-store.js';
 export * from './incremental/incremental-review-engine.js';
+export * from './github/github-client.js';
+export * from './reports/report-generator.js';

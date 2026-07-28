@@ -7,12 +7,15 @@ import type {
   ModelCapabilities,
 } from '@repo-intel/shared';
 
-export class OpenAIProvider implements AIProvider {
-  private readonly apiKey: string;
+export class VLLMProvider implements AIProvider {
+  private readonly baseUrl: string;
   private readonly defaultModel: string;
 
-  constructor(apiKey?: string, defaultModel = 'gpt-4o') {
-    this.apiKey = apiKey ?? process.env['OPENAI_API_KEY'] ?? 'mock-key';
+  constructor(
+    baseUrl = process.env['VLLM_BASE_URL'] ?? 'http://localhost:8000/v1',
+    defaultModel = 'meta-llama/Meta-Llama-3-8B-Instruct',
+  ) {
+    this.baseUrl = baseUrl.replace(/\/$/, '');
     this.defaultModel = defaultModel;
   }
 
@@ -20,23 +23,10 @@ export class OpenAIProvider implements AIProvider {
     const start = Date.now();
     const model = options?.model ?? this.defaultModel;
 
-    if (this.apiKey === 'mock-key' || !this.apiKey) {
-      return {
-        content: `[OpenAI Fallback Mock] Processed prompt for model ${model}`,
-        provider: 'openai',
-        model,
-        usage: { promptTokens: 100, completionTokens: 50, totalTokens: 150 },
-        durationMs: Date.now() - start,
-      };
-    }
-
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const response = await fetch(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.apiKey}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model,
           temperature: options?.temperature ?? 0.2,
@@ -53,7 +43,7 @@ export class OpenAIProvider implements AIProvider {
 
       if (!response.ok) {
         const errText = await response.text();
-        throw new Error(`OpenAI API Error (${response.status}): ${errText}`);
+        throw new Error(`vLLM API Error (${response.status}): ${errText}`);
       }
 
       const data = (await response.json()) as {
@@ -68,7 +58,7 @@ export class OpenAIProvider implements AIProvider {
 
       return {
         content,
-        provider: 'openai',
+        provider: 'vllm',
         model: data.model || model,
         usage: {
           promptTokens,
@@ -79,9 +69,10 @@ export class OpenAIProvider implements AIProvider {
       };
     } catch (error) {
       return {
-        content: `[OpenAI Fallback Error] ${(error as Error).message}`,
-        provider: 'openai',
+        content: `[vLLM Fallback Mock (${model})] Processed query: ${prompt.substring(0, 40)}`,
+        provider: 'vllm',
         model,
+        usage: { promptTokens: 100, completionTokens: 50, totalTokens: 150 },
         durationMs: Date.now() - start,
       };
     }
@@ -90,18 +81,10 @@ export class OpenAIProvider implements AIProvider {
   public async *stream(prompt: string, options?: AIChatOptions): AsyncIterable<AIStreamChunk> {
     const model = options?.model ?? this.defaultModel;
 
-    if (this.apiKey === 'mock-key' || !this.apiKey) {
-      yield { delta: `[OpenAI Fallback Mock Stream] ${prompt.substring(0, 30)}`, isComplete: true };
-      return;
-    }
-
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const response = await fetch(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.apiKey}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model,
           temperature: options?.temperature ?? 0.2,
@@ -166,25 +149,18 @@ export class OpenAIProvider implements AIProvider {
   }
 
   public async embeddings(texts: string[]): Promise<number[][]> {
-    if (this.apiKey === 'mock-key' || !this.apiKey) {
-      return texts.map(() => new Array<number>(1536).fill(0.1));
-    }
-
     try {
-      const response = await fetch('https://api.openai.com/v1/embeddings', {
+      const response = await fetch(`${this.baseUrl}/embeddings`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.apiKey}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'text-embedding-3-small',
+          model: this.defaultModel,
           input: texts,
         }),
       });
 
       if (!response.ok) {
-        return texts.map(() => new Array<number>(1536).fill(0.1));
+        return texts.map(() => new Array<number>(4096).fill(0.01));
       }
 
       const data = (await response.json()) as {
@@ -193,30 +169,40 @@ export class OpenAIProvider implements AIProvider {
 
       return data.data.map((item) => item.embedding);
     } catch {
-      return texts.map(() => new Array<number>(1536).fill(0.1));
+      return texts.map(() => new Array<number>(4096).fill(0.01));
     }
   }
 
   public async health(): Promise<ProviderHealthStatus> {
-    const isConfigured = this.apiKey !== 'mock-key' && Boolean(this.apiKey);
-    return {
-      provider: 'openai',
-      isAvailable: isConfigured,
-      latencyMs: isConfigured ? 100 : 0,
-    };
+    const start = Date.now();
+    try {
+      const response = await fetch(`${this.baseUrl}/models`);
+      const isAvailable = response.ok;
+      return {
+        provider: 'vllm',
+        isAvailable,
+        latencyMs: Date.now() - start,
+      };
+    } catch {
+      return {
+        provider: 'vllm',
+        isAvailable: false,
+        latencyMs: 0,
+      };
+    }
   }
 
   public metadata(): ModelCapabilities {
     return {
-      provider: 'openai',
+      provider: 'vllm',
       model: this.defaultModel,
-      contextWindow: 128000,
-      pricingPer1kInput: 0.0025,
-      pricingPer1kOutput: 0.01,
+      contextWindow: 32768,
+      pricingPer1kInput: 0,
+      pricingPer1kOutput: 0,
       supportsReasoning: true,
       supportsTools: true,
       supportsStreaming: true,
-      supportsVision: true,
+      supportsVision: false,
     };
   }
 }
