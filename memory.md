@@ -4,18 +4,18 @@ This file is the **living state file** and **persistent engineering memory** for
 
 ---
 
-### Project Status
+## Project Status
 
-| Metric                | Status / Value                                                   |
-| :-------------------- | :--------------------------------------------------------------- |
-| **Version**           | `v0.1.0-beta` (Phase 24 Complete 🟢)                             |
-| **Current Milestone** | Milestone 4: AI Provider Abstraction Layer & Prompt Pipeline 🟢 |
-| **Current Phase**     | Phase 24: GitHub PR Review, CI Integration & Automated Review ✅  |
-| **Overall Progress**  | 57.1% (24 / 42 Roadmap Phases Completed 🟢)                      |
-| **Last Updated**      | 2026-07-28                                                       |
-| **Current Branch**    | `main`                                                           |
-| **Build Status**      | 🟢 Passing (`npm run build` 0 errors across workspace)           |
-| **Test Status**       | 🟢 Passing (159/159 Vitest unit & integration tests)             |
+| Metric                | Status / Value                                                 |
+| :-------------------- | :------------------------------------------------------------- |
+| **Version**           | `v0.1.0-beta` (Milestone 5 Complete 🟢)                        |
+| **Current Milestone** | Milestone 5: Multi-Agent Review Engine & Auto-Fix Framework ✅ |
+| **Current Phase**     | Phase 34: Unified Patch Generator & Auto-Fix Framework ✅      |
+| **Overall Progress**  | 81.0% (34 / 42 Roadmap Phases Completed 🟢)                    |
+| **Last Updated**      | 2026-07-28                                                     |
+| **Current Branch**    | `main`                                                         |
+| **Build Status**      | 🟢 Passing (`npm run build` 0 errors across workspace)         |
+| **Test Status**       | 🟢 Passing (194/194 Vitest unit & integration tests)           |
 
 ---
 
@@ -27,7 +27,7 @@ This file is the **living state file** and **persistent engineering memory** for
 - **Started:** 2026-07-27
 - **Completed:** 2026-07-27
 
-#### Objectives Achieved
+#### Objectives Achieved A
 
 1. **Integration Audit Report:** Completed monorepo audit verifying zero broken APIs, zero dead code, and full integration of mature backend engines (`@repo-intel/shared`, `@repo-intel/parser`, `@repo-intel/graph`, `@repo-intel/retrieval`, `@repo-intel/ai`, `@repo-intel/review-engine`, `@repo-intel/patch-gen`, `DefaultPlatformRuntime`).
 2. **Live Web UI API Connection (`apps/web`):** Connected all Next.js React components (`RepositoryDashboard`, `ReviewRunner`, `FindingsExplorer`, `PatchPreviewer`, `RepoChat`, `GraphViewer`, `ProviderSelector`, `SettingsPage`, `SetupWizard`) to live Fastify API Gateway endpoints (`http://localhost:3000/api/v1`).
@@ -145,7 +145,7 @@ This file is the **living state file** and **persistent engineering memory** for
    - Implemented `EmbeddingPipeline` orchestrating context construction, vector generation, and vector store upserting across all graph entity kinds.
    - Implemented `SemanticSearchEngine` (`searchVector`) executing top-k semantic vector searches with score reranking and metadata filtering.
 
-#### Objectives Achieved
+#### Objectives Achieved B
 
 1. **Phase 14 Architectural Improvements:**
    - **Language Capability Registry:** Implemented `LanguageCapabilityRegistry` (`supportsClasses`, `supportsInterfaces`, `supportsInheritance`, `supportsGenerics`, `supportsAsync`, `supportsStructs`, `supportsNamespaces`).
@@ -160,7 +160,7 @@ This file is the **living state file** and **persistent engineering memory** for
 3. **Cross-Language Resolution Engine (`@repo-intel/graph`):**
    - Implemented `CrossLanguageResolver` attaching `concept` properties (`ClassLike`, `FunctionLike`, `InterfaceLike`, `EnumLike`, `ModuleLike`) to symbol nodes.
 
-#### Objectives Achieved
+#### Objectives Achieved C
 
 1. **Python Symbol Extractor** (`packages/parser/src/extractors/py-extractor.ts`):
    - Implemented `PythonExtractor` handling Python class definitions, methods, top-level functions, `async def` definitions, return types, parameters, docstrings (`"""..."""`), `import`/`import_from` statements, and export visibility.
@@ -175,7 +175,7 @@ This file is the **living state file** and **persistent engineering memory** for
    - Pre-populated Python, Go, and Java S-expression query manifests in `QueryRegistry`.
    - Added 18 new unit tests across `py-extractor.test.ts`, `go-extractor.test.ts`, and `java-extractor.test.ts` (156/156 monorepo tests passing).
 
-#### Objectives Achieved
+#### Objectives Achieved D
 
 1. **Phase 12 Architectural Improvements:**
    - **Stable Symbol Identity:** Implemented `buildSymbolId(repoId, filePath, name, parentName, signature)` utility in `@repo-intel/shared`.
@@ -201,7 +201,7 @@ This file is the **living state file** and **persistent engineering memory** for
    - Created benchmark scaffolding (`graph.bench.ts`) verifying sub-100ms processing for 1,000 nodes / 2,000 edges.
    - Authored **ADR-022: Knowledge Graph Abstraction and Storage Strategy** in `decisions.md`.
 
-#### Objectives Achieved
+#### Objectives Achieved E
 
 1. **Symbol Extractor Abstraction** (`packages/parser/src/extractors/extractor.interface.ts`):
    - Defined `SymbolExtractor` interface (`languageId`, `supportedExtensions`, `extract(tree, filePath): ExtractedFileSymbols`).
@@ -217,7 +217,7 @@ This file is the **living state file** and **persistent engineering memory** for
    - Added 14 unit tests verifying symbol node IDs, kind classification, signatures, docstrings, imports, exports, and empty tree handling.
    - Exported extractor module from `@repo-intel/parser`.
 
-#### Objectives Achieved
+#### Objectives Achieved F
 
 1. **Phase 10 Improvements:**
    - Hardened `RepositoryState`, `DeltaResult`, and `RepositorySnapshot` with full `readonly` modifiers.

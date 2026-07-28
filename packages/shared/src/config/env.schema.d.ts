@@ -17,21 +17,21 @@ export declare const EnvSchema: z.ZodObject<{
     NODE_ENV: "development" | "production" | "test";
     PORT: number;
     HOST: string;
-    LOG_LEVEL: "fatal" | "error" | "warn" | "info" | "debug" | "trace";
+    LOG_LEVEL: "debug" | "error" | "fatal" | "info" | "trace" | "warn";
     KUZU_DB_PATH: string;
     LANCE_DB_PATH: string;
+    OPENAI_API_KEY?: string | undefined;
+    ANTHROPIC_API_KEY?: string | undefined;
+    GEMINI_API_KEY?: string | undefined;
     OLLAMA_BASE_URL: string;
     VLLM_BASE_URL: string;
     ENABLE_VECTOR_SEARCH: boolean;
     ENABLE_GRAPH_CACHE: boolean;
-    OPENAI_API_KEY?: string | undefined;
-    ANTHROPIC_API_KEY?: string | undefined;
-    GEMINI_API_KEY?: string | undefined;
 }, {
     NODE_ENV?: "development" | "production" | "test" | undefined;
     PORT?: string | undefined;
     HOST?: string | undefined;
-    LOG_LEVEL?: "fatal" | "error" | "warn" | "info" | "debug" | "trace" | undefined;
+    LOG_LEVEL?: "debug" | "error" | "fatal" | "info" | "trace" | "warn" | undefined;
     KUZU_DB_PATH?: string | undefined;
     LANCE_DB_PATH?: string | undefined;
     OPENAI_API_KEY?: string | undefined;

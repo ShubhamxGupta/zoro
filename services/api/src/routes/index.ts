@@ -6,6 +6,10 @@ import { chatRoutes } from './chat.js';
 import { patchRoutes } from './patches.js';
 import { graphRoutes } from './graph.js';
 import { prRoutes } from './pr.js';
+import { historyRoutes } from './history.js';
+import { extensionRoutes } from './extensions.js';
+import { enterpriseRoutes } from './enterprise.js';
+import { operationsRoutes } from './operations.js';
 import { DefaultPlatformRuntime } from '../runtime/platform-runtime.js';
 
 export const apiV1Routes: FastifyPluginAsync = async (fastify: FastifyInstance): Promise<void> => {
@@ -19,4 +23,8 @@ export const apiV1Routes: FastifyPluginAsync = async (fastify: FastifyInstance):
   await fastify.register(async (f) => patchRoutes(f, runtime));
   await fastify.register(async (f) => graphRoutes(f, runtime));
   await fastify.register(async (f) => prRoutes(f, runtime));
+  await fastify.register(async (f) => historyRoutes(f, runtime));
+  await fastify.register(async (f) => extensionRoutes(f, runtime));
+  await fastify.register(async (f) => enterpriseRoutes(f, runtime));
+  await fastify.register(async (f) => operationsRoutes(f, runtime));
 };

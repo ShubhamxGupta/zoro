@@ -1387,6 +1387,334 @@ Requiring explicit user confirmation before posting prevents unintended GitHub P
 
 ---
 
+### ADR-046: Repository Memory Architecture & Persistent Store
+
+- **Status:** Accepted
+- **Date:** 2026-07-28
+
+#### Context
+
+Code reviews should become context-aware across time rather than treating every review session independently. A persistent repository memory store is required to record completed reviews, findings, user feedback, accepted/rejected patches, and notes.
+
+#### Options Considered
+
+1. **In-Memory Session Storage:** Forgets findings history, feedback, and patch acceptance metrics upon application restart.
+2. **Persistent Repository Memory (`RepositoryMemoryStore`):**
+   - Persists state locally to `.repo-intel-memory.json`.
+   - Tracks review history, accepted/rejected patch records, code hotspots, and user notes across restarts.
+
+#### Why This Option Was Chosen
+
+Local JSON file storage provides fast, zero-dependency persistence that survives application restarts.
+
+#### Consequences
+
+- **Positive:** Persistent state across restarts, zero external DB setup needed for local usage.
+- **Negative:** File write concurrency must be handled gracefully.
+- **Affected Modules:** `@repo-intel/shared`, `@repo-intel/review-engine`.
+
+---
+
+### ADR-047: Adaptive Review Context & Feedback Loop
+
+- **Status:** Accepted
+- **Date:** 2026-07-28
+
+#### Context
+
+Before running a review, the system should load past findings, unresolved issues, accepted fixes, and user feedback (Useful, Incorrect, Ignored, False Positive) to adapt future prompt context and re-rank findings.
+
+#### Options Considered
+
+1. **Static Review Prompts:** Repeats identical findings and potential false positives regardless of past user feedback.
+2. **Adaptive Context Engine (`AdaptiveContextEngine`):**
+   - Automatically injects historical memory, unstable hotspots, user feedback constraints, and architectural decisions into GraphRAG retrieval bundles and review prompts.
+
+#### Why This Option Was Chosen
+
+Adaptive context injection prevents repetitive false positives and aligns AI code reviews with team feedback over time.
+
+#### Consequences
+
+- **Positive:** Progressively improves review quality, reduces false positives, enforces team architectural standards.
+- **Negative:** Consumes a small portion of prompt context tokens.
+- **Affected Modules:** `@repo-intel/review-engine`, `@repo-intel/retrieval`.
+
+---
+
+### ADR-048: Repository Intelligence & Trend Analytics Engine
+
+- **Status:** Accepted
+- **Date:** 2026-07-28
+
+#### Context
+
+Engineering leads and team members need visibility into repository health trends over time, such as findings per review, patch acceptance rates, false positive rates, severity breakdowns, and code hotspots.
+
+#### Options Considered
+
+1. **Uncalculated Ad-Hoc Logs:** Requires manually sifting through raw session logs.
+2. **Trend Analytics Engine (`TrendAnalyticsEngine`):**
+   - Computes repository intelligence metrics, hotspot scores, and trend breakdowns.
+   - Exposes REST API endpoints and interactive Web UI dashboard visualizers.
+
+#### Why This Option Was Chosen
+
+Automated trend metrics provide actionable repository health visibility for engineering managers and team leads.
+
+#### Consequences
+
+- **Positive:** Real-time visibility into repository health trends and hotspots.
+- **Negative:** Requires accumulating feedback and session events over time.
+- **Affected Modules:** `@repo-intel/review-engine`, `services/api`, `apps/web`.
+
+---
+
+### ADR-049: Extension SDK & Plugin Architecture
+
+- **Status:** Accepted
+- **Date:** 2026-07-28
+
+#### Context
+
+The platform requires third-party extensibility for custom review agents, language parsers, static analysis integrations, report exporters, AI providers, workflow hooks, and UI widgets without modifying core platform code.
+
+#### Options Considered
+
+1. **Core Source Edits:** Forces users to fork and modify core monorepo packages.
+2. **Extension SDK & Plugin Framework (`BaseExtension` Contracts):**
+   - Defines strict interfaces for `ReviewAgentExtension`, `LanguageExtension`, `ExporterExtension`, `WorkflowExtension`, `AIProviderExtension`, and `UIExtension`.
+
+#### Why This Option Was Chosen
+
+Contract-based SDK interfaces allow third-party developers to extend every layer of the platform cleanly.
+
+#### Consequences
+
+- **Positive:** Zero core code modifications required for customization, modular plugin ecosystem.
+- **Negative:** Must maintain SDK interface backwards compatibility.
+- **Affected Modules:** `@repo-intel/shared`, `@repo-intel/review-engine`.
+
+---
+
+### ADR-050: Plugin Lifecycle & Failure Isolation
+
+- **Status:** Accepted
+- **Date:** 2026-07-28
+
+#### Context
+
+Third-party plugin failures or runtime exceptions must be isolated to prevent crashing the core review engine or runtime environment.
+
+#### Options Considered
+
+1. **Uncaught Direct Execution:** Unhandled plugin errors crash the core API process.
+2. **Isolated Plugin Runner (`ExtensionManager` & Fail-Safe Wrappers):**
+   - Wraps plugin calls in try/catch boundaries with isolated logging.
+   - Disables misbehaving plugins automatically without interrupting core pipelines.
+
+#### Why This Option Was Chosen
+
+Failure isolation ensures enterprise uptime guarantees regardless of third-party plugin quality.
+
+#### Consequences
+
+- **Positive:** Platform resilience, zero crash risk from external plugins.
+- **Negative:** Plugin failures must be surfaced via log inspector.
+- **Affected Modules:** `@repo-intel/review-engine`.
+
+---
+
+### ADR-051: Workflow Hook Event Bus Framework
+
+- **Status:** Accepted
+- **Date:** 2026-07-28
+
+#### Context
+
+Plugins need to observe or augment core execution stages (e.g. before/after indexing, review, patch generation, report generation) transparently.
+
+#### Options Considered
+
+1. **Hardcoded Middleware Interceptors:** Rigorous setup for each stage.
+2. **Workflow Hook Event Bus (`WorkflowHookBus`):**
+   - Emits lifecycle hook events (`beforeReview`, `afterReview`, etc.) allowing extensions to inspect or modify payloads sequentially.
+
+#### Why This Option Was Chosen
+
+An event bus decouples extensions from pipeline internals while enabling powerful workflow automation.
+
+#### Consequences
+
+- **Positive:** Flexible event-driven extensibility.
+- **Negative:** Asynchronous hook chains add slight latency to review pipelines.
+- **Affected Modules:** `@repo-intel/review-engine`.
+
+---
+
+### ADR-052: Enterprise Authentication & Identity Architecture
+
+- **Status:** Accepted
+- **Date:** 2026-07-28
+
+#### Context
+
+Team and enterprise deployments require extensible authentication supporting Local accounts, OAuth 2.0, and OpenID Connect (GitHub, Google, Entra ID, Okta).
+
+#### Options Considered
+
+1. **Hardcoded Local Passwords Only:** Limits enterprise adoption.
+2. **Extensible Auth Abstraction (`AuthManager` & OAuth2/OIDC Adapters):**
+   - Supports local token authentication alongside OAuth2/OIDC identity providers.
+
+#### Why This Option Was Chosen
+
+Abstracted auth provider interfaces enable smooth integration with enterprise identity providers.
+
+#### Consequences
+
+- **Positive:** Enterprise SSO readiness, flexible auth options.
+- **Negative:** Session state management required across providers.
+- **Affected Modules:** `services/api`.
+
+---
+
+### ADR-053: Role-Based Access Control (RBAC) & Permission Boundaries
+
+- **Status:** Accepted
+- **Date:** 2026-07-28
+
+#### Context
+
+To ensure operational security in team environments, permissions must be governed by granular roles (Administrator, Maintainer, Reviewer, Developer, Read-Only).
+
+#### Options Considered
+
+1. **Unrestricted Admin Access for All Users:** High security risk in enterprise settings.
+2. **RBAC Manager (`RBACManager`):**
+   - Enforces permission checks (`repo:read`, `review:execute`, `provider:configure`, `admin:manage`) per route and command.
+
+#### Why This Option Was Chosen
+
+Strict RBAC boundaries prevent unauthorized configuration changes and secure sensitive credentials.
+
+#### Consequences
+
+- **Positive:** Granular security enforcement.
+- **Negative:** API requests must pass role authorization headers.
+- **Affected Modules:** `services/api`, `apps/cli`.
+
+---
+
+### ADR-054: Enterprise Operations, Encryption & Telemetry Metrics
+
+- **Status:** Accepted
+- **Date:** 2026-07-28
+
+#### Context
+
+Operations teams need Prometheus-compatible telemetry metrics and AES-256-GCM secret encryption at rest.
+
+#### Options Considered
+
+1. **Unencrypted Plaintext Secret Storage:** Insecure.
+2. **Encrypted Secrets & Telemetry Engine (`SecretsManager` & `MetricsCollector`):**
+   - AES-256-CBC/GCM encryption at rest.
+   - Prometheus text format metrics endpoint (`/api/v1/metrics`).
+
+#### Why This Option Was Chosen
+
+Meets enterprise security and observability standards out of the box.
+
+#### Consequences
+
+- **Positive:** Industry-standard secret security and Prometheus monitoring.
+- **Negative:** Secret key seed must be backed up securely.
+- **Affected Modules:** `services/api`.
+
+---
+
+### ADR-055: Production Operations Architecture & Diagnostics
+
+- **Status:** Accepted
+- **Date:** 2026-07-28
+
+#### Context
+
+Production deployments require real-time diagnostics, performance profiling, readiness/liveness checks, and operational dashboards.
+
+#### Options Considered
+
+1. **Ad-Hoc Logs Only:** High diagnostic complexity during outages.
+2. **Operations & Diagnostics Suite (`HealthDiagnostics` & `PerformanceProfiler`):**
+   - Microsecond execution timing, bottleneck identification, and health readiness/liveness APIs.
+
+#### Why This Option Was Chosen
+
+Provides real-time operational visibility into system state and performance bottlenecks.
+
+#### Consequences
+
+- **Positive:** Deep observability, fast troubleshooting during production incidents.
+- **Negative:** Telemetry recording adds minimal CPU overhead.
+- **Affected Modules:** `services/api`, `apps/cli`, `apps/web`.
+
+---
+
+### ADR-056: Resilience & Circuit Breaker Fault Tolerance
+
+- **Status:** Accepted
+- **Date:** 2026-07-28
+
+#### Context
+
+Downstream AI providers, GitHub APIs, and external services can experience outages or latency spikes. The system must degrade gracefully without crashing core workflows.
+
+#### Options Considered
+
+1. **Unprotected Asynchronous Calls:** Provider failures crash review pipelines.
+2. **Circuit Breaker Pattern (`ResilienceCircuitBreaker`):**
+   - Automatically trips to OPEN state after consecutive failures and executes fallback handlers.
+
+#### Why This Option Was Chosen
+
+Guarantees system resilience and uptime during external API degradation.
+
+#### Consequences
+
+- **Positive:** System stability during external service outages.
+- **Negative:** Fallback responses may have lower fidelity.
+- **Affected Modules:** `services/api`, `@repo-intel/ai`.
+
+---
+
+### ADR-057: Job Scheduler & Queue Abstraction
+
+- **Status:** Accepted
+- **Date:** 2026-07-28
+
+#### Context
+
+Recurring repository indexing, scheduled reviews, and cleanup require a production-ready background scheduler and priority-based job queue abstraction.
+
+#### Options Considered
+
+1. **Ad-Hoc Inline Execution:** Blocks HTTP request handlers during heavy indexing tasks.
+2. **Distributed Queue & Scheduler (`JobScheduler` & `DistributedJobQueue`):**
+   - Decouples heavy tasks into prioritized background workers with retry policies and dead-letter queues.
+
+#### Why This Option Was Chosen
+
+Decouples long-running repository analysis tasks from HTTP gateway handlers.
+
+#### Consequences
+
+- **Positive:** Responsive HTTP gateway, reliable background task execution.
+- **Negative:** Queue state must be tracked across restarts.
+- **Affected Modules:** `services/api`.
+
+---
+
 ## Decision Rules & Governance
 
 A new Architecture Decision Record (**ADR**) **MUST** be created whenever:

@@ -35,3 +35,7 @@ export * from './workflow-engine.types.js';
 export * from './job-queue.types.js';
 export * from './internal-services.types.js';
 export * from './pr-domain.types.js';
+export * from './memory-domain.types.js';
+export * from './extension-sdk.types.js';
+export * from './auth-domain.types.js';
+export * from './operations-domain.types.js';

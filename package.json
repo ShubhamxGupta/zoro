@@ -13,7 +13,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc --build",
-    "lint": "eslint . --ext .ts,.tsx",
+    "lint": "eslint .",
     "check-types": "tsc --build",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",

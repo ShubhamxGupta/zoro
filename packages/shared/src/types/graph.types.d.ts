@@ -1,20 +1,23 @@
 /**
  * Repository Knowledge Graph (RKG) Domain Models
  */
-export type NodeType = 'File' | 'Module' | 'Package' | 'Class' | 'Interface' | 'Function' | 'Variable' | 'APIEndpoint' | 'DatabaseModel' | 'ConfigurationKey' | 'UnitTest';
-export type EdgeRelation = 'CONTAINS' | 'IMPORTS' | 'CALLS' | 'INHERITS_IMPLEMENTS' | 'MUTATES' | 'TESTED_BY' | 'CONFIGURES' | 'HANDLED_BY';
+import type { NormalizedConcept } from './cross-language.types.js';
+import type { GraphProvenance } from './provenance.types.js';
+export type GraphNodeKind = 'Repository' | 'Directory' | 'File' | 'Symbol' | 'Module';
+export type GraphEdgeKind = 'CONTAINS' | 'IMPORTS' | 'EXPORTS' | 'CALLS' | 'REFERENCES' | 'IMPLEMENTS' | 'EXTENDS' | 'DEPENDS_ON' | 'USES' | 'OVERRIDES';
 export interface GraphNode {
     id: string;
-    type: NodeType;
+    kind: GraphNodeKind;
     label: string;
+    concept?: NormalizedConcept;
     properties: Record<string, unknown>;
 }
 export interface GraphEdge {
     id: string;
+    kind: GraphEdgeKind;
     sourceId: string;
     targetId: string;
-    relation: EdgeRelation;
-    weight?: number;
+    provenance?: GraphProvenance;
     properties?: Record<string, unknown>;
 }
 export interface CallGraphEntry {

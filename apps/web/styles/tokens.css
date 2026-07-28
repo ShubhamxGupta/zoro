@@ -1,132 +1,116 @@
-/* Vanilla CSS Design Tokens - HSL & Hex Matrices */
+/* Master Design Tokens - Sleek Charcoal & Electric Indigo Glassmorphism */
 
 :root,
 :root[data-theme="dark"] {
-  /* Surfaces & Backgrounds */
-  --bg-base: #0b0d10;
-  --bg-surface: #12151a;
-  --bg-surface-elevated: #181c23;
-  --border-subtle: #1d232c;
-  --border-default: #242b35;
-  --border-strong: #364151;
-  --text-primary: #ededed;
-  --text-secondary: #9da4b0;
-  --text-muted: #636b78;
+  --bg-base: #0a0c10;
+  --bg-surface: #11141b;
+  --bg-surface-elevated: #161a23;
+  --bg-surface-glass: rgba(18, 22, 30, 0.75);
+  
+  --border-subtle: #1b2029;
+  --border-default: #232a36;
+  --border-strong: #333d4e;
+  --border-glow: rgba(59, 130, 246, 0.35);
 
-  /* Accents */
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+
   --accent-primary: #3b82f6;
   --accent-hover: #60a5fa;
+  --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
   --accent-subtle: rgba(59, 130, 246, 0.12);
-  --code-bg: #0e1116;
+  --code-bg: #0d0f14;
 
-  /* Severity States (Dark Mode) */
-  --sev-critical-text: #ff6b6b;
-  --sev-critical-bg: #3a1014;
-  --sev-critical-border: #842029;
+  /* Severity Tokens */
+  --sev-critical-text: #f87171;
+  --sev-critical-bg: rgba(239, 68, 68, 0.12);
+  --sev-critical-border: rgba(239, 68, 68, 0.3);
 
-  --sev-high-text: #ffa94d;
-  --sev-high-bg: #341d09;
-  --sev-high-border: #7a4310;
+  --sev-high-text: #fb923c;
+  --sev-high-bg: rgba(249, 115, 22, 0.12);
+  --sev-high-border: rgba(249, 115, 22, 0.3);
 
-  --sev-medium-text: #fcc419;
-  --sev-medium-bg: #2d2605;
-  --sev-medium-border: #6b5b00;
+  --sev-medium-text: #facc15;
+  --sev-medium-bg: rgba(234, 179, 8, 0.12);
+  --sev-medium-border: rgba(234, 179, 8, 0.3);
 
-  --sev-low-text: #4dabf7;
-  --sev-low-bg: #0c2340;
-  --sev-low-border: #18497a;
+  --sev-low-text: #38bdf8;
+  --sev-low-bg: rgba(14, 165, 233, 0.12);
+  --sev-low-border: rgba(14, 165, 233, 0.3);
 
-  --sev-info-text: #51cf66;
-  --sev-info-bg: #122019;
-  --sev-info-border: #1b4d2e;
+  --sev-info-text: #4ade80;
+  --sev-info-bg: rgba(34, 197, 94, 0.12);
+  --sev-info-border: rgba(34, 197, 94, 0.3);
 
-  --sev-resolved-text: #868e96;
-  --sev-resolved-bg: #1a1d20;
-
-  --sev-fix-text: #63e6be;
-  --sev-fix-bg: #0a251d;
-
-  /* Elevation Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 12px 32px -4px rgba(0, 0, 0, 0.65);
-  --shadow-focus: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px -2px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 32px -4px rgba(0, 0, 0, 0.7);
 }
 
 :root[data-theme="light"] {
-  /* Surfaces & Backgrounds */
-  --bg-base: #f8f9fa;
+  --bg-base: #f8fafc;
   --bg-surface: #ffffff;
-  --bg-surface-elevated: #f1f3f5;
-  --border-subtle: #eceeef;
-  --border-default: #e2e4e9;
-  --border-strong: #cdd1d9;
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --text-muted: #9ca3af;
+  --bg-surface-elevated: #f1f5f9;
+  --bg-surface-glass: rgba(255, 255, 255, 0.85);
 
-  /* Accents */
+  --border-subtle: #f1f5f9;
+  --border-default: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --border-glow: rgba(37, 99, 235, 0.25);
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+
   --accent-primary: #2563eb;
   --accent-hover: #1d4ed8;
+  --accent-gradient: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
   --accent-subtle: rgba(37, 99, 235, 0.08);
-  --code-bg: #f3f4f6;
+  --code-bg: #f8fafc;
 
-  /* Severity States (Light Mode) */
-  --sev-critical-text: #c92a2a;
-  --sev-critical-bg: #fff5f5;
-  --sev-critical-border: #ffc9c9;
+  /* Severity Tokens */
+  --sev-critical-text: #dc2626;
+  --sev-critical-bg: #fef2f2;
+  --sev-critical-border: #fecaca;
 
-  --sev-high-text: #d9480f;
-  --sev-high-bg: #fff4e6;
-  --sev-high-border: #ffd8a8;
+  --sev-high-text: #ea580c;
+  --sev-high-bg: #fff7ed;
+  --sev-high-border: #fed7aa;
 
-  --sev-medium-text: #e67700;
-  --sev-medium-bg: #fff9db;
-  --sev-medium-border: #ffec99;
+  --sev-medium-text: #ca8a04;
+  --sev-medium-bg: #fefce8;
+  --sev-medium-border: #fef08a;
 
-  --sev-low-text: #1864ab;
-  --sev-low-bg: #e7f5ff;
-  --sev-low-border: #a5d8ff;
+  --sev-low-text: #0284c7;
+  --sev-low-bg: #f0f9ff;
+  --sev-low-border: #bae6fd;
 
-  --sev-info-text: #2b8a3e;
-  --sev-info-bg: #e6fcf5;
-  --sev-info-border: #96f2d7;
+  --sev-info-text: #16a34a;
+  --sev-info-bg: #f0fdf4;
+  --sev-info-border: #bbf7d0;
 
-  --sev-resolved-text: #495057;
-  --sev-resolved-bg: #f1f3f5;
-
-  --sev-fix-text: #0ca678;
-  --sev-fix-bg: #e6fcf5;
-
-  /* Elevation Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 12px 32px -4px rgba(0, 0, 0, 0.15);
-  --shadow-focus: 0 0 0 2px rgba(37, 99, 235, 0.4);
+  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 32px -4px rgba(0, 0, 0, 0.12);
 }
 
 :root {
-  /* Spatial Grid System Tokens */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
+  --space-5: 20px;
   --space-6: 24px;
   --space-8: 32px;
-  --space-10: 40px;
-  --space-12: 48px;
-  --space-16: 64px;
 
-  /* Border Radii */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
   --radius-full: 9999px;
 
-  /* Motion Tokens */
-  --duration-fast: 100ms;
-  --duration-normal: 180ms;
-  --duration-slow: 250ms;
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
   --ease-default: cubic-bezier(0.16, 1, 0.3, 1);
 }

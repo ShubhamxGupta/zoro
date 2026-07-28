@@ -38,7 +38,7 @@ describe('AgentOrchestrator', () => {
 
     const { findings, metrics } = await orchestrator.executeReview(mockBundle, provider);
 
-    expect(metrics.agentCount).toBe(6);
+    expect(metrics.agentCount).toBe(8);
     expect(findings.length).toBeGreaterThan(0);
     expect(findings[0]?.agentId).toBeDefined();
   });

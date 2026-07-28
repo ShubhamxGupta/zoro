@@ -7,6 +7,8 @@ import {
   SecurityAgent,
   CodeQualityAgent,
   DocumentationAgent,
+  SyntaxAgent,
+  LogicAgent,
 } from '../agents/specialized-agents.js';
 
 export interface OrchestrationOptions {
@@ -20,10 +22,12 @@ export class AgentOrchestrator {
 
   constructor(customAgents?: ReviewAgent[]) {
     this.agents = customAgents ?? [
+      new SyntaxAgent(),
+      new LogicAgent(),
+      new SecurityAgent(),
+      new PerformanceAgent(),
       new ArchitectureAgent(),
       new BugDetectionAgent(),
-      new PerformanceAgent(),
-      new SecurityAgent(),
       new CodeQualityAgent(),
       new DocumentationAgent(),
     ];

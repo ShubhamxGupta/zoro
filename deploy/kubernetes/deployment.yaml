@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: repo-intel-api
+  namespace: repo-intel
+  labels:
+    app: repo-intel-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: repo-intel-api
+  template:
+    metadata:
+      labels:
+        app: repo-intel-api
+    spec:
+      containers:
+        - name: repo-intel-api
+          image: repo-intel-api:0.6.0
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: repo-intel-config
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"

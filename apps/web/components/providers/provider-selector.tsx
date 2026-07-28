@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Cpu, Check, Server, Key, RefreshCw, Sparkles, Activity, ShieldCheck, Database } from 'lucide-react';
+import { Cpu, Check, Server, Key, RefreshCw, Sparkles, Activity, Database } from 'lucide-react';
 import { fetchApi } from '../../lib/api-client';
 
 export interface ProviderSelectorProps {
@@ -15,24 +15,14 @@ export function ProviderSelector({ onProviderChange }: ProviderSelectorProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
-  const [capabilities, setCapabilities] = useState<any[]>([]);
-  const [usageStats, setUsageStats] = useState<any[]>([]);
-
   const fetchProviderData = async () => {
     setIsLoading(true);
     try {
-      const [provRes, capRes, usageRes] = await Promise.all([
-        fetchApi<any>('/providers'),
-        fetchApi<any>('/providers/capabilities'),
-        fetchApi<any>('/providers/usage'),
-      ]);
-
+      const provRes = await fetchApi<any>('/providers');
       if (provRes) {
         if (provRes.activeProvider) setActiveProvider(provRes.activeProvider);
         if (provRes.selectedModel) setSelectedModel(provRes.selectedModel);
       }
-      if (capRes?.capabilities) setCapabilities(capRes.capabilities);
-      if (usageRes?.usage) setUsageStats(usageRes.usage);
     } catch {
       // Offline defaults
     } finally {

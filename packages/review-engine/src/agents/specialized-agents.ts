@@ -16,10 +16,9 @@ export class PerformanceAgent extends BaseReviewAgent {
   readonly category: PromptCategory = 'performance';
 }
 
-export class SecurityAgent extends BaseReviewAgent {
-  readonly name = 'SecurityAgent';
-  readonly category: PromptCategory = 'security';
-}
+export { SyntaxAgent } from './syntax-agent.js';
+export { LogicAgent } from './logic-agent.js';
+export { SecurityAgent } from './security-agent.js';
 
 export class CodeQualityAgent extends BaseReviewAgent {
   readonly name = 'CodeQualityAgent';
