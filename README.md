@@ -8,11 +8,14 @@
 
 ## 🌟 Features
 
-- **100% Local & Privacy-First:** Native support for local air-gapped runners via **Ollama** (`llama3`, `qwen`, `mistral`, `deepseek`, `codellama`, `phi`) with cloud **OpenAI** fallback.
+- **100% Local & Privacy-First:** Native support for local air-gapped runners via **Ollama** (`llama3`, `qwen`,
+  `mistral`, `deepseek`, `codellama`, `phi`) with cloud **OpenAI** fallback.
 - **Knowledge Graph Engine:** Construct multi-language symbol dependency graphs using KùzuDB and Tree-sitter.
 - **GraphRAG Retrieval:** Multi-hop graph walk context retrieval combined with vector search.
-- **Multi-Agent Review Engine:** 6 specialized AI review agents (Architecture, Security, Performance, Bug Detection, Quality, Documentation).
-- **Deterministic Patch Generation:** Non-destructive in-memory AST refactoring simulation producing unified diffs and explainable risk scores.
+- **Multi-Agent Review Engine:** 6 specialized AI review agents (Architecture, Security, Performance, Bug Detection,
+  Quality, Documentation).
+- **Deterministic Patch Generation:** Non-destructive in-memory AST refactoring simulation producing unified diffs and
+  explainable risk scores.
 - **Web UI & CLI Interfaces:** Full React/Next.js 14 web dashboard and `repo-intel` CLI tool.
 
 ---
@@ -62,15 +65,15 @@ node apps/cli/dist/index.js providers
 ## 🛠️ Architecture
 
 ```mermaid
-[Web UI / CLI]
-      │
-      ▼
-[PlatformRuntime] ──► [TypedEventBus]
-      │
-      ├──► [RepositoryService]
-      ├──► [ReviewService] ──► [AgentOrchestrator] (6 Agents)
-      ├──► [RetrievalService] ──► [GraphRAGRetrievalEngine]
-      └──► [PatchService] ──► [PatchGenerationEngine]
+  [Web UI / CLI]
+  │
+  ▼
+  [PlatformRuntime] ──► [TypedEventBus]
+  │
+  ├──► [RepositoryService]
+  ├──► [ReviewService] ──► [AgentOrchestrator] (6 Agents)
+  ├──► [RetrievalService] ──► [GraphRAGRetrievalEngine]
+  └──► [PatchService] ──► [PatchGenerationEngine]
 ```
 
 ---

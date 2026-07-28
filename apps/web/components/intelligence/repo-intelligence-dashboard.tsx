@@ -12,22 +12,7 @@ export function RepoIntelligenceDashboard() {
       const intelRes = await fetchApi<any>('/repository/intelligence');
       if (intelRes?.intelligence) setIntelligence(intelRes.intelligence);
     } catch {
-      // Fallback defaults
-      setIntelligence({
-        recurringSecurityIssues: 2,
-        recurringPerformanceIssues: 1,
-        hotspots: [
-          { filePath: 'src/user.ts', findingCount: 3, unstableScore: 0.75 },
-          { filePath: 'services/api/server.ts', findingCount: 2, unstableScore: 0.45 },
-        ],
-        trends: {
-          totalReviews: 12,
-          avgFindingsPerReview: 2.1,
-          patchAcceptanceRate: 88,
-          falsePositiveRate: 4,
-          avgReviewDurationMs: 240,
-        },
-      });
+      setIntelligence(null);
     }
   };
 
@@ -47,9 +32,9 @@ export function RepoIntelligenceDashboard() {
         gap: 'var(--space-5)',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className="responsive-banner">
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-          <Brain size={20} color="var(--accent-primary)" />
+          <Brain size={20} color="var(--accent-primary)" style={{ flexShrink: 0 }} />
           <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
             Repository Memory & Trend Intelligence
           </h2>
@@ -64,6 +49,8 @@ export function RepoIntelligenceDashboard() {
             color: 'var(--text-primary)',
             fontSize: '12px',
             cursor: 'pointer',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
           }}
         >
           Refresh Insights
@@ -71,7 +58,7 @@ export function RepoIntelligenceDashboard() {
       </div>
 
       {/* Analytics Metric Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'var(--space-4)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 'var(--space-4)' }}>
         <div style={{ padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '12px' }}>
             <History size={14} />
@@ -121,28 +108,36 @@ export function RepoIntelligenceDashboard() {
         </div>
 
         <div style={{ borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-default)', overflow: 'hidden' }}>
-          {intelligence?.hotspots?.map((h: any, idx: number) => (
-            <div
-              key={idx}
-              style={{
-                padding: '10px 16px',
-                borderBottom: '1px solid var(--border-default)',
-                backgroundColor: 'var(--bg-surface-elevated)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                fontSize: '13px',
-              }}
-            >
-              <div style={{ fontFamily: 'monospace', color: 'var(--text-primary)' }}>{h.filePath}</div>
-              <div style={{ display: 'flex', gap: '16px', color: 'var(--text-secondary)', fontSize: '12px' }}>
-                <span>Findings: {h.findingCount}</span>
-                <span style={{ color: h.unstableScore > 0.5 ? '#f87171' : '#34d399', fontWeight: 600 }}>
-                  Unstable Score: {h.unstableScore}
-                </span>
-              </div>
+          {!intelligence?.hotspots || intelligence.hotspots.length === 0 ? (
+            <div style={{ padding: 'var(--space-4)', backgroundColor: 'var(--bg-surface-elevated)', color: 'var(--text-muted)', fontSize: '13px', textAlign: 'center' }}>
+              No high-churn or unstable code hotspots identified in the codebase.
             </div>
-          ))}
+          ) : (
+            intelligence.hotspots.map((h: any, idx: number) => (
+              <div
+                key={idx}
+                style={{
+                  padding: '10px 16px',
+                  borderBottom: '1px solid var(--border-default)',
+                  backgroundColor: 'var(--bg-surface-elevated)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '8px',
+                  fontSize: '13px',
+                }}
+              >
+                <div style={{ fontFamily: 'monospace', color: 'var(--text-primary)', wordBreak: 'break-all' }}>{h.filePath}</div>
+                <div style={{ display: 'flex', gap: '16px', color: 'var(--text-secondary)', fontSize: '12px', flexWrap: 'wrap' }}>
+                  <span>Findings: {h.findingCount}</span>
+                  <span style={{ color: h.unstableScore > 0.5 ? '#f87171' : '#34d399', fontWeight: 600 }}>
+                    Unstable Score: {h.unstableScore}
+                  </span>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

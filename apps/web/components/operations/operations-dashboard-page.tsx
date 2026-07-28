@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Activity, ShieldCheck, HardDrive, Clock, RefreshCw, Zap } from 'lucide-react';
 import { fetchApi } from '../../lib/api-client';
+import { FeatureHint } from '../common/feature-hint';
 
 export function OperationsDashboardPage() {
   const [health, setHealth] = useState<any>(null);
@@ -21,18 +22,9 @@ export function OperationsDashboardPage() {
       if (jRes?.jobs) setJobs(jRes.jobs);
       if (cRes?.stats) setCacheStats(cRes.stats);
     } catch {
-      // Fallback
-      setHealth({
-        status: 'HEALTHY',
-        readiness: true,
-        liveness: true,
-        metrics: { memoryMb: 112, cpuPercent: 1.2, uptimeSeconds: 43200 },
-      });
-      setJobs([
-        { id: 'job-1', name: 'Recurring Repository Indexing', status: 'COMPLETED' },
-        { id: 'job-2', name: 'Scheduled Metrics Aggregation', status: 'RUNNING' },
-      ]);
-      setCacheStats({ hitRatioPercent: 94, keysCount: 42, memoryUsageMb: 2 });
+      setHealth(null);
+      setJobs([]);
+      setCacheStats(null);
     }
   };
 
@@ -52,12 +44,21 @@ export function OperationsDashboardPage() {
         gap: 'var(--space-5)',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className="responsive-banner">
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-          <Activity size={20} color="var(--accent-primary)" />
+          <Activity size={20} color="var(--accent-primary)" style={{ flexShrink: 0 }} />
           <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
             Production Operations & Diagnostics Dashboard
           </h2>
+          <FeatureHint
+            title="Production Operations & Diagnostics"
+            description="Monitor system uptime, heap memory usage, cache hit ratios, and background scheduled job queues."
+            tips={[
+              'Click "Refresh Operations" to query live Node.js RSS heap usage and active job scheduler queues.',
+              'Prometheus metrics text format is exported live at GET /metrics or GET /api/v1/metrics.',
+              'Request correlation tracing (X-Request-ID) is automatically attached to every operational probe log.',
+            ]}
+          />
         </div>
         <button
           onClick={loadOperationsData}
@@ -72,6 +73,8 @@ export function OperationsDashboardPage() {
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
           }}
         >
           <RefreshCw size={14} />
@@ -80,8 +83,8 @@ export function OperationsDashboardPage() {
       </div>
 
       {/* Health Metric Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'var(--space-4)' }}>
-        <div style={{ padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 'var(--space-4)' }}>
+        <div title="System readiness & liveness status from /operations/health" style={{ padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#34d399', fontSize: '12px' }}>
             <ShieldCheck size={14} />
             <span>Health Status</span>
@@ -91,17 +94,17 @@ export function OperationsDashboardPage() {
           </div>
         </div>
 
-        <div style={{ padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)' }}>
+        <div title="Multi-tier AST & vector cache hit ratio percentage" style={{ padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent-primary)', fontSize: '12px' }}>
             <Zap size={14} />
             <span>Cache Hit Ratio</span>
           </div>
           <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--accent-primary)', marginTop: '4px' }}>
-            {cacheStats?.hitRatioPercent || 94}%
+            {cacheStats?.hitRatioPercent || 100}%
           </div>
         </div>
 
-        <div style={{ padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)' }}>
+        <div title="Node.js RSS heap memory allocated by server runtime" style={{ padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '12px' }}>
             <HardDrive size={14} />
             <span>Heap Memory</span>
@@ -111,7 +114,7 @@ export function OperationsDashboardPage() {
           </div>
         </div>
 
-        <div style={{ padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)' }}>
+        <div title="Continuous process uptime since gateway initialization" style={{ padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#f59e0b', fontSize: '12px' }}>
             <Clock size={14} />
             <span>Uptime</span>
@@ -132,37 +135,45 @@ export function OperationsDashboardPage() {
         </div>
 
         <div style={{ borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-default)', overflow: 'hidden' }}>
-          {jobs.map((job, idx) => (
-            <div
-              key={idx}
-              style={{
-                padding: '10px 16px',
-                borderBottom: '1px solid var(--border-default)',
-                backgroundColor: 'var(--bg-surface-elevated)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                fontSize: '13px',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{job.name}</span>
-                <code style={{ fontSize: '11px', color: 'var(--text-muted)' }}>({job.id})</code>
-              </div>
-              <span
+          {jobs.length === 0 ? (
+            <div style={{ padding: 'var(--space-4)', backgroundColor: 'var(--bg-surface-elevated)', color: 'var(--text-muted)', fontSize: '13px', textAlign: 'center' }}>
+              No active background jobs currently scheduled.
+            </div>
+          ) : (
+            jobs.map((job, idx) => (
+              <div
+                key={idx}
                 style={{
-                  fontSize: '11px',
-                  padding: '2px 8px',
-                  borderRadius: 'var(--radius-full)',
-                  backgroundColor: job.status === 'COMPLETED' ? 'var(--sev-info-bg)' : 'var(--sev-low-bg)',
-                  color: job.status === 'COMPLETED' ? 'var(--sev-info-text)' : 'var(--sev-low-text)',
-                  fontWeight: 600,
+                  padding: '10px 16px',
+                  borderBottom: '1px solid var(--border-default)',
+                  backgroundColor: 'var(--bg-surface-elevated)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '8px',
+                  fontSize: '13px',
                 }}
               >
-                {job.status}
-              </span>
-            </div>
-          ))}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{job.name}</span>
+                  <code style={{ fontSize: '11px', color: 'var(--text-muted)' }}>({job.id})</code>
+                </div>
+                <span
+                  style={{
+                    fontSize: '11px',
+                    padding: '2px 8px',
+                    borderRadius: 'var(--radius-full)',
+                    backgroundColor: job.status === 'COMPLETED' ? 'var(--sev-info-bg)' : 'var(--sev-low-bg)',
+                    color: job.status === 'COMPLETED' ? 'var(--sev-info-text)' : 'var(--sev-low-text)',
+                    fontWeight: 600,
+                  }}
+                >
+                  {job.status}
+                </span>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

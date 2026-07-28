@@ -1,14 +1,51 @@
 {
-  "name": "@repo-intel/vscode",
-  "version": "0.0.0",
+  "name": "vscode-repo-intelligence",
+  "displayName": "Repo Intelligence AI Assistant",
+  "description": "Multi-agent code review, GraphRAG architectural tooltips, inline squiggly diagnostics, and one-click AI patches",
+  "version": "0.6.0",
+  "publisher": "zoro",
   "private": true,
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/extension.js",
+  "types": "./dist/extension.d.ts",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Linters",
+    "Programming Languages",
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:typescript",
+    "onLanguage:javascript",
+    "onLanguage:python",
+    "onLanguage:go",
+    "onLanguage:java"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "repo-intel.runReview",
+        "title": "Repo Intelligence: Run AI Code Review"
+      },
+      {
+        "command": "repo-intel.applyPatch",
+        "title": "Repo Intelligence: Apply AI Refactoring Patch"
+      }
+    ]
+  },
   "scripts": {
     "build": "tsc --build",
     "check-types": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
     "clean": "rimraf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@repo-intel/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "@types/vscode": "^1.85.0"
   }
 }

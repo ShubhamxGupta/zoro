@@ -60,6 +60,7 @@ export function SidebarNav({ activeTab, onSelectTab }: SidebarNavProps) {
 
   return (
     <aside
+      className="dashboard-sidebar custom-scrollbar"
       style={{
         width: '240px',
         backgroundColor: 'var(--bg-surface)',
@@ -109,10 +110,11 @@ export function SidebarNav({ activeTab, onSelectTab }: SidebarNavProps) {
                   cursor: 'pointer',
                   transition: 'all var(--duration-fast)',
                   textAlign: 'left',
+                  whiteSpace: 'nowrap',
                 }}
               >
-                <span style={{ color: isActive ? 'var(--accent-primary)' : 'var(--text-muted)' }}>{item.icon}</span>
-                <span>{item.label}</span>
+                <span style={{ color: isActive ? 'var(--accent-primary)' : 'var(--text-muted)', flexShrink: 0 }}>{item.icon}</span>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.label}</span>
               </button>
             );
           })}

@@ -10,6 +10,7 @@ import { historyRoutes } from './history.js';
 import { extensionRoutes } from './extensions.js';
 import { enterpriseRoutes } from './enterprise.js';
 import { operationsRoutes } from './operations.js';
+import { memoryRoutes } from './memory.js';
 import { DefaultPlatformRuntime } from '../runtime/platform-runtime.js';
 
 export const apiV1Routes: FastifyPluginAsync = async (fastify: FastifyInstance): Promise<void> => {
@@ -27,4 +28,5 @@ export const apiV1Routes: FastifyPluginAsync = async (fastify: FastifyInstance):
   await fastify.register(async (f) => extensionRoutes(f, runtime));
   await fastify.register(async (f) => enterpriseRoutes(f, runtime));
   await fastify.register(async (f) => operationsRoutes(f, runtime));
+  await fastify.register(async (f) => memoryRoutes(f, runtime));
 };

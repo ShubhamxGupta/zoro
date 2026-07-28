@@ -1,3 +1,5 @@
+export * from './extension.js';
+
 import type { ExplainableFinding } from '@repo-intel/shared';
 
 export const VSCODE_APP_VERSION = '0.6.0';

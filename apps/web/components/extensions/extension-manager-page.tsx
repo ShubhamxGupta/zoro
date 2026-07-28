@@ -18,21 +18,8 @@ export function ExtensionManagerPage() {
       if (extRes?.extensions) setExtensions(extRes.extensions);
       if (logRes?.logs) setLogs(logRes.logs);
     } catch {
-      // Fallback
-      setExtensions([
-        {
-          metadata: {
-            id: 'org.example.custom-security-agent',
-            name: 'Sample Third-Party Security Agent',
-            version: '1.0.0',
-            author: 'SecurityTeam',
-            category: 'review-agent',
-            capabilities: ['security-audit', 'credential-leak-detection'],
-          },
-          isEnabled: true,
-        },
-      ]);
-      setLogs(['System initialized extension manager.']);
+      setExtensions([]);
+      setLogs([]);
     }
   };
 
@@ -87,64 +74,70 @@ export function ExtensionManagerPage() {
 
       {/* Extension Cards Grid */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-        {extensions.map((ext) => (
-          <div
-            key={ext.metadata.id}
-            style={{
-              padding: 'var(--space-4)',
-              borderRadius: 'var(--radius-lg)',
-              backgroundColor: 'var(--bg-surface-elevated)',
-              border: '1px solid var(--border-default)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>
-                  {ext.metadata.name}
-                </span>
-                <span style={{ fontSize: '11px', padding: '2px 6px', borderRadius: '4px', backgroundColor: 'var(--bg-surface)', color: 'var(--text-muted)' }}>
-                  v{ext.metadata.version}
-                </span>
-                <span style={{ fontSize: '11px', padding: '2px 6px', borderRadius: '4px', backgroundColor: 'var(--accent-primary-alpha)', color: 'var(--accent-primary)', fontWeight: 600 }}>
-                  {ext.metadata.category}
-                </span>
-              </div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                Author: {ext.metadata.author} | ID: <code style={{ fontSize: '11px' }}>{ext.metadata.id}</code>
-              </div>
-              <div style={{ display: 'flex', gap: '6px', marginTop: '4px' }}>
-                {ext.metadata.capabilities?.map((cap: string) => (
-                  <span key={cap} style={{ fontSize: '10px', padding: '1px 6px', borderRadius: '4px', border: '1px solid var(--border-default)', color: 'var(--text-muted)' }}>
-                    {cap}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <button
-              onClick={() => toggleExtension(ext.metadata.id, ext.isEnabled)}
+        {extensions.length === 0 ? (
+          <div style={{ padding: 'var(--space-4)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-surface-elevated)', border: '1px solid var(--border-subtle)', color: 'var(--text-muted)', fontSize: '13px', textAlign: 'center' }}>
+            No third-party SDK extensions registered yet. Load an extension via REST API or CLI.
+          </div>
+        ) : (
+          extensions.map((ext) => (
+            <div
+              key={ext.metadata.id}
               style={{
-                padding: '6px 14px',
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: ext.isEnabled ? '#22c55e' : 'var(--bg-surface)',
+                padding: 'var(--space-4)',
+                borderRadius: 'var(--radius-lg)',
+                backgroundColor: 'var(--bg-surface-elevated)',
                 border: '1px solid var(--border-default)',
-                color: ext.isEnabled ? '#ffffff' : 'var(--text-secondary)',
-                fontSize: '12px',
-                fontWeight: 600,
-                cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
+                justifyContent: 'space-between',
               }}
             >
-              <Power size={14} />
-              {ext.isEnabled ? 'Enabled' : 'Disabled'}
-            </button>
-          </div>
-        ))}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    {ext.metadata.name}
+                  </span>
+                  <span style={{ fontSize: '11px', padding: '2px 6px', borderRadius: '4px', backgroundColor: 'var(--bg-surface)', color: 'var(--text-muted)' }}>
+                    v{ext.metadata.version}
+                  </span>
+                  <span style={{ fontSize: '11px', padding: '2px 6px', borderRadius: '4px', backgroundColor: 'var(--accent-primary-alpha)', color: 'var(--accent-primary)', fontWeight: 600 }}>
+                    {ext.metadata.category}
+                  </span>
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                  Author: {ext.metadata.author} | ID: <code style={{ fontSize: '11px' }}>{ext.metadata.id}</code>
+                </div>
+                <div style={{ display: 'flex', gap: '6px', marginTop: '4px' }}>
+                  {ext.metadata.capabilities?.map((cap: string) => (
+                    <span key={cap} style={{ fontSize: '10px', padding: '1px 6px', borderRadius: '4px', border: '1px solid var(--border-default)', color: 'var(--text-muted)' }}>
+                      {cap}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                onClick={() => toggleExtension(ext.metadata.id, ext.isEnabled)}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  backgroundColor: ext.isEnabled ? '#22c55e' : 'var(--bg-surface)',
+                  border: '1px solid var(--border-default)',
+                  color: ext.isEnabled ? '#ffffff' : 'var(--text-secondary)',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <Power size={14} />
+                {ext.isEnabled ? 'Enabled' : 'Disabled'}
+              </button>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Extension Activity Logs */}

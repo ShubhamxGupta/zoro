@@ -19,6 +19,9 @@ const SENSITIVE_KEYS = new Set([
   'privatekey',
   'private_key',
   'client_secret',
+  'cookie',
+  'cookies',
+  'set-cookie',
 ]);
 
 const SENSITIVE_STRING_PATTERNS = [

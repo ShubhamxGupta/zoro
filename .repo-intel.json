@@ -1,0 +1,19 @@
+{
+  "$schema": "https://repo-intel.dev/schema/config.json",
+  "name": "zoro",
+  "version": "0.6.0",
+  "aiProviderPreference": [
+    "ollama",
+    "openai",
+    "claude"
+  ],
+  "logLevel": "info",
+  "maxParallelJobs": 5,
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/.git/**",
+    "**/dist/**",
+    "**/.next/**"
+  ],
+  "createdAt": "2026-07-28T10:47:17.238Z"
+}

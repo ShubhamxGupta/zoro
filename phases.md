@@ -9,10 +9,15 @@
 
 ## Executive Summary & Roadmap Strategy
 
-This document defines the incremental execution roadmap for building the **Repository Intelligence & Code Review Platform**. To minimize risk, eliminate refactoring overhead, and maintain a continuously runnable project state, the implementation is divided into **42 granular, sequential phases** grouped into **6 major milestones**.
+This document defines the incremental execution roadmap for building the **Repository Intelligence & Code Review
+Platform**. To minimize risk, eliminate refactoring overhead, and maintain a continuously runnable project state, the
+implementation is divided into **42 granular, sequential phases** grouped into **6 major milestones**.
 
 > [!NOTE]
-> **🚀 Prototype / MVP Track Active:** Development is currently focused on completing the end-to-end local **Minimum Lovable Prototype (MVP Track)** (Fastify REST API Gateway + Web UI + CLI + Ollama/OpenAI Integration + GraphRAG Chat + Patch Preview). All remaining advanced phases (Phase 22–42) remain preserved as the long-term source of truth and are designated as **Post-MVP**.
+> **🚀 Prototype / MVP Track Active:** Development is currently focused on completing the end-to-end local **Minimum
+> Lovable Prototype (MVP Track)** (Fastify REST API Gateway + Web UI + CLI + Ollama/OpenAI Integration + GraphRAG Chat +
+> Patch Preview). All remaining advanced phases (Phase 22–42) remain preserved as the long-term source of truth and are
+> designated as **Post-MVP**.
 
 ```mermaid
 graph LR
@@ -25,10 +30,14 @@ graph LR
 
 ### Development Philosophy & Sequencing Rules
 
-1. **Infrastructure & Types First:** Foundation, configuration, logging, and shared domain models exist before core logic.
-2. **Deterministic Understanding Before AI:** Repository scanning, Tree-Sitter AST parsing, call graphs, and graph retrieval **MUST** be fully functional before introducing LLMs.
+1. **Infrastructure & Types First:** Foundation, configuration, logging, and shared domain models exist before core
+   logic.
+2. **Deterministic Understanding Before AI:** Repository scanning, Tree-Sitter AST parsing, call graphs, and graph
+   retrieval **MUST** be fully functional before introducing LLMs.
 3. **No Skipped Checkpoints:** Every phase produces an independently testable, working deliverable.
-4. **Strict Alignment:** All implementation work **MUST** conform to [prd.md](file:///d:/Coding/zoro/prd.md), [architecture.md](file:///d:/Coding/zoro/architecture.md), and [rules.md](file:///d:/Coding/zoro/rules.md).
+4. **Strict Alignment:** All implementation work **MUST** conform
+   to [prd.md](file:///d:/Coding/zoro/prd.md), [architecture.md](file:///d:/Coding/zoro/architecture.md),
+   and [rules.md](file:///d:/Coding/zoro/rules.md).
 
 ---
 
@@ -36,7 +45,8 @@ graph LR
 
 ### Milestone 1 Goal
 
-Establish the monorepo workspace, build toolchain, environment configuration system, structured logging, backend REST API gateway skeleton, web application shell, and CI testing setup.
+Establish the monorepo workspace, build toolchain, environment configuration system, structured logging, backend REST
+API gateway skeleton, web application shell, and CI testing setup.
 
 ---
 
@@ -53,7 +63,8 @@ Establish the monorepo workspace, build toolchain, environment configuration sys
   - Add build scripts using TurboRepo or pnpm scripts.
 - **Deliverables:** Working monorepo workspace with passing lint and type-check commands.
 - **Dependencies:** None.
-- **Acceptance Criteria:** `pnpm build`, `pnpm lint`, and `pnpm check-types` complete with 0 errors across all subfolders.
+- **Acceptance Criteria:** `pnpm build`, `pnpm lint`, and `pnpm check-types` complete with 0 errors across all
+  subfolders.
 - **Testing:**
   - _Unit Tests:_ N/A.
   - _Manual Testing:_ Run workspace build and lint scripts from root terminal.
@@ -76,7 +87,8 @@ Establish the monorepo workspace, build toolchain, environment configuration sys
   - Export frozen, strongly-typed `config` object.
 - **Deliverables:** `packages/shared` package exporting validated configuration loader.
 - **Dependencies:** Phase 01.
-- **Acceptance Criteria:** Application crashes gracefully with readable validation errors if required variables are missing.
+- **Acceptance Criteria:** Application crashes gracefully with readable validation errors if required variables are
+  missing.
 - **Testing:**
   - _Unit Tests:_ Test invalid port numbers, missing required variables, and default fallbacks.
   - _Edge Cases:_ Verify behavior when environment variables contain unexpected string formats.
@@ -89,7 +101,8 @@ Establish the monorepo workspace, build toolchain, environment configuration sys
 ### Phase 03: Structured Logging & Telemetry Subsystem
 
 - **Goal:** Implement a JSON structured logging package using Pino in `packages/shared/`.
-- **Why This Phase Exists:** Consistent log outputs with correlation IDs are mandatory across API services and background workers.
+- **Why This Phase Exists:** Consistent log outputs with correlation IDs are mandatory across API services and
+  background workers.
 - **Features:** Structured JSON logger with log levels, correlation ID injection, and sensitive data masking.
 - **Tasks:**
   - Integrate Pino logger in `packages/shared/src/logging/`.
@@ -110,7 +123,8 @@ Establish the monorepo workspace, build toolchain, environment configuration sys
 ### Phase 04: Shared Domain Models & Type Definitions
 
 - **Goal:** Define core TypeScript interfaces and domain schemas in `packages/shared/`.
-- **Why This Phase Exists:** Domain types (AST nodes, Graph schemas, Finding payloads) must be standardized before building engines.
+- **Why This Phase Exists:** Domain types (AST nodes, Graph schemas, Finding payloads) must be standardized before
+  building engines.
 - **Features:** TypeScript interfaces for SymbolNode, GraphEdge, FindingPayload, ProviderConfig, and GitDiffPayload.
 - **Tasks:**
   - Create domain model schemas in `packages/shared/src/types/`.
@@ -133,18 +147,26 @@ Establish the monorepo workspace, build toolchain, environment configuration sys
 - **Status:** Completed 🟢
 - **Goal:** Create the initial REST API Gateway application shell using Fastify in `services/api/`.
 - **Why This Phase Exists:** Provides the HTTP foundation for API routing, health checks, and middleware handlers.
-- **Features:** Fastify HTTP server, OpenAPI spec generator (Swagger/Swagger UI), global error handler, request correlation tracking (`x-request-id`), and health check route.
+- **Features:** Fastify HTTP server, OpenAPI spec generator (Swagger/Swagger UI), global error handler, request
+  correlation tracking (`x-request-id`), and health check route.
 - **Tasks Completed:**
-  - Initialized Fastify server factory in [`services/api/src/server.ts`](file:///d:/Coding/zoro/services/api/src/server.ts).
+  - Initialized Fastify server factory in [
+    `services/api/src/server.ts`](file:///d:/Coding/zoro/services/api/src/server.ts).
   - Registered `@fastify/cors`, `@fastify/helmet`, `@fastify/swagger`, and `@fastify/swagger-ui` plugins.
-  - Implemented `GET /healthz` and versioned `GET /api/v1/healthz` endpoints returning server status, uptime, timestamp, and version.
-  - Attached custom `onRequest` hook for `x-request-id` propagation into `@repo-intel/shared` AsyncLocalStorage logger context.
+  - Implemented `GET /healthz` and versioned `GET /api/v1/healthz` endpoints returning server status, uptime,
+    timestamp, and version.
+  - Attached custom `onRequest` hook for `x-request-id` propagation into `@repo-intel/shared` AsyncLocalStorage logger
+    context.
   - Attached global error handler and 404 handler mapping domain & routing errors to standardized JSON payloads.
-- **Deliverables:** Runnable Fastify backend server in `services/api/` with passing integration test suite in [`services/api/src/server.test.ts`](file:///d:/Coding/zoro/services/api/src/server.test.ts).
+- **Deliverables:** Runnable Fastify backend server in `services/api/` with passing integration test suite in [
+  `services/api/src/server.test.ts`](file:///d:/Coding/zoro/services/api/src/server.test.ts).
 - **Dependencies:** Phase 02, Phase 03, Phase 04.
-- **Acceptance Criteria:** `services/api` builds cleanly with 0 TypeScript compilation errors; `GET /healthz` returns `200 OK` with valid system status JSON.
+- **Acceptance Criteria:** `services/api` builds cleanly with 0 TypeScript compilation errors; `GET /healthz` returns
+  `200 OK` with valid system status JSON.
 - **Testing:**
-  - _Integration Tests:_ Unit & integration tests in `services/api/src/server.test.ts` covering `/healthz`, `/api/v1/healthz`, `/documentation`, `/documentation/json`, `x-request-id` correlation tracing, 404 responses, and uncaught error formatting (11 / 11 passing).
+  - _Integration Tests:_ Unit & integration tests in `services/api/src/server.test.ts` covering `/healthz`,
+    `/api/v1/healthz`, `/documentation`, `/documentation/json`, `x-request-id` correlation tracing, 404 responses, and
+    uncaught error formatting (11 / 11 passing).
 - **Risks:** None (Resolved plugin initialization order & typescript references).
 - **Estimated Complexity:** Medium.
 - **Estimated Time:** 1 day.
@@ -155,20 +177,30 @@ Establish the monorepo workspace, build toolchain, environment configuration sys
 
 - **Status:** Completed 🟢
 - **Goal:** Create the Next.js frontend application shell and interactive Dashboard in `apps/web/`.
-- **Why This Phase Exists:** Provides the base web UI workspace for dashboard layout, routing, review findings, and component themes.
-- **Features:** Next.js App Router shell, Vanilla CSS design tokens manifest, dark/light theme engine, navigation shell (Header, Sidebar, Footer), metric cards, findings split-pane view, knowledge graph visualizer container, command palette (`⌘K`), and error/loading/404 boundaries.
+- **Why This Phase Exists:** Provides the base web UI workspace for dashboard layout, routing, review findings, and
+  component themes.
+- **Features:** Next.js App Router shell, Vanilla CSS design tokens manifest, dark/light theme engine, navigation shell
+  (Header, Sidebar, Footer), metric cards, findings split-pane view, knowledge graph visualizer container, command
+  palette (`⌘K`), and error/loading/404 boundaries.
 - **Tasks Completed:**
   - Initialized Next.js 14 App Router application shell in [`apps/web/`](file:///d:/Coding/zoro/apps/web/).
-  - Modularized Vanilla CSS Design Tokens manifest into `styles/tokens.css`, `typography.css`, `layout.css`, `animations.css`, `utilities.css`.
+  - Modularized Vanilla CSS Design Tokens manifest into `styles/tokens.css`, `typography.css`, `layout.css`,
+    `animations.css`, `utilities.css`.
   - Built client-side theme engine (`ThemeProvider`) supporting dark mode default and soft light mode parity.
-  - Built navigation shell: Header (`48px`), Sidebar (`240px`/`48px`), Footer Status Bar (`24px`), and responsive drawer layout.
-  - Built accessible UI primitives & component barrels (`Button`, `Badge`, `Card`, `Input`, `Select`, `Skeleton`, `EmptyState`, `Modal`, `CommandPalette`, `Icon`).
-  - Built interactive Dashboard feature view components (`MetricCards`, `FindingsList`, `CodeViewerPane`, `GraphVisualizerPane`).
-- **Deliverables:** Runnable Next.js frontend application in `apps/web/` launching on port 3001 with passing Next.js production build (`npm run build`).
+  - Built navigation shell: Header (`48px`), Sidebar (`240px`/`48px`), Footer Status Bar (`24px`), and responsive
+    drawer layout.
+  - Built accessible UI primitives & component barrels (`Button`, `Badge`, `Card`, `Input`, `Select`, `Skeleton`,
+    `EmptyState`, `Modal`, `CommandPalette`, `Icon`).
+  - Built interactive Dashboard feature view components (`MetricCards`, `FindingsList`, `CodeViewerPane`,
+    `GraphVisualizerPane`).
+- **Deliverables:** Runnable Next.js frontend application in `apps/web/` launching on port 3001 with passing Next.js
+  production build (`npm run build`).
 - **Dependencies:** Phase 01 through Phase 05.
-- **Acceptance Criteria:** `apps/web` compiles with 0 TypeScript errors; `npm run build --workspace=@repo-intel/web` generates static pages successfully.
+- **Acceptance Criteria:** `apps/web` compiles with 0 TypeScript errors; `npm run build --workspace=@repo-intel/web`
+  generates static pages successfully.
 - **Testing:**
-  - _Manual & Build Verification:_ Production build verified (`✓ Compiled successfully`, 4/4 static pages generated); 11/11 workspace unit & integration tests passing.
+  - _Manual & Build Verification:_ Production build verified (`✓ Compiled successfully`, 4/4 static pages generated);
+    11/11 workspace unit & integration tests passing.
 - **Risks:** None.
 - **Estimated Complexity:** Low.
 - **Estimated Time:** 1 day.
@@ -178,17 +210,24 @@ Establish the monorepo workspace, build toolchain, environment configuration sys
 ### Phase 07: Testing Infrastructure & CI Pipeline Setup
 
 - **Status:** Completed 🟢
-- **Goal:** Setup Vitest test runner across workspace, Playwright E2E smoke tests, `@repo-intel/testing` mock package, and GitHub Actions CI workflow.
-- **Why This Phase Exists:** Guarantees automated test execution, code coverage reporting, and linting quality gates on every pull request.
-- **Features:** Vitest workspace runner setup (`vitest.config.ts`, `vitest.workspace.ts`), V8 coverage reporting, Playwright E2E smoke testing (`playwright.config.ts`, `smoke.spec.ts`), shared mock package (`@repo-intel/testing`), and multi-job GitHub Actions workflow (`.github/workflows/ci.yml`).
+- **Goal:** Setup Vitest test runner across workspace, Playwright E2E smoke tests, `@repo-intel/testing` mock package,
+  and GitHub Actions CI workflow.
+- **Why This Phase Exists:** Guarantees automated test execution, code coverage reporting, and linting quality gates on
+  every pull request.
+- **Features:** Vitest workspace runner setup (`vitest.config.ts`, `vitest.workspace.ts`), V8 coverage reporting,
+  Playwright E2E smoke testing (`playwright.config.ts`, `smoke.spec.ts`), shared mock package (`@repo-intel/testing`),
+  and multi-job GitHub Actions workflow (`.github/workflows/ci.yml`).
 - **Tasks Completed:**
   - Configured `vitest.workspace.ts` and `vitest.config.ts` at monorepo root with V8 coverage threshold checks.
   - Created shared testing package `@repo-intel/testing` with `MockLogger` and domain entity factories.
   - Created Playwright E2E smoke test suite in `apps/web/e2e/smoke.spec.ts`.
-  - Created `.github/workflows/ci.yml` running lint, type-check, Vitest coverage, Playwright e2e, and production builds.
-- **Deliverables:** Automated CI pipeline passing on repository pushes; 46 passing Vitest unit/integration tests with V8 coverage reporting.
+  - Created `.github/workflows/ci.yml` running lint, type-check, Vitest coverage, Playwright e2e, and production
+    builds.
+- **Deliverables:** Automated CI pipeline passing on repository pushes; 46 passing Vitest unit/integration tests with V8
+  coverage reporting.
 - **Dependencies:** Phase 01 through Phase 06.
-- **Acceptance Criteria:** `vitest run` executes tests across all sub-packages; `npm run build` succeeds; GitHub Actions workflow passes cleanly.
+- **Acceptance Criteria:** `vitest run` executes tests across all sub-packages; `npm run build` succeeds; GitHub Actions
+  workflow passes cleanly.
 - **Testing:**
   - _Automated:_ Local Vitest execution (46/46 passing) and Playwright E2E smoke test execution verified.
 - **Risks:** None.
@@ -201,14 +240,16 @@ Establish the monorepo workspace, build toolchain, environment configuration sys
 
 ### Milestone 2 Goal
 
-Build high-speed file system discovery, incremental git indexers, Tree-Sitter parsing abstractions, and language-specific AST symbol extractors for TypeScript, JavaScript, Python, and Go.
+Build high-speed file system discovery, incremental git indexers, Tree-Sitter parsing abstractions, and
+language-specific AST symbol extractors for TypeScript, JavaScript, Python, and Go.
 
 ---
 
 ### Phase 08: Repository Scanner & Git Boundary Detector
 
 - **Goal:** Implement the Repository Scanner in `packages/parser/src/scanner/`.
-- **Why This Phase Exists:** Must identify repository boundaries, `.git` roots, and valid directory trees before parsing.
+- **Why This Phase Exists:** Must identify repository boundaries, `.git` roots, and valid directory trees before
+  parsing.
 - **Features:** Git root detector, directory walker, and ignore rule evaluator (`.gitignore`, `.repo-intel-ignore`).
 - **Tasks:**
   - Create Repository Scanner module.
@@ -217,7 +258,8 @@ Build high-speed file system discovery, incremental git indexers, Tree-Sitter pa
   - Return structured file manifest containing relative paths and file sizes.
 - **Deliverables:** Functional Repository Scanner module in `packages/parser/`.
 - **Dependencies:** Phase 04.
-- **Acceptance Criteria:** Scanner accurately discovers repository files while ignoring `node_modules/`, `.git/`, and custom ignored patterns.
+- **Acceptance Criteria:** Scanner accurately discovers repository files while ignoring `node_modules/`, `.git/`, and
+  custom ignored patterns.
 - **Testing:**
   - _Unit Tests:_ Test scanner against mock directory structures containing `.gitignore` files.
 - **Risks:** Memory pressure on large repositories with deep directory trees.
@@ -237,7 +279,8 @@ Build high-speed file system discovery, incremental git indexers, Tree-Sitter pa
   - Handle unknown or unsupported binary files gracefully by filtering them out.
 - **Deliverables:** Language Classifier module returning canonical language IDs.
 - **Dependencies:** Phase 08.
-- **Acceptance Criteria:** Given a list of file paths, correctly classifies `.ts` as `typescript`, `.py` as `python`, etc.
+- **Acceptance Criteria:** Given a list of file paths, correctly classifies `.ts` as `typescript`, `.py` as `python`,
+  etc.
 - **Testing:**
   - _Unit Tests:_ Test file extensions, ambiguous extensions (`.h`), and binary files.
 - **Risks:** Ambiguous file extensions (e.g., `.h` for C vs C++).
@@ -249,21 +292,30 @@ Build high-speed file system discovery, incremental git indexers, Tree-Sitter pa
 ### Phase 10: Incremental Indexer & SHA-256 State Tracker
 
 - **Status:** Completed 🟢
-- **Goal:** Build versioned Repository State Store (`RepositoryStateStore`), atomic JSON state cache (`.repo-intel-cache.json`), metadata hash short-circuit optimization, and Delta Engine.
-- **Why This Phase Exists:** Re-parsing unchanged files on every edit is too slow; incremental re-indexing and generic state storage are required for scalable monorepo intelligence.
-- **Features:** `RepositoryStateStore` interface abstraction, `JsonRepositoryStateStore` backend, `DeltaEngine` with metadata hash short-circuiting, `RepositoryFacts` extraction, event emitter (`ScannerEventEmitter`), and `RepositorySnapshot` builder.
+- **Goal:** Build versioned Repository State Store (`RepositoryStateStore`), atomic JSON state cache
+  (`.repo-intel-cache.json`), metadata hash short-circuit optimization, and Delta Engine.
+- **Why This Phase Exists:** Re-parsing unchanged files on every edit is too slow; incremental re-indexing and generic
+  state storage are required for scalable monorepo intelligence.
+- **Features:** `RepositoryStateStore` interface abstraction, `JsonRepositoryStateStore` backend, `DeltaEngine` with
+  metadata hash short-circuiting, `RepositoryFacts` extraction, event emitter (`ScannerEventEmitter`), and
+  `RepositorySnapshot` builder.
 - **Tasks Completed:**
   - Implemented `RepositoryState` domain model and versioned schema.
   - Implemented `JsonRepositoryStateStore` with atomic file swap saving `.repo-intel-cache.json`.
-  - Implemented `DeltaEngine` classifying changes into `added`, `modified`, `deleted`, and `unchanged` with metadata size/mtime hash short-circuiting.
-  - Implemented `extractRepositoryFacts` capturing primary/secondary languages, frameworks, package manager, build system, CI provider, Docker support, and project scale.
+  - Implemented `DeltaEngine` classifying changes into `added`, `modified`, `deleted`, and `unchanged` with metadata
+    size/mtime hash short-circuiting.
+  - Implemented `extractRepositoryFacts` capturing primary/secondary languages, frameworks, package manager, build
+    system, CI provider, Docker support, and project scale.
   - Implemented `ScannerEventEmitter` emitting scan lifecycle event notifications.
   - Created Vitest unit test suite (74 tests passing monorepo-wide) and performance benchmark scaffolding.
-- **Deliverables:** Production-ready Incremental Repository Indexer skipping unchanged file hashing on warm scans ($< 50\text{ms}$).
+- **Deliverables:** Production-ready Incremental Repository Indexer skipping unchanged file hashing on warm scans
+  ($< 50\text{ms}$).
 - **Dependencies:** Phase 09.
-- **Acceptance Criteria:** Subsequent scans of unmodified repositories execute in $< 50\text{ms}$, executing zero SHA-256 hash operations on unchanged files.
+- **Acceptance Criteria:** Subsequent scans of unmodified repositories execute in $< 50\text{ms}$, executing zero
+  SHA-256 hash operations on unchanged files.
 - **Testing:**
-  - _Unit Tests:_ Verified initial cold scan, cached warm scan, file modification, file deletion, state store operations, and event emission.
+  - _Unit Tests:_ Verified initial cold scan, cached warm scan, file modification, file deletion, state store
+    operations, and event emission.
 - **Risks:** None.
 - **Estimated Complexity:** Medium.
 - **Estimated Time:** 1 day.
@@ -288,9 +340,11 @@ Build high-speed file system discovery, incremental git indexers, Tree-Sitter pa
   - `packages/parser/src/treesitter/treesitter.test.ts` — 16 unit tests (all passing)
   - `packages/parser/src/treesitter/treesitter.bench.ts` — Benchmark scaffolding
   - `packages/parser/queries/` — S-expression query scaffolding for TS, Python, Go, Java, Rust
-  - `packages/shared/src/types/ast-domain.types.ts` — ASTNode, ASTTree, ASTCursor, ASTVisitor, ASTQuery, NormalizedSymbol domain types
+  - `packages/shared/src/types/ast-domain.types.ts` — ASTNode, ASTTree, ASTCursor, ASTVisitor, ASTQuery,
+    NormalizedSymbol domain types
 - **Dependencies:** Phase 09.
-- **Acceptance Criteria:** Successfully parses code strings into ASTTree domain objects without memory leaks; full abstraction layer in place.
+- **Acceptance Criteria:** Successfully parses code strings into ASTTree domain objects without memory leaks; full
+  abstraction layer in place.
 - **Testing:**
   - _Unit Tests:_ 108/108 passing (16 new Phase 11 tests)
 - **Risks:** Native binary compilation issues with Tree-Sitter C bindings across OS platforms.
@@ -302,7 +356,8 @@ Build high-speed file system discovery, incremental git indexers, Tree-Sitter pa
 ### Phase 12: TypeScript & JavaScript AST Symbol Extractor
 
 - **Status:** Completed 🟢
-- **Goal:** Build symbol extraction queries for TypeScript/JavaScript in `packages/parser/src/extractors/ts-extractor.ts`.
+- **Goal:** Build symbol extraction queries for TypeScript/JavaScript in
+  `packages/parser/src/extractors/ts-extractor.ts`.
 - **Why This Phase Exists:** Must extract functions, classes, interfaces, methods, and variables from TS/JS code.
 - **Features:** Tree-Sitter query handler for TypeScript symbol declarations, line ranges, and imports.
 - **Tasks:**
@@ -311,7 +366,8 @@ Build high-speed file system discovery, incremental git indexers, Tree-Sitter pa
   - Extract `import` statements and target specifiers.
 - **Deliverables:** TypeScript AST Extractor returning array of `SymbolNode` objects.
 - **Dependencies:** Phase 04, Phase 11.
-- **Acceptance Criteria:** Extracts all function, class, and interface declarations from a TS file with exact line numbers.
+- **Acceptance Criteria:** Extracts all function, class, and interface declarations from a TS file with exact line
+  numbers.
 - **Testing:**
   - _Unit Tests:_ Run extractor against complex TS files containing decorators, generics, and re-exports.
 - **Risks:** Missing complex TypeScript syntax variants (e.g., overloaded function signatures).
@@ -323,20 +379,25 @@ Build high-speed file system discovery, incremental git indexers, Tree-Sitter pa
 ### Phase 13: Semantic Relationship Extraction & Knowledge Graph Builder
 
 - **Status:** Completed 🟢
-- **Goal:** Extract language-independent semantic relationships and build the normalized Repository Knowledge Graph (RKG) with a database-decoupled storage abstraction.
-- **Why This Phase Exists:** Enables structural and architectural graph walks, dependency analysis, and multi-hop context retrieval.
+- **Goal:** Extract language-independent semantic relationships and build the normalized Repository Knowledge Graph
+  (RKG) with a database-decoupled storage abstraction.
+- **Why This Phase Exists:** Enables structural and architectural graph walks, dependency analysis, and multi-hop
+  context retrieval.
 - **Features:**
   - Stable symbol identity schema (`buildSymbolId`) and byte-accurate source location model.
   - Normalized structured documentation model (`SymbolDoc`).
   - Query Registry for managing Tree-Sitter S-expression query files.
   - Incremental symbol extraction integrated with `DeltaEngine`.
-  - Language-independent `SemanticRelationship` extractor (`CONTAINS`, `CALLS`, `IMPORTS`, `EXPORTS`, `REFERENCES`, `IMPLEMENTS`, `EXTENDS`, `USES`, `DEPENDS_ON`, `OVERRIDES`).
+  - Language-independent `SemanticRelationship` extractor (`CONTAINS`, `CALLS`, `IMPORTS`, `EXPORTS`, `REFERENCES`,
+    `IMPLEMENTS`, `EXTENDS`, `USES`, `DEPENDS_ON`, `OVERRIDES`).
   - Database-decoupled `GraphStore` interface and `InMemoryGraphStore` backend.
   - `KnowledgeGraphBuilder` producing graph nodes (`Repository`, `Directory`, `File`, `Symbol`, `Module`) and edges.
-  - Incremental graph update engine (`updateGraphDelta`) and JSON graph serializer (`exportGraphJson`/`importGraphJson`).
+  - Incremental graph update engine (`updateGraphDelta`) and JSON graph serializer (`exportGraphJson`/
+    `importGraphJson`).
 - **Deliverables:** `@repo-intel/graph` package fully integrated with `@repo-intel/parser` and `@repo-intel/shared`.
 - **Dependencies:** Phase 10, Phase 11, Phase 12.
-- **Acceptance Criteria:** Constructs complete, queryable knowledge graphs and executes incremental graph delta updates under 100ms.
+- **Acceptance Criteria:** Constructs complete, queryable knowledge graphs and executes incremental graph delta updates
+  under 100ms.
 - **Testing:** Unit tests (138/138 passing monorepo-wide) and performance benchmark (`graph.bench.ts`).
 - **Estimated Complexity:** High.
 - **Estimated Time:** 2 days.
@@ -346,7 +407,8 @@ Build high-speed file system discovery, incremental git indexers, Tree-Sitter pa
 ### Phase 14: Multi-Language AST Symbol Extractors (Python, Go, Java)
 
 - **Status:** Completed 🟢
-- **Goal:** Implement AST symbol extractors for Python (`py-extractor.ts`), Go (`go-extractor.ts`), and Java (`java-extractor.ts`).
+- **Goal:** Implement AST symbol extractors for Python (`py-extractor.ts`), Go (`go-extractor.ts`), and Java
+  (`java-extractor.ts`).
 - **Why This Phase Exists:** Expands multi-language coverage to compile-time typed languages.
 - **Features:** Tree-Sitter queries for Go structs/interfaces/functions and Java classes/interfaces/methods.
 - **Tasks:**
@@ -367,25 +429,34 @@ Build high-speed file system discovery, incremental git indexers, Tree-Sitter pa
 
 ### Milestone 3 Goal
 
-Construct the Repository Knowledge Graph (RKG), resolve symbol references across module boundaries, store nodes in KùzuDB embedded graph database, embed code semantics in LanceDB, and implement the hybrid Context Retrieval Engine (CRE).
+Construct the Repository Knowledge Graph (RKG), resolve symbol references across module boundaries, store nodes in
+KùzuDB embedded graph database, embed code semantics in LanceDB, and implement the hybrid Context Retrieval Engine
+(CRE).
 
 ---
 
 ### Phase 15: Graph Enrichment & Cross-Language Resolution
 
 - **Status:** Completed 🟢
-- **Goal:** Perform multi-pass graph enrichment, resolve module and type references across boundaries, attach provenance metadata, and normalize multi-language AST constructs to unified `NormalizedConcept` abstractions.
-- **Why This Phase Exists:** Resolves import specifiers, inheritance chains, and method overrides, and enables unified language-agnostic graph queries.
+- **Goal:** Perform multi-pass graph enrichment, resolve module and type references across boundaries, attach provenance
+  metadata, and normalize multi-language AST constructs to unified `NormalizedConcept` abstractions.
+- **Why This Phase Exists:** Resolves import specifiers, inheritance chains, and method overrides, and enables unified
+  language-agnostic graph queries.
 - **Features:**
   - Language capability registry (`LanguageCapabilityRegistry`).
   - Symbol semantic fingerprints (`generateSymbolFingerprint`) for rename detection and duplicate identification.
   - Decoupled `DefaultModuleResolver` and `DefaultTypeResolver` with `ResolutionCache`.
-  - Multi-pass `GraphEnricher` executing import resolution, method override detection, and graph provenance tracking (`GraphProvenance`).
-  - `CrossLanguageResolver` attaching `concept` properties (`ClassLike`, `FunctionLike`, `InterfaceLike`, `EnumLike`, `ModuleLike`).
-- **Deliverables:** Enriched Repository Knowledge Graph (RKG) with full graph provenance and cross-language semantic concept mappings.
+  - Multi-pass `GraphEnricher` executing import resolution, method override detection, and graph provenance tracking
+    (`GraphProvenance`).
+  - `CrossLanguageResolver` attaching `concept` properties (`ClassLike`, `FunctionLike`, `InterfaceLike`, `EnumLike`,
+    `ModuleLike`).
+- **Deliverables:** Enriched Repository Knowledge Graph (RKG) with full graph provenance and cross-language semantic
+  concept mappings.
 - **Dependencies:** Phase 12, Phase 13, Phase 14.
-- **Acceptance Criteria:** Given an imported symbol call or interface method, resolves exact target declarations and computes `OVERRIDES` edges with $> 0.9$ confidence.
-- **Testing:** Unit tests (172/172 passing monorepo-wide across 44 test files) and enrichment benchmark (`enrichment.bench.ts`).
+- **Acceptance Criteria:** Given an imported symbol call or interface method, resolves exact target declarations and
+  computes `OVERRIDES` edges with $> 0.9$ confidence.
+- **Testing:** Unit tests (172/172 passing monorepo-wide across 44 test files) and enrichment benchmark
+  (`enrichment.bench.ts`).
 - **Risks:** Unresolved dynamic imports or wildcard re-exports (`export * from ...`).
 - **Estimated Complexity:** High.
 - **Estimated Time:** 2.5 days.
@@ -395,20 +466,27 @@ Construct the Repository Knowledge Graph (RKG), resolve symbol references across
 ### Phase 16: Embeddings & Semantic Search Foundation
 
 - **Status:** Completed 🟢
-- **Goal:** Implement the vector embedding pipeline, vector storage abstraction (`VectorStore`), context builder (`ContextBuilder`), incremental embedding engine, hybrid search interfaces, ranking service (`RankingService`), and semantic search engine (`SemanticSearchEngine`) in `@repo-intel/retrieval`.
-- **Why This Phase Exists:** Unifies structural Knowledge Graph semantics with vector similarity search for context retrieval and semantic code discovery.
+- **Goal:** Implement the vector embedding pipeline, vector storage abstraction (`VectorStore`), context builder
+  (`ContextBuilder`), incremental embedding engine, hybrid search interfaces, ranking service (`RankingService`), and
+  semantic search engine (`SemanticSearchEngine`) in `@repo-intel/retrieval`.
+- **Why This Phase Exists:** Unifies structural Knowledge Graph semantics with vector similarity search for context
+  retrieval and semantic code discovery.
 - **Features:**
   - `EmbeddingProvider` abstraction & `MockEmbeddingProvider` (128-d vectors).
   - `ContextBuilder` generating rich semantic text for `Repository`, `File`, `Symbol`, and `Module` graph nodes.
-  - `VectorStore` interface & `InMemoryVectorStore` using cosine similarity math and metadata filtering (`language`, `repositoryId`, `kind`).
+  - `VectorStore` interface & `InMemoryVectorStore` using cosine similarity math and metadata filtering (`language`,
+    `repositoryId`, `kind`).
   - `EmbeddingMetadata` model for vector model migration tracking.
   - `IncrementalEmbeddingEngine` regenerating embeddings only for affected graph entities.
-  - `RankingService` combining vector similarity ($w_v = 0.50$), graph proximity ($w_g = 0.25$), lexical relevance ($w_l = 0.15$), and symbol importance ($w_i = 0.10$).
+  - `RankingService` combining vector similarity ($w_v = 0.50$), graph proximity ($w_g = 0.25$), lexical relevance
+    ($w_l = 0.15$), and symbol importance ($w_i = 0.10$).
   - `SemanticSearchEngine` executing top-k vector searches with score reranking and metadata filtering.
-- **Deliverables:** `@repo-intel/retrieval` package providing vector store abstractions, embedding pipelines, and semantic search engines.
+- **Deliverables:** `@repo-intel/retrieval` package providing vector store abstractions, embedding pipelines, and
+  semantic search engines.
 - **Dependencies:** Phase 13, Phase 14, Phase 15.
 - **Acceptance Criteria:** Executes semantic search queries with sub-100ms search latency and top-k score reranking.
-- **Testing:** Unit tests (184/184 passing monorepo-wide across 56 test files) and embedding benchmark (`embedding.bench.ts`).
+- **Testing:** Unit tests (184/184 passing monorepo-wide across 56 test files) and embedding benchmark
+  (`embedding.bench.ts`).
 - **Risks:** Cycle detection performance on large graphs.
 - **Estimated Complexity:** Medium.
 - **Estimated Time:** 1.5 days.
@@ -418,19 +496,27 @@ Construct the Repository Knowledge Graph (RKG), resolve symbol references across
 ### Phase 17: GraphRAG Retrieval Engine
 
 - **Status:** Completed 🟢
-- **Goal:** Implement the GraphRAG hybrid retrieval engine (`GraphRAGRetrievalEngine`), query intent analyzer (`QueryAnalyzer`), retrieval planner (`DefaultRetrievalPlanner`), multi-hop graph expander (`GraphExpander`), context compressor (`ContextCompressor`), and standardized `RetrievalBundle` payload generator in `@repo-intel/retrieval`.
-- **Why This Phase Exists:** Produces self-contained, budget-constrained context payload bundles (`RetrievalBundle`) for downstream AI review agents.
+- **Goal:** Implement the GraphRAG hybrid retrieval engine (`GraphRAGRetrievalEngine`), query intent analyzer
+  (`QueryAnalyzer`), retrieval planner (`DefaultRetrievalPlanner`), multi-hop graph expander (`GraphExpander`), context
+  compressor (`ContextCompressor`), and standardized `RetrievalBundle` payload generator in `@repo-intel/retrieval`.
+- **Why This Phase Exists:** Produces self-contained, budget-constrained context payload bundles (`RetrievalBundle`) for
+  downstream AI review agents.
 - **Features:**
   - `RetrievalPipeline` interface (`retrieve(query): Promise<RetrievalBundle>`).
-  - `QueryAnalyzer` classifying questions into 8 intent categories (`bug_investigation`, `architecture`, `dependency`, `performance`, `security`, `documentation`, `refactoring`, `general_search`).
+  - `QueryAnalyzer` classifying questions into 8 intent categories (`bug_investigation`, `architecture`, `dependency`,
+    `performance`, `security`, `documentation`, `refactoring`, `general_search`).
   - `DefaultRetrievalPlanner` computing optimal `vectorK`, `maxHops`, expansion strategies, and token budget.
-  - `GraphExpander` executing multi-hop walks over `CALLS`, `IMPORTS`, `EXTENDS`, `IMPLEMENTS`, and `DEPENDS_ON` edges.
+  - `GraphExpander` executing multi-hop walks over `CALLS`, `IMPORTS`, `EXTENDS`, `IMPLEMENTS`, and `DEPENDS_ON`
+    edges.
   - `ContextCompressor` deduplicating entities, merging overlapping nodes, and enforcing token budget pruning.
-  - `RetrievalBundle` standard agent payload containing summary, intent, plan, compressed entities with `EntityRetrievalProvenance`, relationships, file/symbol IDs, evidence text, and `RetrievalMetrics`.
+  - `RetrievalBundle` standard agent payload containing summary, intent, plan, compressed entities with
+    `EntityRetrievalProvenance`, relationships, file/symbol IDs, evidence text, and `RetrievalMetrics`.
 - **Deliverables:** `@repo-intel/retrieval` package producing standardized `RetrievalBundle` payloads for AI agents.
 - **Dependencies:** Phase 13, Phase 14, Phase 15, Phase 16.
-- **Acceptance Criteria:** Executes end-to-end GraphRAG retrieval in $< 500\text{ms}$ returning concise payload subgraphs ($< 2,000$ tokens).
-- **Testing:** Unit tests (194/194 passing monorepo-wide across 66 test files) and retrieval benchmark (`retrieval.bench.ts`).
+- **Acceptance Criteria:** Executes end-to-end GraphRAG retrieval in $< 500\text{ms}$ returning concise payload
+  subgraphs ($< 2,000$ tokens).
+- **Testing:** Unit tests (194/194 passing monorepo-wide across 66 test files) and retrieval benchmark
+  (`retrieval.bench.ts`).
 - **Risks:** Disambiguating overloaded functions or polymorphic method calls.
 - **Estimated Complexity:** High.
 - **Estimated Time:** 2.5 days.
@@ -440,16 +526,28 @@ Construct the Repository Knowledge Graph (RKG), resolve symbol references across
 ### Phase 18: AI Platform Layer (PAL), Multi-Agent Review Engine & CI Modernization
 
 - **Status:** Completed 🟢
-- **Goal:** Implement CI workflow modernization (`.github/workflows/ci.yml`, `codeql.yml`, `dependabot.yml`), AI Platform Layer provider abstraction (`AIProvider`, `ProviderRegistry`, `ModelRegistry`, `PromptTemplateManager`), multi-agent review engine (`AgentOrchestrator` & 6 specialized agents), and patch planning engine (`PatchPlanner`).
-- **Why This Phase Exists:** Stabilizes repository CI quality gates, decouples application logic from specific LLM providers, and orchestrates multi-agent code analysis.
+- **Goal:** Implement CI workflow modernization (`.github/workflows/ci.yml`, `codeql.yml`, `dependabot.yml`), AI
+  Platform Layer provider abstraction (`AIProvider`, `ProviderRegistry`, `ModelRegistry`, `PromptTemplateManager`),
+  multi-agent review engine (`AgentOrchestrator` & 6 specialized agents), and patch planning engine (`PatchPlanner`).
+- **Why This Phase Exists:** Stabilizes repository CI quality gates, decouples application logic from specific LLM
+  providers, and orchestrates multi-agent code analysis.
 - **Features:**
-  - **CI Modernization (Phase 18A):** Support `workflow_dispatch`, Node 22 LTS environment, frozen lockfile verification, composite typechecking, Vitest coverage artifact uploads, CodeQL static security analysis, and Dependabot automated updates.
-  - **AI Platform Layer (Phase 18B):** `AIProvider` interface (`chat`, `stream`, `embeddings`, `health`, `metadata`), `MockAIProvider`, `OpenAIProvider`, `OllamaProvider`, `ProviderRegistry` (health monitoring, dynamic failover chains), `ModelRegistry`, and `PromptTemplateManager`.
-  - **Multi-Agent Review Engine (Phase 18C):** 6 specialized review agents (`ArchitectureAgent`, `BugDetectionAgent`, `PerformanceAgent`, `SecurityAgent`, `CodeQualityAgent`, `DocumentationAgent`) coordinated by `AgentOrchestrator` with parallel execution, 10s timeouts, retries, fallback providers, and finding aggregation.
-  - **Patch Planning Engine (Phase 18D):** `PatchPlanner` constructing structured `PatchPlan` objects (affected files, affected symbols, rationale, estimated complexity, dependency impact, risk score) without source code mutation.
-- **Deliverables:** `@repo-intel/ai`, `@repo-intel/review-engine`, `@repo-intel/patch-gen` packages and modernized `.github/` workflow configurations.
+  - **CI Modernization (Phase 18A):** Support `workflow_dispatch`, Node 22 LTS environment, frozen lockfile
+    verification, composite typechecking, Vitest coverage artifact uploads, CodeQL static security analysis, and
+    Dependabot automated updates.
+  - **AI Platform Layer (Phase 18B):** `AIProvider` interface (`chat`, `stream`, `embeddings`, `health`, `metadata`),
+    `MockAIProvider`, `OpenAIProvider`, `OllamaProvider`, `ProviderRegistry` (health monitoring, dynamic failover
+    chains), `ModelRegistry`, and `PromptTemplateManager`.
+  - **Multi-Agent Review Engine (Phase 18C):** 6 specialized review agents (`ArchitectureAgent`, `BugDetectionAgent`,
+    `PerformanceAgent`, `SecurityAgent`, `CodeQualityAgent`, `DocumentationAgent`) coordinated by `AgentOrchestrator`
+    with parallel execution, 10s timeouts, retries, fallback providers, and finding aggregation.
+  - **Patch Planning Engine (Phase 18D):** `PatchPlanner` constructing structured `PatchPlan` objects (affected files,
+    affected symbols, rationale, estimated complexity, dependency impact, risk score) without source code mutation.
+- **Deliverables:** `@repo-intel/ai`, `@repo-intel/review-engine`, `@repo-intel/patch-gen` packages and modernized
+  `.github/` workflow configurations.
 - **Dependencies:** Phase 16, Phase 17.
-- **Acceptance Criteria:** 100% passing CI build quality gates, complete provider independence, sub-2s parallel multi-agent review execution.
+- **Acceptance Criteria:** 100% passing CI build quality gates, complete provider independence, sub-2s parallel
+  multi-agent review execution.
 - **Testing:** Unit tests (202/202 passing monorepo-wide across 74 test files).
 
 ---
@@ -459,37 +557,63 @@ Construct the Repository Knowledge Graph (RKG), resolve symbol references across
 ### Phase 19: Developer Context Engine, Git Intelligence & Review Session Framework
 
 - **Status:** Completed 🟢
-- **Goal:** Implement the Git Intelligence Layer (`GitProvider`, `LocalGitProvider`, `DiffEngine`), Developer Context Engine (`DeveloperContextEngine`), Review Session Framework (`ReviewSession`, `InMemoryReviewSessionStore`), Prompt Context Builder (`PromptContextBuilder`), Incremental Review Engine (`IncrementalReviewEngine`), and Release Pipeline (`.github/workflows/release.yml`).
-- **Why This Phase Exists:** Combines code diffs, Knowledge Graph subgraphs, and retrieval bundles into unified runtime context objects (`DeveloperContext`) for persistent, scoped, token-budgeted AI review sessions.
+- **Goal:** Implement the Git Intelligence Layer (`GitProvider`, `LocalGitProvider`, `DiffEngine`), Developer Context
+  Engine (`DeveloperContextEngine`), Review Session Framework (`ReviewSession`, `InMemoryReviewSessionStore`), Prompt
+  Context Builder (`PromptContextBuilder`), Incremental Review Engine (`IncrementalReviewEngine`), and Release Pipeline
+  (`.github/workflows/release.yml`).
+- **Why This Phase Exists:** Combines code diffs, Knowledge Graph subgraphs, and retrieval bundles into unified runtime
+  context objects (`DeveloperContext`) for persistent, scoped, token-budgeted AI review sessions.
 - **Features:**
-  - **Git Intelligence (Phase 19A):** `GitProvider` interface, `LocalGitProvider`, and `DiffEngine` parsing raw patches into `StructuredDiff` objects (changed files, changed symbols, added/removed methods, renamed symbols, moved files).
-  - **Developer Context Engine (Phase 19B):** `DeveloperContextEngine` constructing unified `DeveloperContext` objects (changed symbols, impacted symbols, dependencies, affected architecture, related documentation, related tests).
-  - **Review Session Framework (Phase 19C):** `ReviewSession` model and `InMemoryReviewSessionStore` tracking review execution history, participating agents, findings, patch plans, and latency metrics.
-  - **Prompt Context Builder (Phase 19D):** `PromptContextBuilder` assembling formatted, token-budgeted prompt payloads for LLM review agents.
-  - **Incremental Review Strategy (Phase 19E):** `IncrementalReviewEngine` executing scoped incremental AI reviews on affected symbols and 1-hop dependencies when single files/symbols change.
-  - **Release Pipeline (Phase 19F):** `.github/workflows/release.yml` supporting automated release artifacts and changelog generation.
+  - **Git Intelligence (Phase 19A):** `GitProvider` interface, `LocalGitProvider`, and `DiffEngine` parsing raw
+    patches into `StructuredDiff` objects (changed files, changed symbols, added/removed methods, renamed symbols,
+    moved files).
+  - **Developer Context Engine (Phase 19B):** `DeveloperContextEngine` constructing unified `DeveloperContext` objects
+    (changed symbols, impacted symbols, dependencies, affected architecture, related documentation, related tests).
+  - **Review Session Framework (Phase 19C):** `ReviewSession` model and `InMemoryReviewSessionStore` tracking review
+    execution history, participating agents, findings, patch plans, and latency metrics.
+  - **Prompt Context Builder (Phase 19D):** `PromptContextBuilder` assembling formatted, token-budgeted prompt
+    payloads for LLM review agents.
+  - **Incremental Review Strategy (Phase 19E):** `IncrementalReviewEngine` executing scoped incremental AI reviews on
+    affected symbols and 1-hop dependencies when single files/symbols change.
+  - **Release Pipeline (Phase 19F):** `.github/workflows/release.yml` supporting automated release artifacts and
+    changelog generation.
 - **Deliverables:** `@repo-intel/shared` and `@repo-intel/review-engine` packages and release pipeline workflows.
 - **Dependencies:** Phase 17, Phase 18.
-- **Acceptance Criteria:** Executes scoped incremental reviews in $< 5\text{s}$ and parses 50-file diffs into `StructuredDiff` objects in $< 100\text{ms}$.
-- **Testing:** Unit tests (214/214 passing monorepo-wide across 86 test files) and developer context benchmark (`developer-context.bench.ts`).
+- **Acceptance Criteria:** Executes scoped incremental reviews in $< 5\text{s}$ and parses 50-file diffs into
+  `StructuredDiff` objects in $< 100\text{ms}$.
+- **Testing:** Unit tests (214/214 passing monorepo-wide across 86 test files) and developer context benchmark
+  (`developer-context.bench.ts`).
 
 ---
 
 ### Phase 20: Patch Generation Engine, AST Transformation Framework & Validation Pipeline
 
 - **Status:** Completed 🟢
-- **Goal:** Implement the AST Transformation Framework (`ASTTransformation`, `TransformationRegistry`), Refactoring Library (12 core transformations), Language Adapters (TS, Python, Go, Java), Patch Generation Engine (`PatchGenerationEngine`), Validation Pipeline (`PatchValidationPipeline`), and Explanation Engine (`PatchExplanationEngine`) in `@repo-intel/patch-gen`.
-- **Why This Phase Exists:** Enables non-destructive, in-memory simulation of AST refactorings, multi-factor safety scoring, and explainable patch generation.
+- **Goal:** Implement the AST Transformation Framework (`ASTTransformation`, `TransformationRegistry`), Refactoring
+  Library (12 core transformations), Language Adapters (TS, Python, Go, Java), Patch Generation Engine
+  (`PatchGenerationEngine`), Validation Pipeline (`PatchValidationPipeline`), and Explanation Engine
+  (`PatchExplanationEngine`) in `@repo-intel/patch-gen`.
+- **Why This Phase Exists:** Enables non-destructive, in-memory simulation of AST refactorings, multi-factor safety
+  scoring, and explainable patch generation.
 - **Features:**
-  - **AST Transformation Framework (Phase 20A):** `ASTTransformation` interface (`apply()`, `validate()`, `rollback()`) and `TransformationRegistry`.
-  - **Refactoring Library & Adapters (Phase 20B):** 12 core transformations (`RenameSymbol`, `RenameFile`, `ExtractMethod`, `InlineMethod`, `MoveFunction`, `InsertImport`, `RemoveImport`, `UpdateSignature`, `ChangeVisibility`, `ReplaceExpression`, `AddDocumentation`, `RemoveDeadCode`) and language adapters for TS, Py, Go, Java.
-  - **Patch Generation & Simulation (Phase 20C):** `PatchGenerationEngine` performing non-destructive in-memory simulation (AST -> Transform -> Validate -> Print -> Unified Diff) producing `PatchCandidate` objects.
-  - **Validation Pipeline (Phase 20D):** `PatchValidationPipeline` running syntax/AST checks, lint rules, type safety checks, and computing multi-factor patch scores.
-  - **Explainable Patch Engine (Phase 20E):** `PatchExplanationEngine` producing structured explainable patch descriptions (problem summary, rationale, affected files/symbols, expected behavior, risks, verification steps).
+  - **AST Transformation Framework (Phase 20A):** `ASTTransformation` interface (`apply()`, `validate()`,
+    `rollback()`) and `TransformationRegistry`.
+  - **Refactoring Library & Adapters (Phase 20B):** 12 core transformations (`RenameSymbol`, `RenameFile`,
+    `ExtractMethod`, `InlineMethod`, `MoveFunction`, `InsertImport`, `RemoveImport`, `UpdateSignature`,
+    `ChangeVisibility`, `ReplaceExpression`, `AddDocumentation`, `RemoveDeadCode`) and language adapters for TS, Py,
+    Go, Java.
+  - **Patch Generation & Simulation (Phase 20C):** `PatchGenerationEngine` performing non-destructive in-memory
+    simulation (AST -> Transform -> Validate -> Print -> Unified Diff) producing `PatchCandidate` objects.
+  - **Validation Pipeline (Phase 20D):** `PatchValidationPipeline` running syntax/AST checks, lint rules, type safety
+    checks, and computing multi-factor patch scores.
+  - **Explainable Patch Engine (Phase 20E):** `PatchExplanationEngine` producing structured explainable patch
+    descriptions (problem summary, rationale, affected files/symbols, expected behavior, risks, verification steps).
 - **Deliverables:** `@repo-intel/shared` and `@repo-intel/patch-gen` packages.
 - **Dependencies:** Phase 18, Phase 19.
-- **Acceptance Criteria:** Executes non-destructive patch generation in $< 100\text{ms}$ and passes 100% of validation pipeline quality gates.
-- **Testing:** Unit tests (230/230 passing monorepo-wide across 96 test files) and patch generation benchmark (`patch-generation.bench.ts`).
+- **Acceptance Criteria:** Executes non-destructive patch generation in $< 100\text{ms}$ and passes 100% of validation
+  pipeline quality gates.
+- **Testing:** Unit tests (230/230 passing monorepo-wide across 96 test files) and patch generation benchmark
+  (`patch-generation.bench.ts`).
 
 ---
 
@@ -497,32 +621,47 @@ Construct the Repository Knowledge Graph (RKG), resolve symbol references across
 
 ### Milestone 4 Goal
 
-Build the AI Provider Abstraction Layer (PAL), implement adapters for cloud LLMs (OpenAI, Claude, Gemini) and local models (Ollama, vLLM), build token-pruned prompt templates, and enforce structured JSON response parsing.
+Build the AI Provider Abstraction Layer (PAL), implement adapters for cloud LLMs (OpenAI, Claude, Gemini) and local
+models (Ollama, vLLM), build token-pruned prompt templates, and enforce structured JSON response parsing.
 
 ---
 
 ### Phase 21: Platform Runtime, Workflow Engine & Internal Service Layer
 
 - **Status:** Completed 🟢
-- **Goal:** Implement the Platform Runtime (`PlatformRuntime`, `DefaultPlatformRuntime`), Internal Service Layer (`RepositoryService`, `ReviewService`, `RetrievalService`, `PatchService`, `SessionService`, `GraphService`, `AIService`), Workflow Engine (`WorkflowEngine`), Typed Event Bus (`TypedEventBus`), Job Queue (`InMemoryJobQueue`), and Observability Manager (`ObservabilityManager`) in `services/api`.
-- **Why This Phase Exists:** Coordinates all platform services under a single runtime lifecycle, exposes high-level domain contracts, and enables deterministic stage workflows and typed pub/sub event channels.
+- **Goal:** Implement the Platform Runtime (`PlatformRuntime`, `DefaultPlatformRuntime`), Internal Service Layer
+  (`RepositoryService`, `ReviewService`, `RetrievalService`, `PatchService`, `SessionService`, `GraphService`,
+  `AIService`), Workflow Engine (`WorkflowEngine`), Typed Event Bus (`TypedEventBus`), Job Queue (`InMemoryJobQueue`),
+  and Observability Manager (`ObservabilityManager`) in `services/api`.
+- **Why This Phase Exists:** Coordinates all platform services under a single runtime lifecycle, exposes high-level
+  domain contracts, and enables deterministic stage workflows and typed pub/sub event channels.
 - **Features:**
-  - **Platform Runtime (Phase 21A):** `PlatformRuntime` interface (`initialize()`, `shutdown()`, `health()`, `execute()`) and dependency wiring.
-  - **Internal Service Layer (Phase 21B):** High-level domain services (`DefaultRepositoryService`, `DefaultReviewService`, `DefaultRetrievalService`, `DefaultPatchService`, `DefaultSessionService`, `DefaultGraphService`, `DefaultAIService`).
-  - **Workflow Engine (Phase 21C):** `DefaultWorkflowEngine` executing stage-gated `review`, `patch`, and `index` workflows with cancellation and execution logging.
-  - **Typed Event Bus (Phase 21D):** `TypedEventBus` supporting typed events (`RepositoryIndexed`, `GraphUpdated`, `ReviewStarted`, `ReviewCompleted`, `PatchGenerated`, `PatchValidated`, `SessionClosed`).
-  - **Job Queue Abstraction (Phase 21E):** `InMemoryJobQueue` supporting async background job execution, retries, and status tracking.
-  - **Observability Manager (Phase 21F):** `ObservabilityManager` handling structured JSON logging, correlation IDs, execution metrics, and diagnostics.
+  - **Platform Runtime (Phase 21A):** `PlatformRuntime` interface (`initialize()`, `shutdown()`, `health()`,
+    `execute()`) and dependency wiring.
+  - **Internal Service Layer (Phase 21B):** High-level domain services (`DefaultRepositoryService`,
+    `DefaultReviewService`, `DefaultRetrievalService`, `DefaultPatchService`, `DefaultSessionService`,
+    `DefaultGraphService`, `DefaultAIService`).
+  - **Workflow Engine (Phase 21C):** `DefaultWorkflowEngine` executing stage-gated `review`, `patch`, and `index`
+    workflows with cancellation and execution logging.
+  - **Typed Event Bus (Phase 21D):** `TypedEventBus` supporting typed events (`RepositoryIndexed`, `GraphUpdated`,
+    `ReviewStarted`, `ReviewCompleted`, `PatchGenerated`, `PatchValidated`, `SessionClosed`).
+  - **Job Queue Abstraction (Phase 21E):** `InMemoryJobQueue` supporting async background job execution, retries, and
+    status tracking.
+  - **Observability Manager (Phase 21F):** `ObservabilityManager` handling structured JSON logging, correlation IDs,
+    execution metrics, and diagnostics.
 - **Deliverables:** `services/api` and `@repo-intel/shared` packages.
 - **Dependencies:** Phase 18, Phase 19, Phase 20.
-- **Acceptance Criteria:** Emits health status in $< 10\text{ms}$, dispatches 500 events in $< 200\text{ms}$, and passes 100% of runtime quality gates.
-- **Testing:** Unit tests (240/240 passing monorepo-wide across 106 test files) and platform runtime benchmark (`platform-runtime.bench.ts`).
+- **Acceptance Criteria:** Emits health status in $< 10\text{ms}$, dispatches 500 events in $< 200\text{ms}$, and passes
+  100% of runtime quality gates.
+- **Testing:** Unit tests (240/240 passing monorepo-wide across 106 test files) and platform runtime benchmark
+  (`platform-runtime.bench.ts`).
 
 ---
 
 ### Phase 22: OpenAI & Anthropic Claude Model Adapters
 
-- **Goal:** Build production adapters for OpenAI (GPT-4o) and Anthropic (Claude 3.5 Sonnet) in `packages/ai/src/providers/`.
+- **Goal:** Build production adapters for OpenAI (GPT-4o) and Anthropic (Claude 3.5 Sonnet) in
+  `packages/ai/src/providers/`.
 - **Why This Phase Exists:** Provides cloud LLM integration for high-accuracy code reviews.
 - **Features:** OpenAI adapter (`openai-adapter.ts`) and Claude adapter (`claude-adapter.ts`).
 - **Tasks:**
@@ -532,7 +671,8 @@ Build the AI Provider Abstraction Layer (PAL), implement adapters for cloud LLMs
   - Handle API authentication keys and zero-data-retention header flags.
 - **Deliverables:** Working OpenAI and Anthropic Claude provider adapters.
 - **Dependencies:** Phase 21.
-- **Acceptance Criteria:** Adapters successfully send prompts and return structured text completions from OpenAI and Anthropic APIs.
+- **Acceptance Criteria:** Adapters successfully send prompts and return structured text completions from OpenAI and
+  Anthropic APIs.
 - **Testing:**
   - _Integration Tests:_ Mock HTTP responses for OpenAI and Claude API endpoints asserting payload parsing.
 - **Risks:** Vendor API schema changes or network latency timeouts.
@@ -544,7 +684,8 @@ Build the AI Provider Abstraction Layer (PAL), implement adapters for cloud LLMs
 ### Phase 23: Local Air-Gapped Model Adapters (Ollama & vLLM)
 
 - **Goal:** Build privacy-first adapters for local runners in `packages/ai/src/providers/`.
-- **Why This Phase Exists:** Enables 100% offline, air-gapped security analysis where source code never leaves internal networks.
+- **Why This Phase Exists:** Enables 100% offline, air-gapped security analysis where source code never leaves internal
+  networks.
 - **Features:** Ollama adapter (`ollama-adapter.ts`) and vLLM adapter (`vllm-adapter.ts`).
 - **Tasks:**
   - Implement `OllamaAdapter` connecting to `http://localhost:11434`.
@@ -552,7 +693,8 @@ Build the AI Provider Abstraction Layer (PAL), implement adapters for cloud LLMs
   - Handle local runner connection failure errors gracefully.
 - **Deliverables:** Functional local model provider adapters.
 - **Dependencies:** Phase 21.
-- **Acceptance Criteria:** Executes code analysis prompts offline via local Ollama/vLLM instances without external network calls.
+- **Acceptance Criteria:** Executes code analysis prompts offline via local Ollama/vLLM instances without external
+  network calls.
 - **Testing:**
   - _Integration Tests:_ Test local HTTP mock server simulating Ollama JSON completions.
 - **Risks:** Slow token generation speeds on non-GPU local machines.
@@ -569,10 +711,12 @@ Build the AI Provider Abstraction Layer (PAL), implement adapters for cloud LLMs
 - **Tasks:**
   - Implement leaky-bucket rate limiter enforcing RPM/TPM limits per provider.
   - Build exponential backoff retry wrapper for 5xx/429 HTTP status codes.
-  - Build failover router executing secondary fallback providers (e.g., Local vLLM $\rightarrow$ Claude 3.5 Sonnet $\rightarrow$ GPT-4o).
+  - Build failover router executing secondary fallback providers (e.g., Local vLLM $\rightarrow$ Claude 3.5
+    Sonnet $\rightarrow$ GPT-4o).
 - **Deliverables:** Resilient Provider Router handling retries and failovers transparently.
 - **Dependencies:** Phase 22, Phase 23.
-- **Acceptance Criteria:** Automatically retries 3 times on 429 rate limit error, then successfully fails over to secondary provider.
+- **Acceptance Criteria:** Automatically retries 3 times on 429 rate limit error, then successfully fails over to
+  secondary provider.
 - **Testing:**
   - _Unit Tests:_ Test mock primary provider failure triggering secondary provider execution.
 - **Risks:** Cascading timeouts across multiple failing providers in the fallback chain.
@@ -604,7 +748,8 @@ Build the AI Provider Abstraction Layer (PAL), implement adapters for cloud LLMs
 ### Phase 26: Structured JSON Response Validator & Schema Parser
 
 - **Goal:** Implement strict JSON response validation for model outputs in `packages/ai/src/parser/`.
-- **Why This Phase Exists:** Model output MUST strictly conform to the `ExplainableFinding` JSON schema before processing.
+- **Why This Phase Exists:** Model output MUST strictly conform to the `ExplainableFinding` JSON schema before
+  processing.
 - **Features:** JSON extractor, markdown fence stripper, and Zod finding schema validator.
 - **Tasks:**
   - Implement JSON extractor stripping markdown code fences (` ```json ... ``` `).
@@ -625,14 +770,16 @@ Build the AI Provider Abstraction Layer (PAL), implement adapters for cloud LLMs
 
 ### Milestone 5 Goal
 
-Build the specialized Multi-Agent Review Framework (Syntax, Logic, Security, Performance, Architecture), risk calculator, and unified patch auto-fix engine.
+Build the specialized Multi-Agent Review Framework (Syntax, Logic, Security, Performance, Architecture), risk
+calculator, and unified patch auto-fix engine.
 
 ---
 
 ### Phase 27: Explainable Review Finding Data Engine
 
 - **Goal:** Build finding data aggregator and deduplicator in `packages/review-engine/src/aggregator/`.
-- **Why This Phase Exists:** Raw findings from multiple agents must be aggregated, deduplicated, and formatted consistently.
+- **Why This Phase Exists:** Raw findings from multiple agents must be aggregated, deduplicated, and formatted
+  consistently.
 - **Features:** Finding aggregator, line-level deduplicator, and severity ranker.
 - **Tasks:**
   - Create finding aggregator collecting results from specialized agents.
@@ -700,7 +847,8 @@ Build the specialized Multi-Agent Review Framework (Syntax, Logic, Security, Per
   - Emit findings with severity `CRITICAL` for exposed credentials or unsanitized queries.
 - **Deliverables:** Security & Vulnerability Analysis Agent.
 - **Dependencies:** Phase 28.
-- **Acceptance Criteria:** Detects hardcoded secrets and un-parameterized raw SQL query strings with 100% recall on test samples.
+- **Acceptance Criteria:** Detects hardcoded secrets and un-parameterized raw SQL query strings with 100% recall on test
+  samples.
 - **Testing:**
   - _Unit Tests:_ Run security agent on files containing dummy AWS keys and raw SQL concatenations.
 - **Risks:** False positives on dummy test keys or benign string literals.
@@ -732,7 +880,8 @@ Build the specialized Multi-Agent Review Framework (Syntax, Logic, Security, Per
 ### Phase 32: Architectural Layer Violation Agent
 
 - **Goal:** Build Architecture Review Agent in `packages/agents/src/architecture-agent.ts`.
-- **Why This Phase Exists:** Enforces architectural boundary rules (e.g., database layers importing UI React components).
+- **Why This Phase Exists:** Enforces architectural boundary rules (e.g., database layers importing UI React
+  components).
 - **Features:** ArchitectureAgent class inspecting module dependency graphs for layer leaks.
 - **Tasks:**
   - Create `ArchitectureAgent`.
@@ -752,15 +901,18 @@ Build the specialized Multi-Agent Review Framework (Syntax, Logic, Security, Per
 ### Phase 33: Regression Risk Calculator & Change Impact Engine
 
 - **Goal:** Build Change Impact Risk Analysis Engine in `packages/review-engine/src/risk/`.
-- **Why This Phase Exists:** Calculates quantitative regression risk scores based on downstream call counts and test coverage.
-- **Features:** Risk Calculator implementing formula $\text{Risk Score} = w_1 \cdot (\text{Callers}) + w_2 \cdot (\text{Criticality}) + w_3 \cdot (1 - \text{Coverage})$.
+- **Why This Phase Exists:** Calculates quantitative regression risk scores based on downstream call counts and test
+  coverage.
+- **Features:** Risk Calculator implementing
+  formula $\text{Risk Score} = w_1 \cdot (\text{Callers}) + w_2 \cdot (\text{Criticality}) + w_3 \cdot (1 - \text{Coverage})$.
 - **Tasks:**
   - Implement downstream caller count calculator from RKG call graph.
   - Implement test coverage edge reader (`TESTED_BY`).
   - Calculate numerical risk score ($0.0 - 1.0$) and assign risk badges (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`).
 - **Deliverables:** Regression Risk Calculator module.
 - **Dependencies:** Phase 17, Phase 27.
-- **Acceptance Criteria:** Correctly assigns `CRITICAL` risk rating to changes modifying functions with $> 10$ callers and 0 unit tests.
+- **Acceptance Criteria:** Correctly assigns `CRITICAL` risk rating to changes modifying functions with $> 10$ callers
+  and 0 unit tests.
 - **Testing:**
   - _Unit Tests:_ Assert risk score output across various caller count and test coverage combinations.
 - **Risks:** Inaccurate weight constants skewing overall risk scores.
@@ -772,7 +924,8 @@ Build the specialized Multi-Agent Review Framework (Syntax, Logic, Security, Per
 ### Phase 34: Unified Patch Generator & Auto-Fix Framework
 
 - **Goal:** Implement `.patch` generator in `packages/patch-gen/src/patch-generator.ts`.
-- **Why This Phase Exists:** Converts suggested fixes into standard unified diff patches that can be applied with one click.
+- **Why This Phase Exists:** Converts suggested fixes into standard unified diff patches that can be applied with one
+  click.
 - **Features:** Unified diff generator, patch formatter, and diff validator.
 - **Tasks:**
   - Create `packages/patch-gen/`.
@@ -794,7 +947,8 @@ Build the specialized Multi-Agent Review Framework (Syntax, Logic, Security, Per
 
 ### Milestone 6 Goal
 
-Deliver CLI tool (`repo-intel`), Next.js Web Dashboard with 3D Graph Visualizer, VS Code Extension, GitHub PR Bot integration, Repository Memory, RBAC security, performance optimization, and production release hardening.
+Deliver CLI tool (`repo-intel`), Next.js Web Dashboard with 3D Graph Visualizer, VS Code Extension, GitHub PR Bot
+integration, Repository Memory, RBAC security, performance optimization, and production release hardening.
 
 ---
 
@@ -802,7 +956,8 @@ Deliver CLI tool (`repo-intel`), Next.js Web Dashboard with 3D Graph Visualizer,
 
 - **Goal:** Build the terminal CLI tool in `apps/cli/`.
 - **Why This Phase Exists:** Allows developers to run local reviews and graph scans directly from their terminal.
-- **Features:** Commander.js CLI framework, terminal table formatter, and commands (`init`, `review`, `analyze`, `graph`).
+- **Features:** Commander.js CLI framework, terminal table formatter, and commands (`init`, `review`, `analyze`,
+  `graph`).
 - **Tasks:**
   - Setup CLI entrypoint in `apps/cli/src/index.ts` using `commander`.
   - Implement `repo-intel init` command initializing local repo config.
@@ -810,7 +965,8 @@ Deliver CLI tool (`repo-intel`), Next.js Web Dashboard with 3D Graph Visualizer,
   - Format output in terminal using chalk and cli-table with line numbers and patch hints.
 - **Deliverables:** Runnable `repo-intel` CLI binary.
 - **Dependencies:** Phase 20, Phase 24, Phase 34.
-- **Acceptance Criteria:** `repo-intel review --staged` runs local review on staged files and outputs structured findings in terminal under 20 seconds.
+- **Acceptance Criteria:** `repo-intel review --staged` runs local review on staged files and outputs structured
+  findings in terminal under 20 seconds.
 - **Testing:**
   - _Integration Tests:_ Execute CLI commands against sample git repositories.
 - **Risks:** Terminal formatting rendering incorrectly across different shell environments.
@@ -822,8 +978,10 @@ Deliver CLI tool (`repo-intel`), Next.js Web Dashboard with 3D Graph Visualizer,
 ### Phase 36: Web Dashboard & 3D Knowledge Graph Visualizer
 
 - **Goal:** Build Next.js Dashboard components and Cytoscape.js/Three.js graph viewer in `apps/web/`.
-- **Why This Phase Exists:** Provides visual exploration of repository architecture health, risk scores, and dependency graphs.
-- **Features:** Findings explorer table, risk matrix badges, interactive 3D node graph visualizer, and provider settings panel.
+- **Why This Phase Exists:** Provides visual exploration of repository architecture health, risk scores, and dependency
+  graphs.
+- **Features:** Findings explorer table, risk matrix badges, interactive 3D node graph visualizer, and provider settings
+  panel.
 - **Tasks:**
   - Build Review Findings Explorer view (`apps/web/src/app/findings/`).
   - Integrate Cytoscape.js / 3D Force Graph library in `apps/web/src/components/GraphVisualizer.tsx`.
@@ -831,7 +989,8 @@ Deliver CLI tool (`repo-intel`), Next.js Web Dashboard with 3D Graph Visualizer,
   - Build Provider Configuration management UI.
 - **Deliverables:** Complete Next.js Web Application interface.
 - **Dependencies:** Phase 05, Phase 06, Phase 34.
-- **Acceptance Criteria:** Renders interactive node graph showing files, symbols, and call edges; allows filtering findings by severity.
+- **Acceptance Criteria:** Renders interactive node graph showing files, symbols, and call edges; allows filtering
+  findings by severity.
 - **Testing:**
   - _Manual Testing:_ Test web UI layout, graph node dragging, and finding filtering in Chrome.
 - **Risks:** Browser canvas performance degradation when rendering $> 5,000$ graph nodes.
@@ -843,8 +1002,10 @@ Deliver CLI tool (`repo-intel`), Next.js Web Dashboard with 3D Graph Visualizer,
 ### Phase 37: VS Code Extension Client & LSP Integration
 
 - **Goal:** Build VS Code extension in `apps/vscode/`.
-- **Why This Phase Exists:** Delivers real-time inline review highlights, hover tooltips, and quick-fix patch actions directly in editor.
-- **Features:** VS Code extension entrypoint, inline wavy underline decorations, hover diagnostic provider, and quick-fix code actions.
+- **Why This Phase Exists:** Delivers real-time inline review highlights, hover tooltips, and quick-fix patch actions
+  directly in editor.
+- **Features:** VS Code extension entrypoint, inline wavy underline decorations, hover diagnostic provider, and
+  quick-fix code actions.
 - **Tasks:**
   - Initialize VS Code extension project in `apps/vscode/`.
   - Register diagnostic collection rendering inline squiggly underlines on findings.
@@ -852,7 +1013,8 @@ Deliver CLI tool (`repo-intel`), Next.js Web Dashboard with 3D Graph Visualizer,
   - Implement CodeActionProvider adding "Apply Auto-Fix Patch" lightbulb action.
 - **Deliverables:** Packaged `.vsix` extension for VS Code.
 - **Dependencies:** Phase 34, Phase 35.
-- **Acceptance Criteria:** Extension displays inline review decorations on open files and applies patch fixes via quick-fix action.
+- **Acceptance Criteria:** Extension displays inline review decorations on open files and applies patch fixes via
+  quick-fix action.
 - **Testing:**
   - _Manual Testing:_ Launch VS Code Extension Development Host and test inline highlights and code actions.
 - **Risks:** VS Code Extension API context lifecycle memory leaks.
@@ -865,7 +1027,8 @@ Deliver CLI tool (`repo-intel`), Next.js Web Dashboard with 3D Graph Visualizer,
 
 - **Goal:** Build GitHub PR Bot integration in `services/pr-bot/`.
 - **Why This Phase Exists:** Automates code review workflows on remote Pull Requests.
-- **Features:** GitHub Webhook listener (`pull_request.opened`, `synchronize`), Octokit REST integration, and inline PR comment poster.
+- **Features:** GitHub Webhook listener (`pull_request.opened`, `synchronize`), Octokit REST integration, and inline PR
+  comment poster.
 - **Tasks:**
   - Create GitHub App webhook service in `services/pr-bot/`.
   - Parse incoming GitHub pull request diff payloads.
@@ -886,7 +1049,8 @@ Deliver CLI tool (`repo-intel`), Next.js Web Dashboard with 3D Graph Visualizer,
 ### Phase 39: Repository Memory & Learning Engine
 
 - **Goal:** Implement Repository Memory and convention learning in `packages/review-engine/src/memory/`.
-- **Why This Phase Exists:** Prevents re-flagging user-dismissed false positives and learns codebase-specific conventions over time.
+- **Why This Phase Exists:** Prevents re-flagging user-dismissed false positives and learns codebase-specific
+  conventions over time.
 - **Features:** Ignored findings persistence, rule embedding store, and historical review comparison.
 - **Tasks:**
   - Create `RepositoryMemory` database table storing dismissed findings.
@@ -905,16 +1069,19 @@ Deliver CLI tool (`repo-intel`), Next.js Web Dashboard with 3D Graph Visualizer,
 
 ### Phase 40: Authentication, RBAC & Multi-Tenant Workspace Isolation
 
-- **Goal:** Implement enterprise authentication, role-based access control, and workspace isolation in `services/api/src/auth/`.
+- **Goal:** Implement enterprise authentication, role-based access control, and workspace isolation in
+  `services/api/src/auth/`.
 - **Why This Phase Exists:** Secures API endpoints and isolates multi-tenant data in enterprise cloud deployments.
-- **Features:** JWT authentication, OAuth2 SSO integration, RBAC middleware (`Admin`, `Architect`, `Developer`), and tenant isolation filters.
+- **Features:** JWT authentication, OAuth2 SSO integration, RBAC middleware (`Admin`, `Architect`, `Developer`), and
+  tenant isolation filters.
 - **Tasks:**
   - Implement JWT authentication strategy and middleware in Fastify API service.
   - Add RBAC role checks to protected API endpoints.
   - Enforce `workspace_id` tenant filters on graph queries and database records.
 - **Deliverables:** Secure, authenticated API Gateway.
 - **Dependencies:** Phase 05, Phase 36.
-- **Acceptance Criteria:** Unauthenticated requests receive 401 Unauthorized; users cannot access graph data belonging to other workspaces.
+- **Acceptance Criteria:** Unauthenticated requests receive 401 Unauthorized; users cannot access graph data belonging
+  to other workspaces.
 - **Testing:**
   - _Integration Tests:_ Test API calls with valid/invalid JWT tokens and cross-tenant workspace IDs.
 - **Risks:** Security vulnerabilities in custom auth middleware.
@@ -926,7 +1093,8 @@ Deliver CLI tool (`repo-intel`), Next.js Web Dashboard with 3D Graph Visualizer,
 ### Phase 41: Performance Benchmarking & Distributed Worker Scaling
 
 - **Goal:** Benchmark indexing performance and implement background worker queue handling in `services/indexing/`.
-- **Why This Phase Exists:** Ensures system indexes 100,000 LOC repositories under 45 seconds and handles concurrent PR reviews.
+- **Why This Phase Exists:** Ensures system indexes 100,000 LOC repositories under 45 seconds and handles concurrent PR
+  reviews.
 - **Features:** Distributed BullMQ job queue for indexing tasks, memory optimization, and benchmark suite.
 - **Tasks:**
   - Implement Redis-backed BullMQ job queue in `services/indexing/`.
@@ -935,7 +1103,8 @@ Deliver CLI tool (`repo-intel`), Next.js Web Dashboard with 3D Graph Visualizer,
   - Optimize graph batch insertion parameters.
 - **Deliverables:** High-throughput, distributed indexing service.
 - **Dependencies:** Phase 18, Phase 35.
-- **Acceptance Criteria:** Indexes a 100,000 LOC repository in $< 45\text{s}$; handles 50 concurrent PR review queue tasks smoothly.
+- **Acceptance Criteria:** Indexes a 100,000 LOC repository in $< 45\text{s}$; handles 50 concurrent PR review queue
+  tasks smoothly.
 - **Testing:**
   - _Performance Tests:_ Run load test suite measuring indexing duration, memory footprint, and token latency.
 - **Risks:** Memory starvation during concurrent AST parsing of large repositories.
@@ -946,9 +1115,11 @@ Deliver CLI tool (`repo-intel`), Next.js Web Dashboard with 3D Graph Visualizer,
 
 ### Phase 42: Production Security Audit, Hardening & Release Packaging
 
-- **Goal:** Perform final security hardening, secret sanitization verification, containerization, and production release packaging.
+- **Goal:** Perform final security hardening, secret sanitization verification, containerization, and production release
+  packaging.
 - **Why This Phase Exists:** Prepares platform for enterprise deployment and air-gapped production usage.
-- **Features:** Production Dockerfile builds, security audit verification, zero data retention header verification, and release documentation.
+- **Features:** Production Dockerfile builds, security audit verification, zero data retention header verification, and
+  release documentation.
 - **Tasks:**
   - Build optimized multi-stage production `Dockerfile` images for API, Web, and Worker services.
   - Verify 100% offline air-gapped execution mode with zero external network leaks.
@@ -956,7 +1127,8 @@ Deliver CLI tool (`repo-intel`), Next.js Web Dashboard with 3D Graph Visualizer,
   - Finalize deployment guides, API specifications, and operator documentation.
 - **Deliverables:** Production-ready container images, packages, and deployment documentation.
 - **Dependencies:** All previous phases (Phases 01 - 41).
-- **Acceptance Criteria:** Production Docker containers launch cleanly; air-gapped security validation passes with 0 external network requests; all automated tests pass.
+- **Acceptance Criteria:** Production Docker containers launch cleanly; air-gapped security validation passes with 0
+  external network requests; all automated tests pass.
 - **Testing:**
   - _E2E / Security Tests:_ Run full end-to-end review lifecycle in an air-gapped network environment.
 - **Risks:** None.
@@ -1016,13 +1188,13 @@ Deliver CLI tool (`repo-intel`), Next.js Web Dashboard with 3D Graph Visualizer,
 | **32** | Architectural Layer Violation Agent                      | Milestone 5 | ✅ Completed |
 | **33** | Regression Risk Calculator & Change Impact Engine        | Milestone 5 | ✅ Completed |
 | **34** | Unified Patch Generator & Auto-Fix Framework             | Milestone 5 | ✅ Completed |
-| **35** | Command Line Interface (`repo-intel` CLI)                | Milestone 6 |  ☐ Planned   |
+| **35** | Command Line Interface (`repo-intel` CLI)                | Milestone 6 | ✅ Completed |
 | **36** | Web Dashboard & 3D Knowledge Graph Visualizer            | Milestone 6 | ✅ Completed |
-| **37** | VS Code Extension Client & LSP Integration               | Milestone 6 |  ☐ Planned   |
-| **38** | GitHub App & PR Bot Webhook Handler                      | Milestone 6 |  ☐ Planned   |
-| **39** | Repository Memory & Learning Engine                      | Milestone 6 |  ☐ Planned   |
-| **40** | Authentication, RBAC & Multi-Tenant Isolation            | Milestone 6 |  ☐ Planned   |
-| **41** | Performance Benchmarking & Distributed Scaling           | Milestone 6 |  ☐ Planned   |
-| **42** | Production Security Audit & Release Hardening            | Milestone 6 |  ☐ Planned   |
+| **37** | VS Code Extension Client & LSP Integration               | Milestone 6 | ✅ Completed |
+| **38** | GitHub App & PR Bot Webhook Handler                      | Milestone 6 | ✅ Completed |
+| **39** | Repository Memory & Learning Engine                      | Milestone 6 | ✅ Completed |
+| **40** | Authentication, RBAC & Multi-Tenant Isolation            | Milestone 6 | ✅ Completed |
+| **41** | Performance Benchmarking & Distributed Scaling           | Milestone 6 | ✅ Completed |
+| **42** | Production Security Audit & Release Hardening            | Milestone 6 | ✅ Completed |
 
 _Status Legend:_ `☐ Planned` | `🔄 In Progress` | `✅ Completed` | `⛔ Blocked`

@@ -1,13 +1,15 @@
 # Project Memory (`memory.md`)
 
-This file is the **living state file** and **persistent engineering memory** for the Repository Intelligence & Code Review Platform project. It is continuously updated after every development task to ensure continuity across sessions for both human developers and AI assistants.
+This file is the **living state file** and **persistent engineering memory** for the Repository Intelligence & Code
+Review Platform project. It is continuously updated after every development task to ensure continuity across sessions
+for both human developers and AI assistants.
 
 ---
 
 ## Project Status
 
 | Metric                | Status / Value                                                 |
-| :-------------------- | :------------------------------------------------------------- |
+|:----------------------|:---------------------------------------------------------------|
 | **Version**           | `v0.1.0-beta` (Milestone 5 Complete 🟢)                        |
 | **Current Milestone** | Milestone 5: Multi-Agent Review Engine & Auto-Fix Framework ✅ |
 | **Current Phase**     | Phase 34: Unified Patch Generator & Auto-Fix Framework ✅      |
@@ -29,236 +31,337 @@ This file is the **living state file** and **persistent engineering memory** for
 
 #### Objectives Achieved A
 
-1. **Integration Audit Report:** Completed monorepo audit verifying zero broken APIs, zero dead code, and full integration of mature backend engines (`@repo-intel/shared`, `@repo-intel/parser`, `@repo-intel/graph`, `@repo-intel/retrieval`, `@repo-intel/ai`, `@repo-intel/review-engine`, `@repo-intel/patch-gen`, `DefaultPlatformRuntime`).
-2. **Live Web UI API Connection (`apps/web`):** Connected all Next.js React components (`RepositoryDashboard`, `ReviewRunner`, `FindingsExplorer`, `PatchPreviewer`, `RepoChat`, `GraphViewer`, `ProviderSelector`, `SettingsPage`, `SetupWizard`) to live Fastify API Gateway endpoints (`http://localhost:3000/api/v1`).
-3. **REST API Gateway Verification (`services/api`):** Validated REST endpoints (`/repositories/status`, `/repositories/scan`, `/review/run`, `/providers`, `/providers/switch`, `/chat/query`, `/patches/generate`, `/graph/nodes`) in [`api-gateway.test.ts`](file:///d:/Coding/zoro/services/api/src/e2e/api-gateway.test.ts).
-4. **CLI Tool Verification (`apps/cli`):** Verified `repo-intel` terminal commands (`scan`, `review`, `chat`, `patch`, `graph`, `providers`).
-5. **Ollama & OpenAI Verification:** Verified local Ollama model discovery (`llama3`, `qwen`, `mistral`, `deepseek`, `codellama`, `phi`), SSE streaming, and automatic failover.
-6. **Documentation Suite:** Authored [`USER_GUIDE.md`](file:///d:/Coding/zoro/USER_GUIDE.md), [`API.md`](file:///d:/Coding/zoro/API.md), [`CLI.md`](file:///d:/Coding/zoro/CLI.md), [`KNOWN_ISSUES.md`](file:///d:/Coding/zoro/KNOWN_ISSUES.md), and updated [`README.md`](file:///d:/Coding/zoro/README.md), [`INSTALL.md`](file:///d:/Coding/zoro/INSTALL.md), [`CHANGELOG.md`](file:///d:/Coding/zoro/CHANGELOG.md).
+1. **Integration Audit Report:** Completed monorepo audit verifying zero broken APIs, zero dead code, and full
+   integration of mature backend engines (`@repo-intel/shared`, `@repo-intel/parser`, `@repo-intel/graph`,
+   `@repo-intel/retrieval`, `@repo-intel/ai`, `@repo-intel/review-engine`, `@repo-intel/patch-gen`,
+   `DefaultPlatformRuntime`).
+2. **Live Web UI API Connection (`apps/web`):** Connected all Next.js React components (`RepositoryDashboard`,
+   `ReviewRunner`, `FindingsExplorer`, `PatchPreviewer`, `RepoChat`, `GraphViewer`, `ProviderSelector`, `SettingsPage`,
+   `SetupWizard`) to live Fastify API Gateway endpoints (`http://localhost:3000/api/v1`).
+3. **REST API Gateway Verification (`services/api`):** Validated REST endpoints (`/repositories/status`,
+   `/repositories/scan`, `/review/run`, `/providers`, `/providers/switch`, `/chat/query`, `/patches/generate`,
+   `/graph/nodes`) in [`api-gateway.test.ts`](file:///d:/Coding/zoro/services/api/src/e2e/api-gateway.test.ts).
+4. **CLI Tool Verification (`apps/cli`):** Verified `repo-intel` terminal commands (`scan`, `review`, `chat`, `patch`,
+   `graph`, `providers`).
+5. **Ollama & OpenAI Verification:** Verified local Ollama model discovery (`llama3`, `qwen`, `mistral`, `deepseek`,
+   `codellama`, `phi`), SSE streaming, and automatic failover.
+6. **Documentation Suite:** Authored [`USER_GUIDE.md`](file:///d:/Coding/zoro/USER_GUIDE.md), [
+   `API.md`](file:///d:/Coding/zoro/API.md), [`CLI.md`](file:///d:/Coding/zoro/CLI.md), [
+   `KNOWN_ISSUES.md`](file:///d:/Coding/zoro/KNOWN_ISSUES.md), and updated [
+   `README.md`](file:///d:/Coding/zoro/README.md), [`INSTALL.md`](file:///d:/Coding/zoro/INSTALL.md), [
+   `CHANGELOG.md`](file:///d:/Coding/zoro/CHANGELOG.md).
 7. **Beta Readiness Score:** **100% Beta Ready**.
 
-8. **Sprint 1 — End-to-End Validation (`services/api`):** Verified complete workflow (Scan -> Index -> Graph -> GraphRAG -> Review -> Findings -> Patch Candidate -> Accept/Reject) via `e2e-workflow.test.ts`.
-9. **Sprint 2 — First-Time User Experience (`apps/web`):** Built interactive onboarding Setup Wizard (`setup-wizard.tsx`) detecting Git, Ollama runners, local models (`llama3`, `qwen`, `mistral`, `deepseek`, `codellama`, `phi`), OpenAI API keys, and target repo indexing.
-10. **Sprint 3 — UI Polish & Enhanced Components (`apps/web`):** Polished Dashboard (loading skeletons, health summary), Review Runner (cancel/retry, live progress), Findings Explorer (filtering, search, expandable details), Patch Previewer (side-by-side diff, risk badges), Repo Chat (history, copy, suggested prompt chips), Graph Viewer (interactive selection, relationship highlighting), and Settings (test provider connection).
-11. **Sprint 4 — Performance & Latency Benchmarks (`packages/testing`):** Added benchmark suite (`beta-performance.bench.ts`) verifying indexing latency (65ms), GraphRAG retrieval latency (12ms), review latency (180ms), and patch generation latency (18ms).
-12. **Sprint 5 — Reliability & Error Recovery (`services/api`):** Implemented error recovery middleware (`error-recovery.ts`) for resilient API failure recovery and provider failover.
-13. **Sprint 6 — Comprehensive Documentation Suite:** Authored `README.md`, `INSTALL.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, `KNOWN_LIMITATIONS.md`, and `ROADMAP.md`.
-14. **Sprint 7 — Sample Projects & Multi-Language Validation (`samples/`):** Created sample projects for Express (TypeScript) and FastAPI (Python) with multi-language parsing tests (`sample-projects.test.ts`).
-15. **Sprint 8 — Release Packaging:** Authored `RELEASE_NOTES_v0.1.0-beta.md` featuring release summary, benchmark report, and quickstart instructions.
-16. **Sprint 9 — Final Quality Gates:** 100% build pass rate (`npm run build`), 242/242 passing Vitest tests, zero unresolved bugs.
+8. **Sprint 1 — End-to-End Validation (`services/api`):** Verified complete workflow (Scan -> Index -> Graph ->
+   GraphRAG -> Review -> Findings -> Patch Candidate -> Accept/Reject) via `e2e-workflow.test.ts`.
+9. **Sprint 2 — First-Time User Experience (`apps/web`):** Built interactive onboarding Setup Wizard
+   (`setup-wizard.tsx`) detecting Git, Ollama runners, local models (`llama3`, `qwen`, `mistral`, `deepseek`,
+   `codellama`, `phi`), OpenAI API keys, and target repo indexing.
+10. **Sprint 3 — UI Polish & Enhanced Components (`apps/web`):** Polished Dashboard (loading skeletons, health summary),
+    Review Runner (cancel/retry, live progress), Findings Explorer (filtering, search, expandable details), Patch
+    Previewer (side-by-side diff, risk badges), Repo Chat (history, copy, suggested prompt chips), Graph Viewer
+    (interactive selection, relationship highlighting), and Settings (test provider connection).
+11. **Sprint 4 — Performance & Latency Benchmarks (`packages/testing`):** Added benchmark suite
+    (`beta-performance.bench.ts`) verifying indexing latency (65ms), GraphRAG retrieval latency (12ms), review latency
+    (180ms), and patch generation latency (18ms).
+12. **Sprint 5 — Reliability & Error Recovery (`services/api`):** Implemented error recovery middleware
+    (`error-recovery.ts`) for resilient API failure recovery and provider failover.
+13. **Sprint 6 — Comprehensive Documentation Suite:** Authored `README.md`, `INSTALL.md`, `CONTRIBUTING.md`,
+    `CHANGELOG.md`, `KNOWN_LIMITATIONS.md`, and `ROADMAP.md`.
+14. **Sprint 7 — Sample Projects & Multi-Language Validation (`samples/`):** Created sample projects for Express
+    (TypeScript) and FastAPI (Python) with multi-language parsing tests (`sample-projects.test.ts`).
+15. **Sprint 8 — Release Packaging:** Authored `RELEASE_NOTES_v0.1.0-beta.md` featuring release summary, benchmark
+    report, and quickstart instructions.
+16. **Sprint 9 — Final Quality Gates:** 100% build pass rate (`npm run build`), 242/242 passing Vitest tests, zero
+    unresolved bugs.
 
 17. **Phase 21A — Platform Runtime & Lifecycle (`services/api` & `@repo-intel/shared`):**
     - Introduced `PlatformRuntime` interface (`initialize()`, `shutdown()`, `health()`, `execute()`).
-    - Implemented `DefaultPlatformRuntime` managing dependency wiring, service discovery, runtime configuration, and graceful shutdown.
+    - Implemented `DefaultPlatformRuntime` managing dependency wiring, service discovery, runtime configuration, and
+      graceful shutdown.
 
 18. **Phase 21B — Internal Service Layer (`services/api`):**
-    - Implemented high-level domain services (`DefaultRepositoryService`, `DefaultReviewService`, `DefaultRetrievalService`, `DefaultPatchService`, `DefaultSessionService`, `DefaultGraphService`, `DefaultAIService`).
+    - Implemented high-level domain services (`DefaultRepositoryService`, `DefaultReviewService`,
+      `DefaultRetrievalService`, `DefaultPatchService`, `DefaultSessionService`, `DefaultGraphService`,
+      `DefaultAIService`).
 
 19. **Phase 21C — Workflow Engine (`services/api`):**
-    - Implemented `DefaultWorkflowEngine` managing deterministic, resumable, stage-gated Review, Patch, and Index workflows.
+    - Implemented `DefaultWorkflowEngine` managing deterministic, resumable, stage-gated Review, Patch, and Index
+      workflows.
 
 20. **Phase 21D — Typed Event Bus (`services/api`):**
-    - Implemented `TypedEventBus` supporting typed pub/sub event channels (`RepositoryIndexed`, `GraphUpdated`, `RetrievalCompleted`, `ReviewStarted`, `ReviewCompleted`, `PatchGenerated`, `PatchValidated`, `SessionClosed`) with correlation IDs.
+    - Implemented `TypedEventBus` supporting typed pub/sub event channels (`RepositoryIndexed`, `GraphUpdated`,
+      `RetrievalCompleted`, `ReviewStarted`, `ReviewCompleted`, `PatchGenerated`, `PatchValidated`, `SessionClosed`)
+      with correlation IDs.
 
 21. **Phase 21E — Job Queue Abstraction (`services/api`):**
     - Implemented `InMemoryJobQueue` supporting async jobs, worker execution, retries, and job status tracking.
 
 22. **Phase 21F — Observability & Diagnostics (`services/api`):**
-    - Implemented `ObservabilityManager` handling structured JSON logging, correlation IDs, execution metrics, and health diagnostics.
+    - Implemented `ObservabilityManager` handling structured JSON logging, correlation IDs, execution metrics, and
+      health diagnostics.
 
 23. **Phase 20A — AST Transformation Framework & Registry (`@repo-intel/shared` & `@repo-intel/patch-gen`):**
     - Introduced `ASTTransformation` interface (`apply()`, `validate()`, `rollback()`).
     - Implemented `TransformationRegistry` managing registration, discovery, capability lookup, and execution.
 
 24. **Phase 20B — Refactoring Library & Language Adapters (`@repo-intel/patch-gen`):**
-    - Implemented 12 deterministic refactoring transformations (`RenameSymbol`, `RenameFile`, `ExtractMethod`, `InlineMethod`, `MoveFunction`, `InsertImport`, `RemoveImport`, `UpdateSignature`, `ChangeVisibility`, `ReplaceExpression`, `AddDocumentation`, `RemoveDeadCode`).
+    - Implemented 12 deterministic refactoring transformations (`RenameSymbol`, `RenameFile`, `ExtractMethod`,
+      `InlineMethod`, `MoveFunction`, `InsertImport`, `RemoveImport`, `UpdateSignature`, `ChangeVisibility`,
+      `ReplaceExpression`, `AddDocumentation`, `RemoveDeadCode`).
     - Built language adapters for TypeScript, Python, Go, and Java.
 
 25. **Phase 20C — Patch Generation Engine & Simulation (`@repo-intel/patch-gen`):**
-    - Built `PatchGenerationEngine` performing non-destructive in-memory simulation (AST -> Transform -> Validate -> Print -> Unified Diff) producing `PatchCandidate` objects.
+    - Built `PatchGenerationEngine` performing non-destructive in-memory simulation (AST -> Transform -> Validate ->
+      Print -> Unified Diff) producing `PatchCandidate` objects.
 
 26. **Phase 20D — Validation Pipeline & Patch Scoring (`@repo-intel/patch-gen`):**
-    - Built `PatchValidationPipeline` verifying AST syntax, parser validity, lint rules, type correctness, and computing multi-factor patch scores.
+    - Built `PatchValidationPipeline` verifying AST syntax, parser validity, lint rules, type correctness, and computing
+      multi-factor patch scores.
 
 27. **Phase 20E — Explainable Patch Engine (`@repo-intel/patch-gen`):**
-    - Built `PatchExplanationEngine` producing structured explainable patch descriptions (problem summary, rationale, affected files/symbols, expected behavior, risks, verification steps).
+    - Built `PatchExplanationEngine` producing structured explainable patch descriptions (problem summary, rationale,
+      affected files/symbols, expected behavior, risks, verification steps).
 
 28. **Phase 19A — Git Intelligence Layer (`@repo-intel/shared` & `@repo-intel/review-engine`):**
-    - Introduced `GitProvider` interface (`getRepository`, `getBranches`, `getCommit`, `getDiff`, `getPullRequest`, `getChangedFiles`, `getChangedSymbols`).
-    - Implemented `LocalGitProvider` and `DiffEngine` converting raw patches into `StructuredDiff` objects (changed files, changed/added/removed methods, renamed symbols, moved files).
+    - Introduced `GitProvider` interface (`getRepository`, `getBranches`, `getCommit`, `getDiff`, `getPullRequest`,
+      `getChangedFiles`, `getChangedSymbols`).
+    - Implemented `LocalGitProvider` and `DiffEngine` converting raw patches into `StructuredDiff` objects (changed
+      files, changed/added/removed methods, renamed symbols, moved files).
 
 29. **Phase 19B — Developer Context Engine (`@repo-intel/review-engine`):**
-    - Built `DeveloperContextEngine` constructing unified `DeveloperContext` runtime objects (changed symbols, impacted symbols, dependencies, affected architecture, related documentation, related unit tests).
+    - Built `DeveloperContextEngine` constructing unified `DeveloperContext` runtime objects (changed symbols, impacted
+      symbols, dependencies, affected architecture, related documentation, related unit tests).
 
 30. **Phase 19C — Review Session Framework (`@repo-intel/shared` & `@repo-intel/review-engine`):**
-    - Introduced `ReviewSession` model and `InMemoryReviewSessionStore` tracking review execution history, participating agents, findings, patch plans, and latency metrics.
+    - Introduced `ReviewSession` model and `InMemoryReviewSessionStore` tracking review execution history, participating
+      agents, findings, patch plans, and latency metrics.
 
 31. **Phase 19D — Prompt Context Builder (`@repo-intel/review-engine`):**
     - Built `PromptContextBuilder` assembling formatted, token-budgeted prompt payloads for LLM review agents.
 
 32. **Phase 19E — Incremental Review Strategy (`@repo-intel/review-engine`):**
-    - Built `IncrementalReviewEngine` executing scoped incremental reviews on affected symbols and 1-hop dependencies when single files/symbols change.
+    - Built `IncrementalReviewEngine` executing scoped incremental reviews on affected symbols and 1-hop dependencies
+      when single files/symbols change.
 
 33. **Phase 19F — GitHub Actions Improvements (`.github/workflows/`):**
-    - Configured release workflow in `.github/workflows/release.yml` for automated release artifacts and changelog generation.
+    - Configured release workflow in `.github/workflows/release.yml` for automated release artifacts and changelog
+      generation.
 
 34. **Phase 18A — Repository Health & CI Stabilization:**
-    - Updated `.github/workflows/ci.yml` supporting `workflow_dispatch`, Node 22 LTS environment, frozen lockfile enforcement, composite typechecking, Vitest coverage artifact uploads, and npm security audit.
-    - Configured static security analysis in `.github/workflows/codeql.yml` and automated dependency updates in `.github/dependabot.yml`.
+    - Updated `.github/workflows/ci.yml` supporting `workflow_dispatch`, Node 22 LTS environment, frozen lockfile
+      enforcement, composite typechecking, Vitest coverage artifact uploads, and npm security audit.
+    - Configured static security analysis in `.github/workflows/codeql.yml` and automated dependency updates in
+      `.github/dependabot.yml`.
 
 35. **Phase 18B — AI Platform Layer (PAL) (`@repo-intel/ai`):**
     - Introduced `AIProvider` interface (`chat`, `stream`, `embeddings`, `health`, `metadata`).
     - Implemented `MockAIProvider`, `OpenAIProvider`, and `OllamaProvider`.
-    - Implemented `ProviderRegistry` (dynamic provider registration, health monitoring, automatic failover chains) and `ModelRegistry`.
+    - Implemented `ProviderRegistry` (dynamic provider registration, health monitoring, automatic failover chains) and
+      `ModelRegistry`.
     - Built `PromptTemplateManager` separating prompt templates from application logic.
 
 36. **Phase 18C — Multi-Agent Review Engine (`@repo-intel/review-engine`):**
-    - Implemented 6 decoupled specialized review agents (`ArchitectureAgent`, `BugDetectionAgent`, `PerformanceAgent`, `SecurityAgent`, `CodeQualityAgent`, `DocumentationAgent`).
-    - Implemented `AgentOrchestrator` orchestrating parallel agent execution, 10s timeouts, retries, fallback providers, and finding aggregation into standard `ExplainableFinding[]`.
+    - Implemented 6 decoupled specialized review agents (`ArchitectureAgent`, `BugDetectionAgent`, `PerformanceAgent`,
+      `SecurityAgent`, `CodeQualityAgent`, `DocumentationAgent`).
+    - Implemented `AgentOrchestrator` orchestrating parallel agent execution, 10s timeouts, retries, fallback providers,
+      and finding aggregation into standard `ExplainableFinding[]`.
 
 37. **Phase 18D — Patch Planning Engine (`@repo-intel/patch-gen`):**
-    - Implemented `PatchPlanner` generating structured `PatchPlan` objects (affected files, affected symbols, rationale, estimated complexity, dependency impact, risk score) without source code mutation.
+    - Implemented `PatchPlanner` generating structured `PatchPlan` objects (affected files, affected symbols, rationale,
+      estimated complexity, dependency impact, risk score) without source code mutation.
 
 38. **Phase 16 Architectural Improvements (`@repo-intel/retrieval` & `@repo-intel/shared`):**
     - **Retrieval Pipeline Interface:** Introduced `RetrievalPipeline` (`retrieve(query): Promise<RetrievalBundle>`).
-    - **Query Intent Model:** Built `QueryAnalyzer` classifying questions into 8 intent categories (`bug_investigation`, `architecture`, `dependency`, `performance`, `security`, `documentation`, `refactoring`, `general_search`).
-    - **Retrieval Planner:** Built `DefaultRetrievalPlanner` computing optimal `vectorK`, `maxHops`, expansion strategies, and token budget.
-    - **Graph Expansion Policies:** Built `GraphExpander` executing multi-hop walks over `CALLS`, `IMPORTS`, `EXTENDS`, `IMPLEMENTS`, and `DEPENDS_ON` edges.
-    - **Context Compression Engine:** Built `ContextCompressor` deduplicating entities, merging overlapping nodes, and enforcing token budget pruning.
-    - **Entity Provenance & Metrics:** Tracked `EntityRetrievalProvenance` and recorded stage latency metrics (`RetrievalMetrics`).
+    - **Query Intent Model:** Built `QueryAnalyzer` classifying questions into 8 intent categories (`bug_investigation`,
+      `architecture`, `dependency`, `performance`, `security`, `documentation`, `refactoring`, `general_search`).
+    - **Retrieval Planner:** Built `DefaultRetrievalPlanner` computing optimal `vectorK`, `maxHops`, expansion
+      strategies, and token budget.
+    - **Graph Expansion Policies:** Built `GraphExpander` executing multi-hop walks over `CALLS`, `IMPORTS`, `EXTENDS`,
+      `IMPLEMENTS`, and `DEPENDS_ON` edges.
+    - **Context Compression Engine:** Built `ContextCompressor` deduplicating entities, merging overlapping nodes, and
+      enforcing token budget pruning.
+    - **Entity Provenance & Metrics:** Tracked `EntityRetrievalProvenance` and recorded stage latency metrics
+      (`RetrievalMetrics`).
     - **Standardized Agent Payload:** Created `RetrievalBundle` payload model for downstream AI review agents.
 
 39. **GraphRAG Retrieval Engine (`@repo-intel/retrieval`):**
-    - Implemented `GraphRAGRetrievalEngine` orchestrating intent analysis, retrieval planning, vector search, multi-hop graph expansion, context compression, score ranking, and retrieval bundle payload generation.
+    - Implemented `GraphRAGRetrievalEngine` orchestrating intent analysis, retrieval planning, vector search, multi-hop
+      graph expansion, context compression, score ranking, and retrieval bundle payload generation.
 
 #### Objectives Achieved
 
 1. **Phase 15 Architectural Improvements (`@repo-intel/retrieval`):**
-   - **Embedding Provider Abstraction:** Defined `EmbeddingProvider` (`embed`, `embedBatch`, `dimensions`, `model`) and implemented `MockEmbeddingProvider` (128-d deterministic vectors).
-   - **Rich Context Builder:** Built `ContextBuilder` extracting text representations for `Repository`, `File`, `Symbol`, and `Module` graph entities incorporating names, signatures, documentation, modifiers, imports, and 1-hop graph neighbourhoods.
-   - **Vector Store Abstraction:** Defined `VectorStore` (`upsert`, `search`, `delete`, `get`) and implemented `InMemoryVectorStore` with cosine similarity math and metadata filtering (`language`, `repositoryId`, `kind`).
-   - **Embedding Metadata Model:** Defined `EmbeddingMetadata` (`provider`, `model`, `dimensions`, `graphVersion`, `contentHash`, `createdAt`).
-   - **Incremental Embedding Engine:** Built `IncrementalEmbeddingEngine` regenerating embeddings only for modified graph entities.
-   - **Search Ranking Service:** Built `RankingService` combining vector similarity ($w_v = 0.50$), graph proximity ($w_g = 0.25$), lexical relevance ($w_l = 0.15$), and symbol importance ($w_i = 0.10$).
+    - **Embedding Provider Abstraction:** Defined `EmbeddingProvider` (`embed`, `embedBatch`, `dimensions`, `model`) and
+      implemented `MockEmbeddingProvider` (128-d deterministic vectors).
+    - **Rich Context Builder:** Built `ContextBuilder` extracting text representations for `Repository`, `File`,
+      `Symbol`, and `Module` graph entities incorporating names, signatures, documentation, modifiers, imports, and
+      1-hop graph neighbourhoods.
+    - **Vector Store Abstraction:** Defined `VectorStore` (`upsert`, `search`, `delete`, `get`) and implemented
+      `InMemoryVectorStore` with cosine similarity math and metadata filtering (`language`, `repositoryId`, `kind`).
+    - **Embedding Metadata Model:** Defined `EmbeddingMetadata` (`provider`, `model`, `dimensions`, `graphVersion`,
+      `contentHash`, `createdAt`).
+    - **Incremental Embedding Engine:** Built `IncrementalEmbeddingEngine` regenerating embeddings only for modified
+      graph entities.
+    - **Search Ranking Service:** Built `RankingService` combining vector similarity ($w_v = 0.50$), graph proximity
+      ($w_g = 0.25$), lexical relevance ($w_l = 0.15$), and symbol importance ($w_i = 0.10$).
 
 2. **Embedding Pipeline & Semantic Search Engine (`@repo-intel/retrieval`):**
-   - Implemented `EmbeddingPipeline` orchestrating context construction, vector generation, and vector store upserting across all graph entity kinds.
-   - Implemented `SemanticSearchEngine` (`searchVector`) executing top-k semantic vector searches with score reranking and metadata filtering.
+    - Implemented `EmbeddingPipeline` orchestrating context construction, vector generation, and vector store upserting
+      across all graph entity kinds.
+    - Implemented `SemanticSearchEngine` (`searchVector`) executing top-k semantic vector searches with score reranking
+      and metadata filtering.
 
 #### Objectives Achieved B
 
 1. **Phase 14 Architectural Improvements:**
-   - **Language Capability Registry:** Implemented `LanguageCapabilityRegistry` (`supportsClasses`, `supportsInterfaces`, `supportsInheritance`, `supportsGenerics`, `supportsAsync`, `supportsStructs`, `supportsNamespaces`).
-   - **Symbol Fingerprints:** Implemented `generateSymbolFingerprint()` for rename detection and duplicate identification.
-   - **Modular Type & Module Resolvers:** Created `DefaultTypeResolver` and `DefaultModuleResolver` decoupled from extractors.
-   - **Resolution Cache:** Built `ResolutionCache` tracking hit/miss ratios for fast resolution in monorepos.
+    - **Language Capability Registry:** Implemented `LanguageCapabilityRegistry` (`supportsClasses`,
+      `supportsInterfaces`, `supportsInheritance`, `supportsGenerics`, `supportsAsync`, `supportsStructs`,
+      `supportsNamespaces`).
+    - **Symbol Fingerprints:** Implemented `generateSymbolFingerprint()` for rename detection and duplicate
+      identification.
+    - **Modular Type & Module Resolvers:** Created `DefaultTypeResolver` and `DefaultModuleResolver` decoupled from
+      extractors.
+    - **Resolution Cache:** Built `ResolutionCache` tracking hit/miss ratios for fast resolution in monorepos.
 
 2. **Graph Enrichment Engine (`@repo-intel/graph`):**
-   - Implemented `GraphEnricher` performing multi-pass graph enrichment (resolving `IMPORTS` to target file nodes, computing inheritance chains and `OVERRIDES` edges).
-   - Attached `GraphProvenance` metadata (`extractor`, `language`, `evidence`, `confidence`, `timestamp`) to enriched edges.
+    - Implemented `GraphEnricher` performing multi-pass graph enrichment (resolving `IMPORTS` to target file nodes,
+      computing inheritance chains and `OVERRIDES` edges).
+    - Attached `GraphProvenance` metadata (`extractor`, `language`, `evidence`, `confidence`, `timestamp`) to enriched
+      edges.
 
 3. **Cross-Language Resolution Engine (`@repo-intel/graph`):**
-   - Implemented `CrossLanguageResolver` attaching `concept` properties (`ClassLike`, `FunctionLike`, `InterfaceLike`, `EnumLike`, `ModuleLike`) to symbol nodes.
+    - Implemented `CrossLanguageResolver` attaching `concept` properties (`ClassLike`, `FunctionLike`, `InterfaceLike`,
+      `EnumLike`, `ModuleLike`) to symbol nodes.
 
 #### Objectives Achieved C
 
 1. **Python Symbol Extractor** (`packages/parser/src/extractors/py-extractor.ts`):
-   - Implemented `PythonExtractor` handling Python class definitions, methods, top-level functions, `async def` definitions, return types, parameters, docstrings (`"""..."""`), `import`/`import_from` statements, and export visibility.
+    - Implemented `PythonExtractor` handling Python class definitions, methods, top-level functions, `async def`
+      definitions, return types, parameters, docstrings (`"""..."""`), `import`/`import_from` statements, and export
+      visibility.
 
 2. **Go Symbol Extractor** (`packages/parser/src/extractors/go-extractor.ts`):
-   - Implemented `GoExtractor` handling package declarations, functions, receiver methods (`func (s *Service) Handle()`), structs, interfaces, package import declarations, doc comments (`// ...`), and Go capital letter export detection (`[A-Z]...`).
+    - Implemented `GoExtractor` handling package declarations, functions, receiver methods
+      (`func (s *Service) Handle()`), structs, interfaces, package import declarations, doc comments (`// ...`), and Go
+      capital letter export detection (`[A-Z]...`).
 
 3. **Java Symbol Extractor** (`packages/parser/src/extractors/java-extractor.ts`):
-   - Implemented `JavaExtractor` handling package declarations, `class`, `interface`, `enum` declarations, methods, constructors, visibility modifiers (`public`, `private`, `protected`, `static`, `abstract`), JavaDoc comments (`/** ... */`), and import statements (`import java.util.List`).
+    - Implemented `JavaExtractor` handling package declarations, `class`, `interface`, `enum` declarations, methods,
+      constructors, visibility modifiers (`public`, `private`, `protected`, `static`, `abstract`), JavaDoc comments
+      (`/** ... */`), and import statements (`import java.util.List`).
 
 4. **Multi-Language Query Registry & Tests:**
-   - Pre-populated Python, Go, and Java S-expression query manifests in `QueryRegistry`.
-   - Added 18 new unit tests across `py-extractor.test.ts`, `go-extractor.test.ts`, and `java-extractor.test.ts` (156/156 monorepo tests passing).
+    - Pre-populated Python, Go, and Java S-expression query manifests in `QueryRegistry`.
+    - Added 18 new unit tests across `py-extractor.test.ts`, `go-extractor.test.ts`, and `java-extractor.test.ts`
+      (156/156 monorepo tests passing).
 
 #### Objectives Achieved D
 
 1. **Phase 12 Architectural Improvements:**
-   - **Stable Symbol Identity:** Implemented `buildSymbolId(repoId, filePath, name, parentName, signature)` utility in `@repo-intel/shared`.
-   - **Source Location Model:** Extended `Location` interface with `startByte` and `endByte` properties.
-   - **Structured Documentation Model:** Introduced `SymbolDoc` interface (`summary`, `parameters`, `returns`, `examples`, `throws`, `deprecated`) and parsed JSDoc blocks in `TypeScriptExtractor`.
-   - **Extraction Diagnostics:** Added `ParseDiagnostic[]` emissions to `ExtractedFileSymbols` tracking parse recovery, skipped nodes, and syntax warnings.
-   - **Query Registry:** Created `QueryRegistry` (`packages/parser/src/treesitter/query-registry.ts`) loading and caching S-expression queries by language and query type.
-   - **Incremental Extraction:** Integrated `IncrementalExtractor` with `DeltaEngine` and `JsonRepositoryStateStore` to bypass re-parsing unchanged files.
+    - **Stable Symbol Identity:** Implemented `buildSymbolId(repoId, filePath, name, parentName, signature)` utility in
+      `@repo-intel/shared`.
+    - **Source Location Model:** Extended `Location` interface with `startByte` and `endByte` properties.
+    - **Structured Documentation Model:** Introduced `SymbolDoc` interface (`summary`, `parameters`, `returns`,
+      `examples`, `throws`, `deprecated`) and parsed JSDoc blocks in `TypeScriptExtractor`.
+    - **Extraction Diagnostics:** Added `ParseDiagnostic[]` emissions to `ExtractedFileSymbols` tracking parse recovery,
+      skipped nodes, and syntax warnings.
+    - **Query Registry:** Created `QueryRegistry` (`packages/parser/src/treesitter/query-registry.ts`) loading and
+      caching S-expression queries by language and query type.
+    - **Incremental Extraction:** Integrated `IncrementalExtractor` with `DeltaEngine` and `JsonRepositoryStateStore` to
+      bypass re-parsing unchanged files.
 
 2. **Semantic Relationship Extraction Engine** (`packages/parser/src/extractors/relationship-extractor.ts`):
-   - Defined language-independent `SemanticRelationship` domain contract (`CONTAINS`, `CALLS`, `IMPORTS`, `EXPORTS`, `REFERENCES`, `IMPLEMENTS`, `EXTENDS`, `USES`, `DEPENDS_ON`, `OVERRIDES`).
-   - Implemented `RelationshipExtractor` mapping AST symbol hierarchies, inheritance, call signatures, and module imports to semantic relationships.
+    - Defined language-independent `SemanticRelationship` domain contract (`CONTAINS`, `CALLS`, `IMPORTS`, `EXPORTS`,
+      `REFERENCES`, `IMPLEMENTS`, `EXTENDS`, `USES`, `DEPENDS_ON`, `OVERRIDES`).
+    - Implemented `RelationshipExtractor` mapping AST symbol hierarchies, inheritance, call signatures, and module
+      imports to semantic relationships.
 
 3. **Knowledge Graph Engine & Storage Abstraction** (`packages/graph/`):
-   - Defined database-decoupled `GraphStore` interface (`addNode`, `addEdge`, `removeNode`, `removeEdge`, `getNode`, `getEdge`, `queryNodes`, `queryEdges`, `commit`, `clear`).
-   - Implemented in-memory Map-backed `InMemoryGraphStore` with indexed lookup methods.
-   - Implemented `KnowledgeGraphBuilder` constructing normalized graph entities (`Repository`, `Directory`, `File`, `Symbol`, `Module`) and directional edges (`CONTAINS`, `IMPORTS`, `EXPORTS`, `CALLS`, `EXTENDS`, `IMPLEMENTS`, `DEPENDS_ON`).
-   - Implemented incremental graph update algorithm (`updateGraphDelta`) purging deleted/modified file subgraphs and appending updated delta nodes/edges.
-   - Implemented graph serialization (`exportGraphJson`, `importGraphJson`).
+    - Defined database-decoupled `GraphStore` interface (`addNode`, `addEdge`, `removeNode`, `removeEdge`, `getNode`,
+      `getEdge`, `queryNodes`, `queryEdges`, `commit`, `clear`).
+    - Implemented in-memory Map-backed `InMemoryGraphStore` with indexed lookup methods.
+    - Implemented `KnowledgeGraphBuilder` constructing normalized graph entities (`Repository`, `Directory`, `File`,
+      `Symbol`, `Module`) and directional edges (`CONTAINS`, `IMPORTS`, `EXPORTS`, `CALLS`, `EXTENDS`, `IMPLEMENTS`,
+      `DEPENDS_ON`).
+    - Implemented incremental graph update algorithm (`updateGraphDelta`) purging deleted/modified file subgraphs and
+      appending updated delta nodes/edges.
+    - Implemented graph serialization (`exportGraphJson`, `importGraphJson`).
 
 4. **Testing, Benchmarks & ADRs:**
-   - Added 16 unit tests across `relationship-extractor.test.ts`, `in-memory-graph-store.test.ts`, `knowledge-graph-builder.test.ts`, `graph-serialization.test.ts` (138/138 monorepo tests passing).
-   - Created benchmark scaffolding (`graph.bench.ts`) verifying sub-100ms processing for 1,000 nodes / 2,000 edges.
-   - Authored **ADR-022: Knowledge Graph Abstraction and Storage Strategy** in `decisions.md`.
+    - Added 16 unit tests across `relationship-extractor.test.ts`, `in-memory-graph-store.test.ts`,
+      `knowledge-graph-builder.test.ts`, `graph-serialization.test.ts` (138/138 monorepo tests passing).
+    - Created benchmark scaffolding (`graph.bench.ts`) verifying sub-100ms processing for 1,000 nodes / 2,000 edges.
+    - Authored **ADR-022: Knowledge Graph Abstraction and Storage Strategy** in `decisions.md`.
 
 #### Objectives Achieved E
 
 1. **Symbol Extractor Abstraction** (`packages/parser/src/extractors/extractor.interface.ts`):
-   - Defined `SymbolExtractor` interface (`languageId`, `supportedExtensions`, `extract(tree, filePath): ExtractedFileSymbols`).
-   - Standardized `ExtractedFileSymbols` payload structure returning `symbols: SymbolNode[]`, `imports: ImportStatement[]`, `exports: string[]`, `loc: number`.
+    - Defined `SymbolExtractor` interface (`languageId`, `supportedExtensions`,
+      `extract(tree, filePath): ExtractedFileSymbols`).
+    - Standardized `ExtractedFileSymbols` payload structure returning `symbols: SymbolNode[]`,
+      `imports: ImportStatement[]`, `exports: string[]`, `loc: number`.
 
 2. **TypeScript & JavaScript S-Expression Query Manifest** (`packages/parser/queries/typescript/symbols.scm`):
-   - Extended queries for functions, arrow functions, classes, methods, interfaces, type aliases, enums, imports, and exports.
+    - Extended queries for functions, arrow functions, classes, methods, interfaces, type aliases, enums, imports, and
+      exports.
 
 3. **TypeScript Extractor Implementation** (`packages/parser/src/extractors/ts-extractor.ts`):
-   - Built `TypeScriptExtractor` handling function declarations, arrow function variable declarators, class declarations, interface declarations, type aliases, enums, constructor/method signatures, modifiers (`export`, `async`, `public`, `private`, `protected`, `static`), JSDoc docstrings, named/default/wildcard imports, and exports.
+    - Built `TypeScriptExtractor` handling function declarations, arrow function variable declarators, class
+      declarations, interface declarations, type aliases, enums, constructor/method signatures, modifiers (`export`,
+      `async`, `public`, `private`, `protected`, `static`), JSDoc docstrings, named/default/wildcard imports, and
+      exports.
 
 4. **Tests & Barrels** (`packages/parser/src/extractors/ts-extractor.test.ts`, `index.ts`):
-   - Added 14 unit tests verifying symbol node IDs, kind classification, signatures, docstrings, imports, exports, and empty tree handling.
-   - Exported extractor module from `@repo-intel/parser`.
+    - Added 14 unit tests verifying symbol node IDs, kind classification, signatures, docstrings, imports, exports, and
+      empty tree handling.
+    - Exported extractor module from `@repo-intel/parser`.
 
 #### Objectives Achieved F
 
 1. **Phase 10 Improvements:**
-   - Hardened `RepositoryState`, `DeltaResult`, and `RepositorySnapshot` with full `readonly` modifiers.
-   - Added `DeltaSummaryStatistics` to `DeltaResult` exposing `addedCount`, `modifiedCount`, `deletedCount`, `totalChangedFiles`.
-   - Added `createdAt: string` to `RepositorySnapshot` for snapshot immutability tracking.
-   - Expanded `ScannerEventEmitter` with 5 new events: `FileQueued`, `FileParsingStarted`, `FileParsingCompleted`, `ParseFailed`, `RepositoryIndexed`, `RepositoryCompleted`.
-   - Extended `LanguagePlugin` interface with `capabilities`, `queryDirectory`, `grammarId`, and `normalize`/`createParser` stubs.
+    - Hardened `RepositoryState`, `DeltaResult`, and `RepositorySnapshot` with full `readonly` modifiers.
+    - Added `DeltaSummaryStatistics` to `DeltaResult` exposing `addedCount`, `modifiedCount`, `deletedCount`,
+      `totalChangedFiles`.
+    - Added `createdAt: string` to `RepositorySnapshot` for snapshot immutability tracking.
+    - Expanded `ScannerEventEmitter` with 5 new events: `FileQueued`, `FileParsingStarted`, `FileParsingCompleted`,
+      `ParseFailed`, `RepositoryIndexed`, `RepositoryCompleted`.
+    - Extended `LanguagePlugin` interface with `capabilities`, `queryDirectory`, `grammarId`, and `normalize`/
+      `createParser` stubs.
 
 2. **AST Domain Layer** (`packages/shared/src/types/ast-domain.types.ts`):
-   - `ASTRange`, `ASTNode`, `ASTTree`, `ASTCursor`, `ASTVisitor<T>`, `ASTQuery`, `ASTQueryMatch`, `ASTQueryCapture`.
-   - `NormalizedSymbol`, `ParseDiagnostic`, `ParseResult<T>` normalized symbol types.
-   - `SymbolKind` extended in `ast.types.ts` with `constant`, `annotation`, `comment`, `module`, `unknown`.
+    - `ASTRange`, `ASTNode`, `ASTTree`, `ASTCursor`, `ASTVisitor<T>`, `ASTQuery`, `ASTQueryMatch`, `ASTQueryCapture`.
+    - `NormalizedSymbol`, `ParseDiagnostic`, `ParseResult<T>` normalized symbol types.
+    - `SymbolKind` extended in `ast.types.ts` with `constant`, `annotation`, `comment`, `module`, `unknown`.
 
 3. **Grammar Registry** (`packages/parser/src/treesitter/grammar-registry.ts`):
-   - `GrammarEntry` with id, languageId, WASM path, version, capabilities, isLoaded flag.
-   - `GrammarRegistry` class with register/get/getByLanguageId/markLoaded/listRegistered/clear.
-   - `createDefaultGrammarRegistry()` factory pre-populating 6 core language grammars.
+    - `GrammarEntry` with id, languageId, WASM path, version, capabilities, isLoaded flag.
+    - `GrammarRegistry` class with register/get/getByLanguageId/markLoaded/listRegistered/clear.
+    - `createDefaultGrammarRegistry()` factory pre-populating 6 core language grammars.
 
 4. **Parser Pool** (`packages/parser/src/treesitter/parser-pool.ts`):
-   - Generic `ParserPool<T extends Poolable>` with acquire/release/disposeAll/idleCount/activeCount.
-   - Idle timeout eviction, overflow handling, factory-based instance creation.
+    - Generic `ParserPool<T extends Poolable>` with acquire/release/disposeAll/idleCount/activeCount.
+    - Idle timeout eviction, overflow handling, factory-based instance creation.
 
 5. **TreeSitterManager** (`packages/parser/src/treesitter/tree-sitter-manager.ts`):
-   - Central manager coordinating grammar registry and parser pool.
-   - Async `parse(source, languageId): Promise<ASTTree>` via placeholder binding (Phase 12+ for real WASM).
-   - `initialize()`, `supportsLanguage()`, `getPoolStats()`, `dispose()` lifecycle API.
+    - Central manager coordinating grammar registry and parser pool.
+    - Async `parse(source, languageId): Promise<ASTTree>` via placeholder binding (Phase 12+ for real WASM).
+    - `initialize()`, `supportsLanguage()`, `getPoolStats()`, `dispose()` lifecycle API.
 
 6. **AST Normalizer** (`packages/parser/src/treesitter/ast-normalizer.ts`):
-   - `normalizeTree(tree, languageId): NormalizedSymbol[]` interface-level implementation.
-   - Node type → SymbolKind inference mapping.
+    - `normalizeTree(tree, languageId): NormalizedSymbol[]` interface-level implementation.
+    - Node type → SymbolKind inference mapping.
 
 7. **Query Infrastructure** (`packages/parser/queries/`):
-   - Documented S-expression placeholder queries for TypeScript, Python, Go, Java, Rust.
+    - Documented S-expression placeholder queries for TypeScript, Python, Go, Java, Rust.
 
 8. **Tests & Benchmarks:**
-   - `treesitter.test.ts` — 16 unit tests covering GrammarRegistry, ParserPool, TreeSitterManager, and AST normalizer.
-   - `treesitter.bench.ts` — Benchmark scaffolding: parser creation vs. pool reuse, parse throughput.
+    - `treesitter.test.ts` — 16 unit tests covering GrammarRegistry, ParserPool, TreeSitterManager, and AST normalizer.
+    - `treesitter.bench.ts` — Benchmark scaffolding: parser creation vs. pool reuse, parse throughput.
 
 9. **Documentation:**
-   - Added ADR-018 through ADR-021 to `decisions.md`.
-   - Updated `phases.md` Phase 11 status to Complete.
+    - Added ADR-018 through ADR-021 to `decisions.md`.
+    - Updated `phases.md` Phase 11 status to Complete.
 
 ---
 
@@ -294,8 +397,11 @@ decisions.md
 ### 2026-07-22
 
 - **Phase:** Phase 10: Incremental Indexer & SHA-256 State Tracker
-- **Feature:** Repository State Store abstraction (`JsonRepositoryStateStore`), metadata hash short-circuit optimization, modular framework detectors with confidence scores, `RepositoryFacts` domain model, language plugin interfaces, event-driven scanner emitter, unit tests (74 passing), benchmark scaffolding, and ADR-020.
-- **Summary:** Completed Phase 09 improvements and Phase 10 Repository State Store & Incremental Indexer in `@repo-intel/parser` and `@repo-intel/shared`. Verified with 74 passing Vitest unit tests across the workspace.
+- **Feature:** Repository State Store abstraction (`JsonRepositoryStateStore`), metadata hash short-circuit
+  optimization, modular framework detectors with confidence scores, `RepositoryFacts` domain model, language plugin
+  interfaces, event-driven scanner emitter, unit tests (74 passing), benchmark scaffolding, and ADR-020.
+- **Summary:** Completed Phase 09 improvements and Phase 10 Repository State Store & Incremental Indexer in
+  `@repo-intel/parser` and `@repo-intel/shared`. Verified with 74 passing Vitest unit tests across the workspace.
 
 ---
 
@@ -303,7 +409,8 @@ decisions.md
 
 ### Phase 11: Tree-Sitter Parser Abstraction Manager
 
-- **Goal:** Create unified Tree-Sitter parser manager interface in `packages/parser/src/treesitter/` pooling instances and managing grammar load cycles.
+- **Goal:** Create unified Tree-Sitter parser manager interface in `packages/parser/src/treesitter/` pooling instances
+  and managing grammar load cycles.
 - **Dependencies:** Phase 10.
 
 ---
@@ -376,7 +483,7 @@ decisions.md
 ## Active Decisions
 
 | Decision                                   | Reason                                                                                                          | Alternatives Considered                          | Date       | Status   |
-| :----------------------------------------- | :-------------------------------------------------------------------------------------------------------------- | :----------------------------------------------- | :--------- | :------- |
+|:-------------------------------------------|:----------------------------------------------------------------------------------------------------------------|:-------------------------------------------------|:-----------|:---------|
 | **pnpm Monorepo Workspace**                | Fast, deterministic disk-space efficient package management for multi-package architecture.                     | npm workspaces, Yarn v4                          | 2026-07-22 | Accepted |
 | **Embedded Graph Storage (KùzuDB)**        | In-process high performance graph DB requiring no external service setup for local users.                       | Neo4j, Memgraph                                  | 2026-07-22 | Accepted |
 | **Vanilla CSS over Tailwind for Web Core** | High customizability without utility class bloat when implementing specialized glassmorphism & 3D graph shells. | TailwindCSS v3/v4                                | 2026-07-22 | Accepted |
@@ -387,7 +494,7 @@ decisions.md
 ## Open Questions
 
 | Priority   | Owner            | Question / Description                                                                                      | Notes                                      | Status |
-| :--------- | :--------------- | :---------------------------------------------------------------------------------------------------------- | :----------------------------------------- | :----- |
+|:-----------|:-----------------|:------------------------------------------------------------------------------------------------------------|:-------------------------------------------|:-------|
 | **Medium** | Engineering Lead | Should KùzuDB native bindings be compiled as WASM for browser preview mode or kept exclusively backend/CLI? | Investigate in Phase 17.                   | Open   |
 | **Low**    | DevOps Team      | Optimal default token budget threshold for local Ollama models vs cloud GPT-4o models.                      | Test token pruning benchmarks in Phase 25. | Open   |
 
@@ -402,7 +509,7 @@ _No known runtime issues currently logged (project in initialization phase)._
 ## Technical Debt
 
 | Reason                                                           | Priority | Estimated Effort | When to Address     |
-| :--------------------------------------------------------------- | :------- | :--------------- | :------------------ |
+|:-----------------------------------------------------------------|:---------|:-----------------|:--------------------|
 | Single-file placeholder workspace configs pending full packaging | Low      | 0.5 days         | Phase 01 completion |
 
 ---
@@ -410,7 +517,7 @@ _No known runtime issues currently logged (project in initialization phase)._
 ## Recent File Changes
 
 | Path                                                        | Reason                                   | Date       | Status   |
-| :---------------------------------------------------------- | :--------------------------------------- | :--------- | :------- |
+|:------------------------------------------------------------|:-----------------------------------------|:-----------|:---------|
 | [`prd.md`](file:///d:/Coding/zoro/prd.md)                   | Initial product requirements definition  | 2026-07-22 | Complete |
 | [`architecture.md`](file:///d:/Coding/zoro/architecture.md) | Technical system architecture design     | 2026-07-22 | Complete |
 | [`rules.md`](file:///d:/Coding/zoro/rules.md)               | Engineering standards & coding rules     | 2026-07-22 | Complete |
@@ -435,7 +542,8 @@ _No known runtime issues currently logged (project in initialization phase)._
 
 ### Core Architectural Assumptions
 
-- **Monorepo structure:** `apps/` (web, cli, vscode), `packages/` (common, parser, graph, ai, agents, review-engine, patch-gen).
+- **Monorepo structure:** `apps/` (web, cli, vscode), `packages/` (common, parser, graph, ai, agents, review-engine,
+  patch-gen).
 - **Deterministic first:** AST parsing and Knowledge Graph traversal execute before sending context to LLMs.
 - **PAL Isolation:** AI Provider Abstraction Layer (`packages/ai`) encapsulates model vendor API differences.
 
@@ -473,13 +581,16 @@ _No active blockers._
 
 ### Handoff Summary
 
-- **What was completed:** Comprehensive documentation suite (`prd.md`, `architecture.md`, `rules.md`, `design.md`, `phases.md`) and persistent state memory (`memory.md`) created and aligned.
-- **What should be done next:** Begin **Phase 01: Monorepo & Workspace Initialization**. Create root `package.json`, `pnpm-workspace.yaml`, and `tsconfig.base.json`.
+- **What was completed:** Comprehensive documentation suite (`prd.md`, `architecture.md`, `rules.md`, `design.md`,
+  `phases.md`) and persistent state memory (`memory.md`) created and aligned.
+- **What should be done next:** Begin **Phase 01: Monorepo & Workspace Initialization**. Create root `package.json`,
+  `pnpm-workspace.yaml`, and `tsconfig.base.json`.
 - **Files to open first:**
-  1. [`rules.md`](file:///d:/Coding/zoro/rules.md)
-  2. [`phases.md`](file:///d:/Coding/zoro/phases.md#L40) (Phase 01 task details)
-  3. [`memory.md`](file:///d:/Coding/zoro/memory.md)
-- **Key Pitfalls / Warnings:** Ensure `pnpm` workspace syntax matches pnpm v8+ specifications. Do not install global dependencies inside individual package subdirectories.
+    1. [`rules.md`](file:///d:/Coding/zoro/rules.md)
+    2. [`phases.md`](file:///d:/Coding/zoro/phases.md#L40) (Phase 01 task details)
+    3. [`memory.md`](file:///d:/Coding/zoro/memory.md)
+- **Key Pitfalls / Warnings:** Ensure `pnpm` workspace syntax matches pnpm v8+ specifications. Do not install global
+  dependencies inside individual package subdirectories.
 
 ---
 

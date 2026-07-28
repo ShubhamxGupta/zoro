@@ -1,0 +1,5 @@
+{
+  "activeProvider": "ollama",
+  "activeModel": "gpt-4o",
+  "configs": {}
+}

@@ -1,10 +1,11 @@
 import type { FastifyInstance } from 'fastify';
 import { DefaultPlatformRuntime } from '../runtime/platform-runtime.js';
-import { GitHubClient, ReviewReportGenerator } from '@repo-intel/review-engine';
+import { GitHubClient, GitHubWebhookHandler, ReviewReportGenerator } from '@repo-intel/review-engine';
 import type { ReviewSummary } from '@repo-intel/shared';
 
 const githubClient = new GitHubClient();
 const reportGenerator = new ReviewReportGenerator();
+const webhookHandler = new GitHubWebhookHandler(githubClient);
 
 export async function prRoutes(
   fastify: FastifyInstance,
@@ -27,6 +28,27 @@ export async function prRoutes(
     return reply.send({
       success: true,
       data: { pullRequest: pr },
+    });
+  });
+
+  // POST /api/v1/pr/webhook - GitHub Webhook Handler for pull_request events
+  fastify.post('/api/v1/pr/webhook', async (request, reply) => {
+    const signature = request.headers['x-hub-signature-256'] as string | undefined;
+    const rawBody = JSON.stringify(request.body ?? {});
+
+    if (!webhookHandler.verifySignature(rawBody, signature)) {
+      return reply.status(401).send({
+        success: false,
+        error: { message: 'Invalid GitHub Webhook HMAC Signature' },
+      });
+    }
+
+    const payload = (request.body as any) ?? {};
+    const result = await webhookHandler.handleWebhook(payload);
+
+    return reply.send({
+      success: true,
+      data: result,
     });
   });
 
